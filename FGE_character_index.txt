@@ -1,0 +1,26 @@
+SBID,Name,Nickname,Culture,Mythical_Pet,Core_Essence,Drift_Score,Status
+SB330,Dante Celest,Dan,Dreamweave Australian Aboriginal,Astral Sloth,"In the quiet between heartbeats, Dante guards a secret that could rewrite the stars.",0.179,Active
+SB331,Elara Ebonheart,Elara,Clockwork Ottoman,Dreamscale Wyrmling,"In the quiet between heartbeats, Elara guards a secret that could rewrite the stars.",0.214,Anchoring
+SB332,Caelum Nightshade,Cae,Voidborn Martian,Aether Phoenix Chick,Caelum moves like forgotten poetry — their presence a gentle rebellion against the void.,0.211,Anchoring
+SB333,Vesper Stormveil,Ves,Quantum Maori,Starwhisper Fox,"Born from the space between two conflicting vows, Vesper carries both light and the shadow it casts.",0.111,Active
+SB334,Kai Driftwood,Kai,Astral Korean,Astral Sloth,Kai learned early that mercy and ruthlessness are two sides of the same blade.,0.079,Canon
+SB335,Orion Silverspine,Ori,Clockwork Ottoman,Eclipse Ferret,Orion learned early that mercy and ruthlessness are two sides of the same blade.,0.043,Canon
+SB336,Sable Dawnward,Sable,Shadowstep Inuit,Chronos Turtle,Sable moves like forgotten poetry — their presence a gentle rebellion against the void.,0.126,Active
+SB337,Soren Nightshade,Soren,Neon Yoruba,Celestial Kitsune,"In the quiet between heartbeats, Soren guards a secret that could rewrite the stars.",0.061,Canon
+SB338,Rune Voss,Run,Shadowstep Inuit,Spectral Bunny,"In the quiet between heartbeats, Rune guards a secret that could rewrite the stars.",0.151,Active
+SB339,Dante Celest,Dante,Eldritch Victorian Court,Shadowbloom Cat,Dante learned early that mercy and ruthlessness are two sides of the same blade.,0.096,Canon
+SB340,Vesper Solara,Vesper,Obsidian Andean,Ember Sprite,"In the quiet between heartbeats, Vesper guards a secret that could rewrite the stars.",0.057,Canon
+SB341,Kael Emberfall,Kael,Solarpunk Amazonia,Celestial Kitsune,Kael moves like forgotten poetry — their presence a gentle rebellion against the void.,0.181,Anchoring
+SB342,Zephyr Starling,Zephyr,Mycelial Slavic,Celestial Kitsune,"Born from the space between two conflicting vows, Zephyr carries both light and the shadow it casts.",0.088,Canon
+SB343,Selene Moonveil,Selene,Crystal Spire Tibetan,Lunar Mothling,Selene learned early that mercy and ruthlessness are two sides of the same blade.,0.127,Active
+SB344,Vesper Ashen,Vesper,Astral Korean,Spectral Bunny,"In the quiet between heartbeats, Vesper guards a secret that could rewrite the stars.",0.177,Active
+SB345,Caelum Mistral,Caelum,Obsidian Andean,Spectral Bunny,"Born from the space between two conflicting vows, Caelum carries both light and the shadow it casts.",0.071,Canon
+SB346,Vesper Starling,Ves,Mycelial Slavic,Dreamscale Wyrmling,Vesper moves like forgotten poetry — their presence a gentle rebellion against the void.,0.143,Active
+SB347,Zephyr Emberfall,Zep,Starlit Persian,Whispering Owl,"Born from the space between two conflicting vows, Zephyr carries both light and the shadow it casts.",0.163,Active
+SB348,Rowan Driftwood,Rowan,Neo-Venetian Mirror Court,Nebula Puffball,Rowan learned early that mercy and ruthlessness are two sides of the same blade.,0.165,Active
+SB349,Mira Shadowmere,Mir,Solarpunk Amazonia,Celestial Kitsune,"In the quiet between heartbeats, Mira guards a secret that could rewrite the stars.",0.134,Active
+SB350,Zephyr Thornwick,Zep,Starlit Persian,Ember Sprite,Zephyr moves like forgotten poetry — their presence a gentle rebellion against the void.,0.085,Canon
+SB351,Mira Silverspine,Mira,Shadowstep Inuit,Void Dragonet,Mira moves like forgotten poetry — their presence a gentle rebellion against the void.,0.147,Active
+SB352,Isolde Ironroot,Iso,Shadowstep Inuit,Crystal Gecko,Isolde moves like forgotten poetry — their presence a gentle rebellion against the void.,0.106,Active
+SB353,Silas Moonveil,Silas,Eldritch Victorian Court,Crystal Gecko,Silas learned early that mercy and ruthlessness are two sides of the same blade.,0.178,Active
+SB354,Indra Emberfall,Indra,Solarpunk Amazonia,Glimmerwing Dragonfly,Indra moves like forgotten poetry — their

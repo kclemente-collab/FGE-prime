@@ -1,0 +1,109 @@
+%% FGE ENGINEERING MACHINE DIAGRAM v1.0
+%% Append-only, layer-numbered, acyclic-dependency architecture
+%% RULE: new capability = new Ln node + explicit edge. Never mutate an existing Ln in place.
+
+flowchart TB
+
+    subgraph L0["L0 — LIVING CANON FOUNDATION (Kernel, Locked)"]
+        L0K["Invariant Kernel\nsbid | material_fingerprint | frequency_cluster\ncore_conflict | signal\n[+face_gospel — pending ratification]"]
+        L0G["Governance Bureau Gate\n(ratifies kernel field additions)"]
+        L0K -->|"append field proposal"| L0G
+    end
+
+    subgraph L1["L1 — STORAGE / UI SURFACE"]
+        L1A["Adalo Database\n(visual app schema, non-portable)"]
+    end
+
+    subgraph L1c["L1c — IDENTITY COMPILER (Character System v1, SPEC TIER)"]
+        L1cM["Cognitive Mapper\n(raw inspiration → Character Graph)"]
+        L1cT["Neural Taxonomy Instructor\n(Identity Taxonomy)"]
+        L1cCAC["Character Assembly Compiler (CAC v1)\nvalidates: Personality|Behavior|Physical|Narrative"]
+        L1cMV["Morphology Validator\n(Valid / Invalid — Compilation Failure on contradiction)"]
+        L1cCCI["Canonical Character Instance (CCI)"]
+        L1cEV["Evolution Layer\n(versioned recompilation, immutable identity)"]
+        L1cM --> L1cT --> L1cCAC --> L1cMV --> L1cCCI
+        L1cCCI -.->|"re-run same spec"| L1cEV
+        L1cEV -.->|"deterministic recompile\n(spec-level only — NOT pixel-level, see flag 5)"| L1cCCI
+    end
+
+    subgraph L2["L2 — PORTABLE DATA CONTRACT"]
+        L2C["Character Card JSON"]
+        L2S["System Card JSON"]
+        L2X["Collection JSON"]
+    end
+
+    subgraph L3["L3 — LOGIC / AUTOMATION"]
+        L3C["Character (class)"]
+        L3S["SystemCard (class)"]
+        L3X["Collection (class)"]
+    end
+
+    subgraph L4["L4 — MUTATION LOG (Append-Only)"]
+        L4M["MUTATIONS: List[Dict]\nget_mutations() | save_to_json() | get_mutation_by_id()"]
+        L4N["APPEND SLOT →\nnew mutation dict\n{id, target, patch, justification,\nexpectedGain, riskScore, proposedAt}"]
+        L4N -->|"append, never overwrite"| L4M
+    end
+
+    subgraph L5["L5 — PUBLISHING COMPILER"]
+        L5R["fge_render.py"]
+        L5L["fge_layout_v2.py"]
+        L5CM["fge_compositor.py"]
+        L5V["verify.py (integrity check)"]
+    end
+
+    subgraph L6["L6 — BEHAVIORAL OS (orthogonal stack)"]
+        L6A["Anchor Core (identity lock)"]
+        L6B["Anchor Flow (behavior sim)"]
+        L6C["Anchor Mind (cognitive mode)"]
+        L6A --> L6B --> L6C
+    end
+
+    subgraph L7["L7 — ECONOMIC INTERFACE (MAVEN)"]
+        L7M["MAVEN\nScarcity | Lineage | Demand | Production Cost\nBrand Cohesion | Licensing Value | Collection Depth | LTV"]
+        L7N["⚠ STUB CONSUMER\nno producer wired yet — see flag 4"]
+        L7N -.-> L7M
+    end
+
+    subgraph Ln["Ln+1 — FUTURE APPEND ZONE"]
+        LnX["⬜ next layer\n(insert here — do not splice into L0–L6)"]
+    end
+
+    %% Cross-layer edges (dependency direction = acyclic, bottom-up only)
+    L0G -->|"ratified kernel"| L2C
+    L1A -->|"export"| L2C
+    L1A -->|"export"| L2S
+    L1A -->|"export"| L2X
+    L2C --> L3C
+    L2S --> L3S
+    L2X --> L3X
+    L3C -->|"mutation proposal"| L4N
+    L3S -->|"mutation proposal"| L4N
+    L4M -->|"approved patch"| L0K
+    L4M -->|"approved patch"| L5R
+    L2C -->|"card data"| L5R
+    L5R --> L5L --> L5CM --> L5V
+    L5V -->|"drift check"| L0G
+    L6C -.->|"NOT YET WIRED — n+3 flag"| L3C
+    L4M -.->|"future: auto-apply to L6"| L6A
+    L5V --> Ln
+
+    %% L1c — Identity Compiler wiring
+    L1cCCI -->|"canon lock request"| L0G
+    L0G -->|"canon approval"| L1cEV
+    L1cCCI -->|"portable projection"| L2C
+    L1cCAC -.->|"COLLISION — see flag 2:\nsame validation job as L5V + L0G,\nno defined precedence order"| L5V
+    L1cCAC -.->|"COLLISION"| L0G
+
+    %% Product Fracturing Engine vs Publishing Compiler — same output space
+    L1cCCI -.->|"Product Fracturing Engine:\nIdentity Bible→Prompt Pack→Poster→Lookbook→\nSiren Kit→Training Data→License\nCOLLIDES WITH L5 — see flag 1"| L5R
+
+    %% Economic interface — currently unfed
+    L5V -.->|"proposed: lineage/scarcity signal\n(not yet implemented)"| L7N
+    L1cCCI -.->|"proposed: valuation signal\n(not yet implemented)"| L7N
+
+    style L0G fill:#3a1a1a,stroke:#ff5555,stroke-width:2px
+    style L4N fill:#1a2a3a,stroke:#55aaff,stroke-width:2px
+    style LnX fill:#1a1a1a,stroke:#888,stroke-dasharray: 5 5
+    style L6C stroke:#ff9955,stroke-dasharray: 3 3
+    style L1cCAC fill:#3a2a1a,stroke:#ffaa55,stroke-width:2px
+    style L7N fill:#3a1a1a,stroke:#ff5555,stroke-width:2px,stroke-dasharray: 5 5
