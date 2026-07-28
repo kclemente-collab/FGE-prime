@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "seed_id",
+    "identity_core",
+    "visual_dna",
+    "material_fingerprint",
+    "core_conflict",
+    "signal",
+    "output_contract_version"
+  ],
+  "properties": {
+    "seed_id": { "type": "string" },
+    "identity_core": { "type": "object" },
+    "visual_dna": { "type": "object" },
+    "material_fingerprint": {
+      "type": "string",
+      "description": "Must resolve against REG-001 at the declared registry version. Reference: REG-001"
+    },
+    "core_conflict": {
+      "type": "string",
+      "description": "Must resolve against REG-002 category enum. Reference: REG-002"
+    },
+    "signal": { "type": "string" },
+    "output_contract_version": {
+      "type": "string",
+      "description": "Must match a ratified CON-001 version. Reference: CON-001"
+    }
+  },
+  "additionalProperties": false
+}

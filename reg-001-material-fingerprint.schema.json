@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": ["fingerprint_id", "components", "version", "owner"],
+  "properties": {
+    "fingerprint_id": { "type": "string" },
+    "components": {
+      "type": "object",
+      "required": [
+        "material_class",
+        "texture_signature",
+        "light_response_curve",
+        "temporal_decay_model"
+      ],
+      "properties": {
+        "material_class": { "type": "string" },
+        "texture_signature": { "type": "string" },
+        "light_response_curve": { "type": "string" },
+        "temporal_decay_model": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "version": { "type": "string" },
+    "owner": { "type": "string" }
+  },
+  "additionalProperties": false
+}

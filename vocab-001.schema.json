@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": ["term", "definition", "owner", "version", "forbidden_synonyms"],
+  "properties": {
+    "term": { "type": "string" },
+    "definition": { "type": "string" },
+    "owner": { "type": "string" },
+    "version": { "type": "string" },
+    "forbidden_synonyms": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

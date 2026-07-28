@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": [
+    "module_name",
+    "input_schema",
+    "output_schema",
+    "invariants",
+    "failure_modes",
+    "version"
+  ],
+  "properties": {
+    "module_name": { "type": "string" },
+    "input_schema": { "type": "object" },
+    "output_schema": { "type": "object" },
+    "invariants": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "failure_modes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "version": { "type": "string" }
+  },
+  "additionalProperties": false
+}

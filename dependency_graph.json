@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    "VOCAB-001",
+    "REG-001",
+    "REG-002",
+    "CON-001",
+    "CDR-001",
+    "LAW-001",
+    "SPEC-001"
+  ],
+  "edges": [
+    {"from": "VOCAB-001", "to": "REG-001", "type": "semantic_dependency"},
+    {"from": "VOCAB-001", "to": "REG-002", "type": "semantic_dependency"},
+    {"from": "VOCAB-001", "to": "CON-001", "type": "semantic_dependency"},
+    {"from": "REG-001", "to": "CON-001", "type": "data_contract_dependency"},
+    {"from": "REG-002", "to": "SPEC-001", "type": "classification_dependency"},
+    {"from": "CON-001", "to": "SPEC-001", "type": "structural_dependency"},
+    {"from": "CDR-001", "to": "ALL", "type": "governance_dependency"},
+    {"from": "LAW-001", "to": "ALL", "type": "constraint_dependency"}
+  ],
+  "epoch": "0.1",
+  "status": "PROPOSED",
+  "owner": "Keith Clemente",
+  "created": "2026-06-26"
+}

@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "required": ["pattern_id", "category", "description", "severity_scale", "version"],
+  "properties": {
+    "pattern_id": { "type": "string" },
+    "category": {
+      "type": "string",
+      "enum": [
+        "structural_break",
+        "emotional_break",
+        "identity_break",
+        "aesthetic_break",
+        "signal_noise_break",
+        "semantic_break",
+        "temporal_break",
+        "relational_break"
+      ]
+    },
+    "description": { "type": "string" },
+    "severity_scale": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "version": { "type": "string" }
+  },
+  "additionalProperties": false
+}
