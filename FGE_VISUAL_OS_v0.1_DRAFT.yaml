@@ -1,0 +1,274 @@
+# FGE_VISUAL_OS_v0.1_DRAFT.yaml
+# Feral Gloss Empire Visual Operating System
+# Status: DRAFT PROPOSAL — Awaiting Director Review
+# Scope: Infographics only (Character Tiers 1–4 schema remains separate)
+# Purpose: Establish a consistent, machine-readable visual schema layer to eliminate drift,
+#          enable reconstruction, and turn infographic production into a governed system.
+
+version: "0.1"
+status: "DRAFT - For Keith Review"
+date: "2026-06-18"
+proposed_by: "Grok (Systems Architecture)"
+doctrine_reference: "Publishing Studio Constitution - Quality exceeds quantity. Every asset must connect to Character | Companion | Location | Event | Relationship | Collection."
+
+# ============================================================
+# EXECUTIVE SUMMARY
+# ============================================================
+executive_summary: |
+  This proposal introduces a Visual Operating System for FGE infographics only.
+  Current infographics are high-quality but structurally inconsistent. Each generation
+  drifts because the model has no persistent understanding of which elements are
+  structural, data-bearing, identity-defining, or purely decorative.
+  
+  This draft proposes:
+  1. A grounded 12-zone vocabulary derived from actual uploaded infographics.
+  2. Archetype classification for the existing body of work.
+  3. Required / Optional / Forbidden element rules per archetype.
+  
+  Goal: Give Keith a concrete, reviewable artifact that can be ratified, modified,
+  or rejected before any canon-bearing infrastructure is created.
+
+# ============================================================
+# ZONE VOCABULARY v0.1 (Empirically Grounded)
+# ============================================================
+# Derived from analysis of uploaded assets: Raven Genome Sheets, Master Atlas,
+# N+3 Visual OS, Face Prompt Engine, Artifact Posters, and Technical Dossiers.
+
+zone_vocabulary:
+  ZONE_01_HEADER:
+    description: "Top-level identification block containing title, artifact ID, version, and classification."
+    typical_content: ["Main title", "Subtitle", "Artifact ID / Version", "Status badge"]
+    weight: "information_high"
+    required: true
+
+  ZONE_02_HERO:
+    description: "Dominant visual subject — usually the character or central figure, often shown in multiple views (front/back, clothed/unclothed)."
+    typical_content: ["Full-body render", "Dual-view (front + back)", "Hero portrait"]
+    weight: "character_high"
+    required: false
+
+  ZONE_03_PRIMARY_DATA_PANELS:
+    description: "Core information containers. Highest density of structured data. Includes tables, stat blocks, attribute grids, and red/glowing data orbs."
+    typical_content: ["Biometric tables", "Attribute grids", "Red data orbs", "Measurement blocks"]
+    weight: "information_high"
+    required: true
+
+  ZONE_04_SECONDARY_PANELS:
+    description: "Supporting analytical or reference modules (Skin Analysis, Hair Module, Hand Map, Expression Library, Lighting Reference, etc.)."
+    typical_content: ["Analysis modules", "Thumbnail grids", "Small diagrams"]
+    weight: "information_medium"
+    required: false
+
+  ZONE_05_NETWORK_DIAGRAM:
+    description: "Relationship, system, or knowledge graph visualizations showing connections between entities."
+    typical_content: ["Knowledge Graph", "Relationship Web", "Flow diagrams", "Node maps"]
+    weight: "information_medium"
+    required: false
+
+  ZONE_06_FLOW_OR_TIMELINE:
+    description: "Sequential or evolutionary progression (stages, timelines, production rivers, evolution trees)."
+    typical_content: ["Vertical flow stages", "Timeline", "Evolution tree", "Production river"]
+    weight: "information_medium"
+    required: false
+
+  ZONE_07_QUOTE_OR_LORE:
+    description: "Thematic quote, doctrinal statement, or narrative fragment that anchors meaning."
+    typical_content: ["Quote block", "Lore fragment", "Doctrine statement"]
+    weight: "narrative_medium"
+    required: false
+
+  ZONE_08_SYMBOL_OR_ICON_ROW:
+    description: "Strip of icons, sigils, material fingerprints, or classification badges."
+    typical_content: ["Icon row", "Sigil strip", "Classification badges"]
+    weight: "ornament_low"
+    required: false
+
+  ZONE_09_FOOTER:
+    description: "Bottom metadata block containing version history, archive stamps, governance notes, and production metadata."
+    typical_content: ["Version stamp", "Archive ID", "Canonical confidence %", "Director notes"]
+    weight: "information_low"
+    required: true
+
+  ZONE_10_BORDER_FRAME:
+    description: "Outer architectural frame that defines the overall visual container (ornate gold, obsidian, prism glass, etc.)."
+    typical_content: ["Decorative frame", "Corner ornaments", "Edge treatment"]
+    weight: "decorative_high"
+    required: true
+
+  ZONE_11_ORNAMENTS:
+    description: "Non-structural decorative elements (particles, embers, flourishes, light leaks, Kintsugi effects)."
+    typical_content: ["Gold embers", "Light particles", "Corner flourishes"]
+    weight: "decorative_medium"
+    required: false
+
+  ZONE_12_TECHNICAL_METADATA:
+    description: "Generation-specific technical blocks (prompt locks, seed values, model info, face/body lock prompts, pipeline metadata)."
+    typical_content: ["Face Lock Prompt", "Body Lock Prompt", "Generation metadata", "Pipeline info"]
+    weight: "information_medium"
+    required: false
+
+# ============================================================
+# ARCHETYPE CLASSIFICATION (Initial Mapping)
+# ============================================================
+archetype_classification:
+  - asset: "Raven Genome Sheet 1.0"
+    proposed_archetype: "Character Genome Sheet"
+    confidence: "High"
+    notes: "Dense technical dossier with dual hero view, multiple analysis modules, and lock prompts."
+
+  - asset: "Raven Genome Sheet v2 (detailed)"
+    proposed_archetype: "Character Genome Sheet"
+    confidence: "High"
+    notes: "More expanded version with additional modules (Piercing, Sensory, etc.)."
+
+  - asset: "Male Genetic Dossier (Atlas)"
+    proposed_archetype: "Character Genome Sheet / Genetic Dossier"
+    confidence: "High"
+    notes: "Similar structure to Raven sheets but with different visual treatment (aged paper vs dark tech)."
+
+  - asset: "FGE Master Atlas v1.0"
+    proposed_archetype: "Ecosystem / Master Schema Map"
+    confidence: "High"
+    notes: "Large-scale system diagram with central hub, multiple satellite panels, and governance layer."
+
+  - asset: "N+3 Visual Operating System"
+    proposed_archetype: "Meta-System Flowchart"
+    confidence: "High"
+    notes: "Vertical 5-stage production flow with side panels and governance footer."
+
+  - asset: "FGE Face Prompt Engine"
+    proposed_archetype: "Technical Pipeline Diagram"
+    confidence: "High"
+    notes: "Clear 5-stage horizontal pipeline with data architecture layer and benefits row."
+
+  - asset: "Lilith Noir Artifact Poster"
+    proposed_archetype: "Artifact Poster"
+    confidence: "Medium"
+    notes: "Hero character + data panel + quote + legacy network. More narrative than technical."
+
+  - asset: "Liora Voss Character Card"
+    proposed_archetype: "Character Dossier Card"
+    confidence: "Medium"
+    notes: "Compact two-panel card with measurements, behavior, and 6-pillar connections."
+
+  - asset: "Velvet Spectrum (Consent Map)"
+    proposed_archetype: "Boundary / Educational Codex"
+    confidence: "Medium"
+    notes: "Sutra-style silhouette layout with red data orbs. Unique consent-focused archetype."
+
+# ============================================================
+# ARCHETYPE DEFINITIONS (Core Types)
+# ============================================================
+archetype_definitions:
+
+  Character_Genome_Sheet:
+    description: "Primary technical reference for canon characters. Dense, data-heavy, focused on biometric lock and production consistency."
+    required_zones:
+      - ZONE_01_HEADER
+      - ZONE_02_HERO
+      - ZONE_03_PRIMARY_DATA_PANELS
+      - ZONE_09_FOOTER
+      - ZONE_10_BORDER_FRAME
+    optional_zones:
+      - ZONE_04_SECONDARY_PANELS
+      - ZONE_07_QUOTE_OR_LORE
+      - ZONE_12_TECHNICAL_METADATA
+    forbidden_elements:
+      - "Deviation from 32cm gospel measurements"
+      - "Missing Face Lock or Body Lock prompt blocks"
+      - "Unverified biometric data presented as canonical"
+    recommended_visual_language:
+      frame: "dark_luxury or prism_glass"
+      density: "maximal"
+      typography: "data_mono + luxury_serif headers"
+
+  Ecosystem_Master_Schema_Map:
+    description: "High-level living map of the entire FGE universe showing how systems, characters, and value streams interconnect."
+    required_zones:
+      - ZONE_01_HEADER
+      - ZONE_03_PRIMARY_DATA_PANELS
+      - ZONE_05_NETWORK_DIAGRAM
+      - ZONE_06_FLOW_OR_TIMELINE
+      - ZONE_09_FOOTER
+      - ZONE_10_BORDER_FRAME
+    optional_zones:
+      - ZONE_07_QUOTE_OR_LORE
+      - ZONE_11_ORNAMENTS
+    forbidden_elements:
+      - "Missing governance or Seed Philosophy language"
+      - "Unclear system interconnections"
+    recommended_visual_language:
+      frame: "dark_luxury"
+      density: "high"
+      particles: "gold_embers"
+
+  Meta_System_Flowchart:
+    description: "Defines production infrastructure and governance (e.g. N+3 Visual OS)."
+    required_zones:
+      - ZONE_01_HEADER
+      - ZONE_03_PRIMARY_DATA_PANELS
+      - ZONE_06_FLOW_OR_TIMELINE
+      - ZONE_09_FOOTER
+      - ZONE_10_BORDER_FRAME
+    optional_zones:
+      - ZONE_05_NETWORK_DIAGRAM
+      - ZONE_11_ORNAMENTS
+    forbidden_elements:
+      - "Missing governance layer"
+      - "Unclear stage progression or status system"
+    recommended_visual_language:
+      frame: "dark_luxury"
+      density: "high"
+
+  Technical_Pipeline_Diagram:
+    description: "Step-by-step technical process (e.g. Face Prompt Engine, Reversal Engine)."
+    required_zones:
+      - ZONE_01_HEADER
+      - ZONE_03_PRIMARY_DATA_PANELS
+      - ZONE_06_FLOW_OR_TIMELINE
+      - ZONE_09_FOOTER
+    optional_zones:
+      - ZONE_04_SECONDARY_PANELS
+      - ZONE_12_TECHNICAL_METADATA
+    forbidden_elements:
+      - "Missing clear input → output data flow"
+    recommended_visual_language:
+      frame: "dark_luxury"
+      typography: "data_mono"
+      density: "high"
+
+  Artifact_Poster:
+    description: "Narrative + visual delivery vehicle for a single relic, character, or concept. More artistic than technical."
+    required_zones:
+      - ZONE_01_HEADER
+      - ZONE_02_HERO
+      - ZONE_03_PRIMARY_DATA_PANELS
+      - ZONE_07_QUOTE_OR_LORE
+      - ZONE_09_FOOTER
+      - ZONE_10_BORDER_FRAME
+    optional_zones:
+      - ZONE_08_SYMBOL_OR_ICON_ROW
+      - ZONE_11_ORNAMENTS
+    forbidden_elements:
+      - "Overly dense technical data that overwhelms the artistic intent"
+    recommended_visual_language:
+      frame: "ornate_gold or dark_luxury"
+      density: "balanced"
+      lighting: "cinematic_tenebrism or gold_ember_glow"
+
+# ============================================================
+# OPEN QUESTIONS & RECOMMENDATIONS FOR KEITH
+# ============================================================
+recommendations_for_director:
+  - "Should the Visual OS eventually expand beyond infographics into motion assets, lookbooks, and six-second loops, or remain strictly infographic-only?"
+  - "Do we want a separate 'Character Visual Schema' layer later, or keep character work completely isolated from this system?"
+  - "Should every archetype have a 'minimum viable version' and a 'full production version' defined?"
+  - "Would you like a companion 'Interpreter Prompt' created alongside this draft so future generations can be forced to obey the schema?"
+  - "Preferred review format: This YAML file + a short Loom/video walkthrough, or a formatted Notion page?"
+
+# ============================================================
+# END OF DRAFT PROPOSAL
+# ============================================================
+# This file is intentionally lightweight and reviewable.
+# Once ratified by Director decree, it can be promoted to FGE_VISUAL_OS_MASTER.yaml v1.0
+# with full canon status and integration into production pipelines.

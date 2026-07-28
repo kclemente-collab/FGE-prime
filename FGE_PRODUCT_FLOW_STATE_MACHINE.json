@@ -1,0 +1,315 @@
+{
+  "metadata": {
+    "name": "FGE_PRODUCT_FLOW_STATE_MACHINE",
+    "full_name": "FGE-OS CAMPUS UNIVERSAL PIPELINE & GATING SYSTEM v2.0 — Machine-Readable State Machine",
+    "version": "2.0",
+    "canon_id": "FGE-SYS-0002",
+    "parent_system": "FGE-OS Campus Architecture",
+    "description": "Executable state machine defining the 7-stage universal pipeline, mandatory gating procedures, floor-specific variations, failure handling (including Kintsugi Repair), Product Index updates, and automated routing logic for the fge-artifact-synthesis-orchestrator and fge-product-engine. Converts descriptive architecture into programmable manufacturing logic.",
+    "last_updated": "2026-07-11T23:35:00Z",
+    "status": "Canonized & Implemented",
+    "upgrade_path": "n+1 (descriptive) → n+2 (this implementation) → n+3 (automated orchestration layer)",
+    "provenance": "User directive formalized by FGE Executive Intelligence System per Execution Doctrine Registry v1.0",
+    "compliance": "Full adherence to Object Class Rules for SYSTEMS, Anti-Drift Protocol, Commercial Capture Law, and Visual Production Standard (where applicable to diagrams)"
+  },
+  "core_pipeline": {
+    "universal_stages": [
+      {
+        "stage_id": 1,
+        "name": "Intake & State Loading",
+        "description": "Load approved states from registries and reference correct Glass Plate from Hyperreflective Glass Protocol.",
+        "required_inputs": [
+          "Lighting State (FGE_LIGHT_STATE_REGISTRY)",
+          "Material Genome (FGE_MATERIAL_REGISTRY)",
+          "Fashion Genome (FGE_FASHION_REGISTRY)",
+          "Hyperreflective Glass Plate reference"
+        ],
+        "failure_condition": "Missing registry reference → automatic return to previous floor"
+      },
+      {
+        "stage_id": 2,
+        "name": "Build / Synthesis",
+        "description": "Fully render or synthesize the asset using loaded states. Create minimum technical deliverables (master + supporting AOVs).",
+        "required_outputs": [
+          "Fully rendered/synthesized asset",
+          "Master asset",
+          "Supporting AOVs"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "name": "Quality Gating (Light Purity + Contamination Filter)",
+        "description": "Critical optical and purity validation. Calculate Light Purity Score and classify contamination.",
+        "mandatory_checks": [
+          "Light Purity Score (6-metric weighted system)",
+          "Light Contamination Filter classification (Class A–D)",
+          "Hyperreflective Glass Protocol validation (if applied)"
+        ],
+        "minimum_thresholds": {
+          "Elite Physical": 90,
+          "Hero Portrait": 85,
+          "Lookbook Standard": 85,
+          "Fantasy Drift": 82
+        },
+        "on_failure": "Automatic Kintsugi Repair loop → return to Stage 2 with specific remediation notes"
+      },
+      {
+        "stage_id": 4,
+        "name": "Packaging & Documentation",
+        "description": "Assemble complete ship-ready package including all required components.",
+        "required_deliverables": [
+          "Final master asset (8K PNG / video)",
+          "Applied glass plate overlay(s)",
+          "Full metadata block (Light Purity Score, archetype, registries used, provenance)",
+          "Supporting files (prompt DNA, reference_match_language.yaml, AOV package)",
+          "Commercial positioning text"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "name": "Product Index Registration",
+        "description": "Register asset in the current floor’s Product Index with unique ID and initial status.",
+        "actions": [
+          "Assign unique Product ID",
+          "Set status to 'Packaged — Awaiting Optimization'",
+          "Log timestamp and operator"
+        ]
+      },
+      {
+        "stage_id": 6,
+        "name": "Maven / Floor-Specific Optimization",
+        "description": "Floor 2 primary gate. Review for commercial sharpness and apply minor mutations if needed.",
+        "authorized_floor": "Floor 2 (System Vault) only for final 'Ready to Ship' certification",
+        "actions": [
+          "Commercial sharpness review",
+          "Minor mutations/improvements applied",
+          "Status upgraded to 'Ready to Ship'"
+        ]
+      },
+      {
+        "stage_id": 7,
+        "name": "Ship-Ready Certification → Move to Next Floor or Release",
+        "description": "Final sign-off. Asset advances or is released to Economic Engine.",
+        "actions": [
+          "Final sign-off",
+          "Move to next floor’s Product Index OR release to Floor 3 Economic Engine",
+          "All previous floors retain full lineage record"
+        ]
+      }
+    ]
+  },
+  "gates": {
+    "gate1_intake": {
+      "name": "Intake Gate (All Floors)",
+      "type": "mandatory",
+      "checks": [
+        "Approved registries loaded (Lighting, Material, Fashion)",
+        "Correct Hyperreflective Glass Plate referenced"
+      ],
+      "on_pass": "Proceed to Stage 2",
+      "on_fail": "Return to previous floor (no advancement)"
+    },
+    "gate2_build": {
+      "name": "Build Gate",
+      "type": "mandatory",
+      "checks": [
+        "Asset fully rendered/synthesized",
+        "Minimum technical deliverables created (master + AOVs)"
+      ],
+      "on_pass": "Proceed to Stage 3",
+      "on_fail": "Remain in Stage 2 until deliverables complete"
+    },
+    "gate3_optical_purity": {
+      "name": "Optical & Purity Gate (Critical)",
+      "type": "quality_critical",
+      "checks": [
+        "Light Purity Score calculated (6-metric weighted)",
+        "Light Contamination Filter classified (A–D)",
+        "Hyperreflective Glass Protocol validated (if applied)"
+      ],
+      "thresholds": {
+        "Elite Physical": {"min": 90, "action_on_fail": "Kintsugi Repair → Stage 2"},
+        "Hero Portrait": {"min": 85, "action_on_fail": "Kintsugi Repair → Stage 2"},
+        "Lookbook Standard": {"min": 85, "action_on_fail": "Kintsugi Repair → Stage 2"},
+        "Fantasy Drift": {"min": 82, "action_on_fail": "Kintsugi Repair → Stage 2"}
+      },
+      "on_pass": "Proceed to Stage 4",
+      "on_fail": "Kintsugi Repair loop: return to Stage 2 with remediation notes attached to asset state"
+    },
+    "gate4_packaging": {
+      "name": "Packaging Gate",
+      "type": "mandatory",
+      "checks": [
+        "Complete ship-ready package assembled",
+        "All required deliverables present (master, glass overlays, metadata, supporting files, commercial text)"
+      ],
+      "on_pass": "Proceed to Stage 5",
+      "on_fail": "Return to Stage 4 until package complete"
+    },
+    "gate5_product_index": {
+      "name": "Product Index Registration Gate",
+      "type": "registration",
+      "actions": [
+        "Create unique ID in current floor Product Index",
+        "Set status: 'Packaged — Awaiting Optimization'",
+        "Log timestamp + operator"
+      ],
+      "on_pass": "Proceed to Stage 6 (or Floor 2 Maven if applicable)"
+    },
+    "gate6_maven_optimization": {
+      "name": "Maven / Floor Optimization Gate (Floor 2 Primary)",
+      "type": "quality_authority",
+      "authorized_only_on": "Floor 2 — System Vault",
+      "checks": [
+        "Commercial sharpness review",
+        "Minor mutations or improvements applied if needed"
+      ],
+      "on_pass": "Status upgraded to 'Ready to Ship'",
+      "on_fail": "Return to Stage 4 or 5 with specific improvement directives"
+    },
+    "gate7_ship_ready": {
+      "name": "Ship-Ready Certification Gate",
+      "type": "final_authority",
+      "checks": [
+        "Final sign-off complete",
+        "All prior gates passed and lineage recorded"
+      ],
+      "on_pass": "Asset moved to next floor’s Product Index OR released to Floor 3 Economic Engine",
+      "lineage_requirement": "All previous floors retain complete lineage record"
+    }
+  },
+  "floor_specific_variations": {
+    "floor1_manufacturing_engine": {
+      "focus": "High-volume creation",
+      "primary_gate": "gate3_optical_purity",
+      "output_status_after_stage5": "Packaged",
+      "volume": "high",
+      "notes": "Assets enter Floor 1 Product Index as 'Packaged' after Gate 5. No final ship certification here."
+    },
+    "floor2_system_vault_product_observatory": {
+      "focus": "Quality authority + commercial packaging",
+      "primary_gate": "gate6_maven_optimization",
+      "only_authorized_to": "certify assets as 'Ready to Ship' for external release",
+      "output_status": "Ready to Ship",
+      "volume": "medium (quality authority)",
+      "notes": "The true quality and packaging heart of the operation. All external releases must pass through here."
+    },
+    "floor3_economic_engine": {
+      "focus": "Monetization",
+      "primary_gate": "gate7_ship_ready",
+      "input_requirement": "Only assets already marked 'Ready to Ship' from Floor 2",
+      "output": "Commercial offers, sales channels, buyer packages",
+      "volume": "variable (monetization focused)"
+    },
+    "floor4_evolution_reactor": {
+      "focus": "Mutation & improvement",
+      "entry_point": "Re-enter pipeline from Stage 2 with evolution notes attached",
+      "pipeline_override": "Same 7-stage pipeline with additional governance gates for higher strategic value",
+      "notes": "Assets can loop here for controlled evolution before re-entering main flow."
+    },
+    "floors_5_plus_penthouse": {
+      "focus": "Lower volume, higher strategic value",
+      "pipeline": "Same 7-stage pipeline",
+      "additional_gates": "Extra governance and strategic review layers",
+      "notes": "Penthouse-level assets receive maximum oversight and collector-grade treatment."
+    }
+  },
+  "state_transitions": {
+    "normal_flow": {
+      "stage1_pass": "stage2",
+      "stage2_pass": "stage3",
+      "stage3_pass": "stage4",
+      "stage4_pass": "stage5",
+      "stage5_pass": {
+        "if_floor": "Floor 2",
+        "then": "stage6",
+        "else": "stage7"
+      },
+      "stage6_pass": "stage7",
+      "stage7_pass": {
+        "action": "move_to_next_floor_Product_Index OR release_to_Floor3",
+        "lineage_preserved": true
+      }
+    },
+    "failure_paths": {
+      "gate1_fail": {
+        "action": "return_to_previous_floor",
+        "state_update": "intake_incomplete"
+      },
+      "gate3_fail": {
+        "action": "kintsugi_repair_loop",
+        "return_to": "stage2",
+        "state_update": "remediation_notes_attached",
+        "required": "specific remediation notes from purity/contamination failure"
+      },
+      "gate2_fail_or_gate4_fail": {
+        "action": "remain_in_current_stage",
+        "state_update": "deliverables_incomplete"
+      },
+      "gate6_fail": {
+        "action": "return_to_stage4_or_5",
+        "state_update": "improvement_directives_attached"
+      }
+    },
+    "floor_advancement": {
+      "after_gate7_pass": {
+        "if": "Floor < 3",
+        "then": "advance to next floor Product Index",
+        "else_if": "Floor 3",
+        "then": "release to Economic Engine (monetization)"
+      },
+      "evolution_reentry": {
+        "from": "Floor 4",
+        "entry": "Stage 2 with evolution_notes"
+      }
+    }
+  },
+  "product_index_rules": {
+    "registration_trigger": "Successful completion of Gate 5",
+    "initial_status": "Packaged — Awaiting Optimization",
+    "status_progression": [
+      "Packaged — Awaiting Optimization",
+      "Ready to Ship (only after Gate 6 on Floor 2)",
+      "Shipped / Released (after Gate 7)"
+    ],
+    "required_fields": [
+      "unique_product_id",
+      "archetype",
+      "light_purity_score",
+      "contamination_class",
+      "registries_used",
+      "provenance_lineage",
+      "glass_plate_applied",
+      "timestamp",
+      "operator"
+    ],
+    "lineage_requirement": "Every asset must retain immutable record of all previous floors and gates passed"
+  },
+  "orchestrator_integration": {
+    "target_systems": [
+      "fge-artifact-synthesis-orchestrator",
+      "fge-product-engine",
+      "fge-drop-readiness-orchestrator",
+      "fge-canon-session-manager"
+    ],
+    "routing_logic": "Asset state machine evaluates current stage/gate result + current floor Product Index status → determines next action (advance, repair, optimize, release, or re-enter evolution)",
+    "automation_triggers": {
+      "gate_pass_auto_advance": true,
+      "gate_fail_auto_repair": true,
+      "floor2_maven_auto_review": true,
+      "final_release_to_floor3": true
+    },
+    "n+3_readiness": "This state machine provides the exact logic layer required for full automated orchestration between floors based on gate results and Product Index status."
+  },
+  "failure_handling_summary": {
+    "kintsugi_repair": "Primary remediation path for Gate 3 failures. Returns asset to Stage 2 with attached diagnostic notes. Designed to preserve value while enforcing quality.",
+    "automatic_returns": "Gate 1 and certain packaging failures trigger immediate return to prior state/floor without manual intervention.",
+    "escalation": "Repeated failures on the same asset trigger review by Floor 2 Maven or higher governance."
+  },
+  "implementation_notes": {
+    "canon_status": "Fully canonized as operational building code for FGE-OS Campus.",
+    "anti_drift": "All rules, thresholds, and transitions are now explicit and machine-readable to prevent future drift.",
+    "commercial_value": "Enables scalable, auditable, high-quality asset manufacturing with clear path to monetization on Floor 3.",
+    "next_recommended": "Integrate this JSON directly into fge-artifact-synthesis-orchestrator for live automated routing (n+3 upgrade)."
+  }
+}

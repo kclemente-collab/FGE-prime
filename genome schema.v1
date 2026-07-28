@@ -1,0 +1,179 @@
+{
+  "schema": "fge.genome.schema",
+  "version": "1.0.0",
+  "status": "RECONSTRUCTION",
+  "doctrine": {
+    "canon_source": "union(M-0017.AX, FGE-RVN-0426)",
+    "shape": "core + optional modules",
+    "module_sources": ["infographic", "skill", "apple_note", "code"],
+    "provenance": "every field records owner + source + fill_method; append-only",
+    "completeness": "a genome is COMMITTABLE when all core.required fields are non-null and pass validation; modules are present-or-absent"
+  },
+
+  "fill_methods": {
+    "image_measure": "derived by measuring a reference image (the v1 extraction target)",
+    "image_read":    "read directly off a genome-sheet image (OCR/label)",
+    "authored":      "set by operator (the creative dials)",
+    "generated":     "produced downstream by a skill/pipeline, not extracted",
+    "system":        "written automatically (ids, hashes, timestamps)"
+  },
+
+  "field_def_contract": {
+    "type": "one of: string|int|float|enum|ratio|percent|mm|cm|kg|object|list",
+    "unit": "explicit unit string or null",
+    "fill": "one of fill_methods",
+    "owner": "the single extractor/skill id that may write this field",
+    "required": "bool — only meaningful inside core",
+    "image_target": "bool — true = part of the ~40 v1 measurable set"
+  },
+
+  "core": {
+    "description": "Every character has this. Mandatory unless required=false.",
+    "identity": {
+      "subject_id":       {"type":"string","unit":null,"fill":"system","owner":"id-minter","required":true,"image_target":false},
+      "alias":            {"type":"string","unit":null,"fill":"authored","owner":"operator","required":true,"image_target":false},
+      "series":           {"type":"string","unit":null,"fill":"authored","owner":"operator","required":false,"image_target":false},
+      "edition_class":    {"type":"enum","unit":null,"fill":"authored","owner":"operator","required":false,"image_target":false,"enum":["MYTHIC","CLASS_III_SYNTHETIC","STANDARD"]},
+      "status":           {"type":"enum","unit":null,"fill":"system","owner":"canon-gate","required":true,"image_target":false,"enum":["DRAFT","CANONICAL","LOCKED","STABLE"]},
+      "species":          {"type":"string","unit":null,"fill":"authored","owner":"operator","required":false,"image_target":false},
+      "lineage":          {"type":"string","unit":null,"fill":"authored","owner":"operator","required":false,"image_target":false},
+      "revision":         {"type":"string","unit":null,"fill":"system","owner":"version-ctl","required":true,"image_target":false}
+    },
+    "physical_baseline": {
+      "height_cm":        {"type":"cm","unit":"cm","fill":"image_read","owner":"sheet-reader","required":true,"image_target":false},
+      "weight_kg":        {"type":"kg","unit":"kg","fill":"image_read","owner":"sheet-reader","required":true,"image_target":false},
+      "eye_color":        {"type":"string","unit":null,"fill":"image_read","owner":"sheet-reader","required":true,"image_target":false},
+      "hair_color":       {"type":"string","unit":null,"fill":"image_read","owner":"sheet-reader","required":true,"image_target":false},
+      "skin_tone":        {"type":"string","unit":null,"fill":"image_read","owner":"sheet-reader","required":true,"image_target":false}
+    }
+  },
+
+  "modules": {
+
+    "facial_anchor": {
+      "description": "16-point facial lock. v1 PRIMARY extraction target. Filled via measure→verify GATE, not a one-pass fill.",
+      "module_source": "skill:fge-face-prompt-engine",
+      "gated": true,
+      "fields": {
+        "interpupillary_distance": {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "eye_width_left":          {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "eye_width_right":         {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "eye_tilt_angle":          {"type":"float","unit":"deg","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "brow_separation":         {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "brow_arch_height":        {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "nose_bridge_width":       {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "nose_length":             {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "philtrum_length":         {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "upper_lip_ratio":         {"type":"ratio","unit":null,"fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "lower_lip_ratio":         {"type":"ratio","unit":null,"fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "jaw_width":               {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "chin_height":             {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "cheekbone_width":         {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "facial_length":           {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "ear_position_width":      {"type":"mm","unit":"mm","fill":"image_measure","owner":"face-prompt-engine","image_target":true},
+        "face_lock_prompt":        {"type":"string","unit":null,"fill":"generated","owner":"face-prompt-engine","image_target":false},
+        "face_lock_integrity":     {"type":"percent","unit":"%","fill":"system","owner":"face-lock-gate","image_target":false}
+      },
+      "drift_note": "RAVEN sheet shows 16 labeled points incl. facial_length. Operator YAML added ear_position_width. v1 canon = UNION = 16 measurements (facial_length retained, ear_position_width added). RECONCILE on operator confirm."
+    },
+
+    "body_lock": {
+      "description": "17-point body measurement. v1 secondary extraction target.",
+      "module_source": "skill:fge-body-module",
+      "gated": false,
+      "fields": {
+        "height":          {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "head_ratio":      {"type":"ratio","unit":null,"fill":"image_measure","owner":"body-module","image_target":true},
+        "shoulder_width":  {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "bust_width":      {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "underbust":       {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "waist":           {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "hip":             {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "thigh_right":     {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "thigh_left":      {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "calf_right":      {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "calf_left":       {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "arm_length":      {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "forearm":         {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "hand_length":     {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "torso_length":    {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "neck_width":      {"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true},
+        "glute_projection":{"type":"cm","unit":"cm","fill":"image_measure","owner":"body-module","image_target":true}
+      }
+    },
+
+    "proportion_ratios": {
+      "description": "Derived ratios. Computed from body_lock, never measured directly.",
+      "module_source": "skill:fge-body-module",
+      "fields": {
+        "whr":        {"type":"ratio","unit":null,"fill":"generated","owner":"body-module","image_target":false},
+        "shr":        {"type":"ratio","unit":null,"fill":"generated","owner":"body-module","image_target":false},
+        "leg_torso":  {"type":"ratio","unit":null,"fill":"generated","owner":"body-module","image_target":false},
+        "bust_waist": {"type":"ratio","unit":null,"fill":"generated","owner":"body-module","image_target":false},
+        "head_body":  {"type":"ratio","unit":null,"fill":"generated","owner":"body-module","image_target":false}
+      }
+    },
+
+    "skin_analysis": {
+      "description": "Material layer. Some measurable from macro image, most authored.",
+      "module_source": "infographic:skin-analysis",
+      "fields": {
+        "skin_tone_index":       {"type":"float","unit":"/10","fill":"authored","owner":"material-forge","image_target":false},
+        "subsurface_scattering": {"type":"mm","unit":"mm","fill":"authored","owner":"material-forge","image_target":false},
+        "oil_sheen":             {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false},
+        "pore_density":          {"type":"int","unit":"/cm2","fill":"image_measure","owner":"material-forge","image_target":true},
+        "translucency":          {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false},
+        "specular_response":     {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false},
+        "freckle_density":       {"type":"percent","unit":"%","fill":"image_measure","owner":"material-forge","image_target":true},
+        "surface_texture":       {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false},
+        "elasticity":            {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false},
+        "micro_roughness":       {"type":"float","unit":null,"fill":"authored","owner":"material-forge","image_target":false}
+      }
+    },
+
+    "mythic_traits": {
+      "description": "ATLAS-dialect authoring panel. Pure operator dials.",
+      "module_source": "infographic:mythic-traits",
+      "fields": {
+        "trait_list":        {"type":"list","unit":null,"fill":"authored","owner":"operator","image_target":false},
+        "alchemic_signature":{"type":"string","unit":null,"fill":"authored","owner":"operator","image_target":false},
+        "genetic_purity":    {"type":"percent","unit":"%","fill":"authored","owner":"operator","image_target":false},
+        "allelic_marker":    {"type":"string","unit":null,"fill":"image_read","owner":"sheet-reader","image_target":false}
+      }
+    },
+
+    "behavioral_projection": {
+      "description": "RAVEN-dialect authoring panel. Charisma/presence/narrative dials.",
+      "module_source": "infographic:relationship-os",
+      "fields": {
+        "charisma_projection":   {"type":"enum","unit":null,"fill":"authored","owner":"operator","image_target":false,"enum":["LOW","MEDIUM","HIGH","MYTHIC"]},
+        "luxury_response_rating":{"type":"float","unit":"/10","fill":"authored","owner":"operator","image_target":false},
+        "cinematic_compatibility":{"type":"percent","unit":"%","fill":"authored","owner":"operator","image_target":false},
+        "presence_radius":       {"type":"float","unit":"m","fill":"authored","owner":"operator","image_target":false},
+        "visual_gravity":        {"type":"float","unit":null,"fill":"authored","owner":"operator","image_target":false}
+      }
+    },
+
+    "libraries": {
+      "description": "Generated downstream — NOT extracted. Pose/expression/lighting sets.",
+      "module_source": "skill:fge-operational-execution-engine",
+      "fields": {
+        "pose_library":       {"type":"list","unit":null,"fill":"generated","owner":"ops-engine","image_target":false},
+        "expression_library": {"type":"list","unit":null,"fill":"generated","owner":"ops-engine","image_target":false},
+        "lighting_study":     {"type":"list","unit":null,"fill":"generated","owner":"ops-engine","image_target":false}
+      }
+    },
+
+    "generation_metadata": {
+      "description": "System provenance. Auto-written at commit.",
+      "module_source": "system",
+      "fields": {
+        "engine":              {"type":"string","unit":null,"fill":"system","owner":"committer","image_target":false},
+        "seed":                {"type":"string","unit":null,"fill":"system","owner":"committer","image_target":false},
+        "canonical_confidence":{"type":"percent","unit":"%","fill":"system","owner":"committer","image_target":false},
+        "biometric_signature": {"type":"string","unit":null,"fill":"system","owner":"committer","image_target":false},
+        "committed_at":        {"type":"string","unit":null,"fill":"system","owner":"committer","image_target":false}
+      }
+    }
+  }
+}
