@@ -1,0 +1,44 @@
+{
+  "character_id": "CHAR-ISO-BLACK-YOUTH-001",
+  "seed_id": "CSC-0001",
+  "era_variant": "Black Era Youth",
+  "full_name": "Isolde Voss — Black Era Youth (Signature Edition)",
+  "governance": {
+    "canon_lock": true,
+    "assembly_status": "PASS",
+    "preflight_score": 0.91,
+    "synthesis_risk": 0.18,
+    "identity_integrity": 0.93,
+    "morph_drift_index": 0.12,
+    "violation_flags": []
+  },
+  "modules": {
+    "personality": "PS-ISO-2.1",
+    "behavior": "BD-ISO-2.3",
+    "physical": "PH-ISO-BLACK-YOUTH-3.1"
+  },
+  "lineage_trace": [
+    "CSC-0001",
+    "PS-ISO-2.1",
+    "BD-ISO-2.3",
+    "PH-ISO-BLACK-YOUTH-3.1"
+  ],
+  "economic": {
+    "mavin_price": 142.0,
+    "stability_class": "A",
+    "drift_liability": 0.18,
+    "collector_premium": 0.34,
+    "recommended_tier": "Signature"
+  },
+  "timestamps": {
+    "created_at": "2026-07-02T20:15:00Z",
+    "last_validated": "2026-07-02T20:15:00Z",
+    "last_market_update": null
+  },
+  "visual_references": [
+    "hrjCo", "vS3s1", "X4vUw", "VXirP", "Y7muN", "FfVGg",
+    "YttYW", "SAlcl", "qvmZ2", "HUh5c", "HKSUc", "W49KA",
+    "8X2mN", "G2ZGA", "Zkkm2", "rxhXZ", "abo4w"
+  ],
+  "status_note": "CEC-enforced, canon-locked asset. Ready for Mavin Exchange listing and governed agent interaction."
+}

@@ -1,0 +1,70 @@
+# GitHub Actions — Skill Validation Workflow
+# Source: Temporary Grok account (skill-creator session)
+# Date: May 2026
+# Status: ARCHIVAL — preserved as-found
+# File: .github/workflows/validate.yml
+
+name: Validate All Skills (n+5 Expanded)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pull-requests: write   # Only if you need to comment on PRs
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # Pinned SHA May 2026
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # Pinned
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yamllint
+
+      - name: Run yamllint on all SKILL.md files
+        run: |
+          find . -name "SKILL.md" -exec yamllint -c assets/.yamllint {} +
+
+      - name: Make validator executable
+        run: chmod +x scripts/validate-skill.sh
+
+      - name: Validate all skills
+        run: ./scripts/validate-skill.sh --all
+
+      - name: Upload validation report (if fails)
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-report
+          path: |
+            **/*.log
+
+# ─── BEST PRACTICES REFERENCE ───
+# Practice              | Why                          | Recommendation
+# Pin actions to SHAs   | Prevents supply chain attacks | Use @<commit-sha> not @v4
+# Minimal permissions   | Least privilege               | contents: read default
+# Cache dependencies    | Faster runs                   | actions/cache for pip
+# Separate jobs         | Better feedback + parallelism | One job lint, one test
+# OIDC for secrets      | More secure than long tokens  | id-token: write when needed
+# Reusable workflows    | DRY principle                 | Extract common logic
+# Clear naming          | Maintainability               | name: on all jobs/steps
+
+# ─── PENDING ───
+# - Separate lint + test jobs version
+# - Matrix testing version
+# - Reusable workflow version that other skills can call

@@ -1,0 +1,74 @@
+{
+  "object_type": "Telemetry Object",
+  "name": "BUYER_SIGNAL_OBJECT",
+  "version": "0.1.0",
+  "purpose": "Structured schema for capturing, normalizing, and routing buyer/market signals back into the FGE nervous system for product mutation and future SKU decisions.",
+  "inputs": {
+    "raw_sources": [
+      "gumroad sales list / summary",
+      "gumroad sales view (individual purchases)",
+      "manual reviews / DMs / emails",
+      "refund events",
+      "question patterns from support or comments"
+    ],
+    "core_metrics": {
+      "views": "integer (from Gumroad analytics if available, or proxy)",
+      "sales_count": "integer",
+      "conversion_rate": "float (sales / views)",
+      "gross_revenue_cents": "integer",
+      "refunds_count": "integer",
+      "refund_rate": "float",
+      "average_order_value_cents": "integer"
+    },
+    "qualitative_signals": {
+      "buyer_language_patterns": "array of phrases buyers use to describe value or problem",
+      "objections_raised": "array of explicit concerns or questions",
+      "feature_requests": "array of 'I wish it had...' or 'next version should...' items",
+      "price_feedback": "direct or inferred comments on pricing"
+    }
+  },
+  "outputs": {
+    "price_mutation": "recommended price change or tier adjustment with rationale",
+    "copy_mutation": "suggested improvements to sales story, headline, or FAQ based on buyer language",
+    "bundle_mutation": "ideas for what to bundle or split in future versions",
+    "next_product_signal": "clear demand vector for the next control specimen (e.g. 'Character Ledger Pack', 'Material Doctrine Expansion Kit')",
+    "governance_impact": "any signals that should adjust Release Controller thresholds or identity preservation weights"
+  },
+  "collection_process": {
+    "frequency_for_first_specimen": "Daily for first 14 days, then weekly",
+    "tooling": "gumroad sales summary + sales list + manual log in Notion or simple JSON",
+    "automation_target": "Later version can poll via Gumroad CLI and write to central Telemetry Ledger"
+  },
+  "integration": {
+    "feeds_into": [
+      "Mutation Engine (next SKU decisions)",
+      "Sales Story Engine (language refinement)",
+      "Product Release Controller (threshold tuning)",
+      "DOC BRAIN / Studio Nervous System"
+    ],
+    "provenance": "Every signal batch should be timestamped and linked back to the originating SKU and product version"
+  },
+  "example_signal_record": {
+    "timestamp": "2026-07-20T14:30:00Z",
+    "sku": "FGE-SDU-WF-001",
+    "source": "gumroad + manual review",
+    "metrics": {
+      "sales": 7,
+      "conversion_rate": 0.12,
+      "refund_rate": 0.0
+    },
+    "language_patterns": [
+      "\"finally something that measures whether my characters stay consistent\"",
+      "\"I didn't realize how much identity drift I had until I used this\""
+    ],
+    "objections": [
+      "\"Is this just a PDF guide?\" (addressed in FAQ but still appearing)"
+    ],
+    "next_product_signal": "Strong interest in applying the same workflow to character bibles and material doctrine packs",
+    "recommended_actions": [
+      "Add short video walkthrough in v0.1.1",
+      "Create follow-up product: SDU Character Ledger System"
+    ]
+  },
+  "status": "Defined - ready to be used as the output schema for the first buyer signal collection after SDU-COM-001 launch"
+}

@@ -1,0 +1,162 @@
+TEMPLATE BUILDING SYSTEM
+
+This templating system indexes various products according to a given schema, creating a compact, universal structure applicable to all product types. It facilitates easy expansion using JSON or Python classes.
+
+—
+
+FGE Product Blueprint System v2.0
+
+Each product adheres to a core template, which can be extended with attributes specific to its category.
+￼
+
+Core Schema
+
+{
+  "FGEProduct": {
+    "identity": {
+      "name": "",
+      "id": "",
+      "category": ""
+    },
+    "scaleProfile": {
+      "psi": 0,
+      "dimensions": {},
+      "massClass": "",
+      "lifeStage": "",
+      "build": ""
+    },
+    "materialFingerprint": {
+      "density": "",
+      "roughness": 0.0,
+      "reflectivity": 0.0,
+      "textureScale": "",
+      "imperfections": "",
+      "aging": "",
+      "lightResponse": ""
+    },
+    "structure": {},
+    "surfacePhysics": {
+      "wear": "",
+      "imperfections": "",
+      "textureResolution": "16K"
+    },
+    "lighting": {
+      "hdrResponse": "",
+      "anisotropy": 0.0,
+      "subsurface": false
+    },
+    "renderRules": {
+      "cameraScale": "",
+      "detailLevel": "ULTRA",
+      "output": []
+    },
+    "canonMetadata": {}
+  }
+}
+
+—
+
+Example Product Templates
+
+1. Human Product
+{
+  "structure": {
+    "height": "",
+    "bodyType": "",
+    "facialStructure": "",
+    "hair": "",
+    "skin": "",
+    "clothing": ""
+  },
+  "materialFingerprint": {
+    "skinType": "",
+    "hairBehavior": "",
+    "fabricSignature": "",
+    "jewelrySignature": ""
+  }
+}
+
+2. Dragon Product
+{
+  "structure": {
+    "length": "",
+    "wingspan": "",
+    "hornStructure": "",
+    "scalePattern": "",
+    "clawDesign": "",
+    "eyeType": ""
+  },
+  "materialFingerprint": {
+    "scaleMaterial": "",
+    "scaleReflectivity": "",
+    "hornMaterial": "",
+    "wingMembrane": "",
+    "energySignature": ""
+  }
+}
+
+3. Vehicle Product
+{
+  "structure": {
+    "vehicleType": "",
+    "dimensions": "",
+    "engineType": "",
+    "wheelSystem": "",
+    "interiorDesign": ""
+  },
+  "materialFingerprint": {
+    "paintSystem": "",
+    "metalType": "",
+    "glassType": "",
+    "carbonFiber": "",
+    "wearPattern": ""
+  }
+}
+
+4. Building Product
+{
+  "structure": {
+    "height": "",
+    "floors": "",
+    "architecture": "",
+    "foundation": "",
+    "interiorStyle": ""
+  },
+  "materialFingerprint": {
+    "stone": "",
+    "metal": "",
+    "glass": "",
+    "weathering": "",
+    "ageSignature": ""
+  }
+}
+
+—
+
+Indexing Products
+Each product is indexed by its category and psi to create a universal lookup table:
+
+ProductIndex[category][psi] → FGEProduct JSON
+
+Example:
+ProductIndex["Dragon"][92] → Ash Tyrant JSON Template
+ProductIndex["Building"][98] → Skyscraper JSON Template
+
+This allows the renderer or simulation engine to:
+	1.	Identify the object
+	2.	Load the correct template by category and scale
+	3.	Apply material fingerprint and physics
+	4.	Render or simulate accordingly
+
+—
+
+This system supports mass production of different product classes while maintaining a compact, schema-driven approach.
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+￼

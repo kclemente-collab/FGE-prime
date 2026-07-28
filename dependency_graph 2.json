@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    "LAW-001",
+    "REG-001",
+    "REG-002",
+    "VOCAB-001",
+    "CON-001",
+    "CDR-001",
+    "CDR-ROOT-001",
+    "SPEC-001"
+  ],
+  "edges": [
+    {"from": "LAW-001", "to": "REG-002", "type": "constraint_dependency"},
+    {"from": "REG-002", "to": "VOCAB-001", "type": "data_authority_dependency"},
+    {"from": "VOCAB-001", "to": "CON-001", "type": "semantic_dependency"},
+    {"from": "REG-001", "to": "CON-001", "type": "data_contract_dependency"},
+    {"from": "REG-002", "to": "SPEC-001", "type": "classification_dependency"},
+    {"from": "CON-001", "to": "SPEC-001", "type": "structural_dependency"},
+    {"from": "CDR-001", "to": "ALL", "type": "governance_dependency"},
+    {"from": "CDR-ROOT-001", "to": "REG-002", "type": "consolidation_ruling"},
+    {"from": "CDR-ROOT-001", "to": "VOCAB-001", "type": "consolidation_ruling"},
+    {"from": "LAW-001", "to": "ALL", "type": "constraint_dependency"}
+  ],
+  "epoch": "0.2",
+  "status": "PROPOSED",
+  "owner": "Keith Clemente",
+  "created": "2026-06-26",
+  "note": "Updated per CDR-ROOT-003: Registries have no vocabulary dependency. Acyclic chain: LAW-001 → REG-002 → VOCAB-001 → SPEC-001. SVR-001 added as Epoch I dependency for REG-002 v2.0 state layer."
+}

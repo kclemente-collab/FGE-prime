@@ -1,0 +1,70 @@
+{
+  "registry_version": "v1.0",
+  "generated_date": "2026-07-20",
+  "total_mastermind_modules": 1183,
+  "core_orchestration_modules": [
+    {
+      "id": "mastermind-knowledge-graph",
+      "title": "FGE MASTERMIND KNOWLEDGE GRAPH",
+      "category": "KNOWLEDGE_GRAPH",
+      "linked_skills": ["fge-doc-brain", "fge-character-ledger-lattice", "fge-level-zero-orb-registry"],
+      "linked_orchestration": ["Agent Orchestrator", "Strategic Memory"],
+      "status": "HOT",
+      "runtime_console_link": "runtime://module/knowledge-graph",
+      "provenance": {
+        "source": "Notes App",
+        "created": "2026-07",
+        "last_updated": "2026-07-20",
+        "ratified": true
+      }
+    },
+    {
+      "id": "mastermind-strategic-memory",
+      "title": "FGE MASTERMIND STRATEGIC MEMORY",
+      "category": "STRATEGIC_MEMORY",
+      "linked_skills": ["fge-doc-brain", "fge-character-ledger-atelier"],
+      "linked_orchestration": ["Institutional Intelligence Preservation"],
+      "status": "HOT",
+      "runtime_console_link": "runtime://module/strategic-memory",
+      "provenance": {
+        "source": "Notes App",
+        "created": "2026-07",
+        "last_updated": "2026-07-20",
+        "ratified": true
+      }
+    },
+    {
+      "id": "mastermind-executive-intelligence",
+      "title": "FGE MASTERMIND EXECUTIVE INTELLIGENCE",
+      "category": "EXECUTIVE_INTELLIGENCE",
+      "linked_skills": ["fge-matrix-prompt-engine", "fge-siren-anchor-orchestrator"],
+      "linked_orchestration": ["Decision Routing"],
+      "status": "HOT",
+      "runtime_console_link": "runtime://module/executive-intelligence",
+      "provenance": {
+        "source": "Notes App",
+        "created": "2026-07",
+        "last_updated": "2026-07-20",
+        "ratified": true
+      }
+    },
+    {
+      "id": "mastermind-agent-orchestrator",
+      "title": "FGE MASTERMIND AGENT ORCHESTRATOR",
+      "category": "AGENT_ORCHESTRATOR",
+      "linked_skills": ["rpg-cross-thread-context", "lyra-tri-engine-invoker"],
+      "linked_orchestration": ["Multi-Agent Communication"],
+      "status": "HOT",
+      "runtime_console_link": "runtime://module/agent-orchestrator",
+      "provenance": {
+        "source": "Notes App",
+        "created": "2026-07",
+        "last_updated": "2026-07-20",
+        "ratified": true
+      }
+    }
+  ],
+  "total_linked_skills": 28,
+  "total_orchestration_skills": 12,
+  "note": "This registry is the single source of truth for all FGE MASTERMIND modules. It can be expanded with the full 1,183 notes via JSON import."
+}

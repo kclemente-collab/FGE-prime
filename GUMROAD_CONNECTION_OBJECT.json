@@ -1,0 +1,39 @@
+{
+  "object_type": "Marketplace Credential Object",
+  "name": "GUMROAD_CONNECTION_OBJECT",
+  "version": "0.1.0",
+  "platform": "gumroad",
+  "purpose": "Secure, reusable connection configuration for the Marketplace Router and Deployment Agent to interact with Gumroad API/CLI without hardcoding secrets in workflows.",
+  "authentication": {
+    "method": "API token (recommended for agents) or OAuth",
+    "storage": "Environment variable or secure secret store (e.g. GUMROAD_API_TOKEN)",
+    "cli_login_note": "Interactive login via `gumroad auth login` is required once per machine/user. Agents use token-based access after initial setup.",
+    "permissions_required": [
+      "create_product",
+      "update_product",
+      "upload_files",
+      "manage_covers",
+      "set_thumbnail",
+      "read_sales",
+      "read_analytics",
+      "manage_offer_codes"
+    ]
+  },
+  "connection_fields": {
+    "seller_id": "string (from gumroad user command)",
+    "api_base": "https://api.gumroad.com",
+    "cli_command_prefix": "gumroad --no-input --json",
+    "rate_limit_notes": "Use --page-delay 200ms with --all for bulk operations. Respect Gumroad API limits."
+  },
+  "security": {
+    "never_commit_token": true,
+    "recommended": "Store in local env file or system keychain. Rotate token if compromised.",
+    "admin_commands": "Require GUMROAD_ADMIN_TOKEN + --non-interactive for admin/* commands"
+  },
+  "usage_in_architecture": {
+    "Marketplace_Router": "Uses this object to know which CLI commands and field mappings apply",
+    "Deployment_Agent": "Sources credentials and permissions before calling gumroad products create / update / publish",
+    "Telemetry": "Can use read_sales and read_analytics permissions to pull buyer signals"
+  },
+  "status": "Defined - ready for implementation in Deployment Manifest and wrapper scripts"
+}
