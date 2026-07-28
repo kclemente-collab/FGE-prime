@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FGE Commerce Compiler Codex — Unratified</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --obsidian: #0B0D0F;
+    --obsidian-2: #101317;
+    --marble: #E8E4DC;
+    --marble-dim: #D8D3C8;
+    --gold: #C9A227;
+    --gold-dim: #8A7220;
+    --ink: #8A8578;
+    --ink-bright: #C4C0B4;
+    --oxide: #B23A2E;
+    --rule: rgba(201,162,39,0.22);
+  }
+
+  * { box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    background: var(--obsidian);
+    color: var(--marble);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+  }
+
+  /* ---------- COVER / STAMP ---------- */
+  .cover {
+    position: relative;
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-size: clamp(34px, 6vw, 52px);
+    line-height: 1.08;
+    margin: 0 0 14px;
+    color: var(--marble);
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-bright);
+    max-width: 46ch;
+  }
+
+  .version-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    margin-top: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .stamp {
+    position: absolute;
+    top: 8px;
+    right: 4px;
+    transform: rotate(6deg);
+    border: 2px solid var(--oxide);
+    color: var(--oxide);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 9px 12px;
+    text-align: center;
+    line-height: 1.5;
+    border-radius: 3px;
+    opacity: 0.92;
+    animation: stampIn 0.5s ease-out 0.1s both;
+    background: rgba(178,58,46,0.05);
+  }
+
+  @keyframes stampIn {
+    from { opacity: 0; transform: rotate(6deg) scale(1.15); }
+    to { opacity: 0.92; transform: rotate(6deg) scale(1); }
+  }
+
+  /* ---------- PROVENANCE BLOCK ---------- */
+  .provenance {
+    background: rgba(178,58,46,0.06);
+    border: 1px solid rgba(178,58,46,0.35);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-bottom: 56px;
+  }
+
+  .provenance-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--oxide);
+    margin-bottom: 10px;
+  }
+
+  .provenance p {
+    font-size: 13.5px;
+    color: var(--ink-bright);
+    margin: 0 0 8px;
+  }
+  .provenance p:last-child { margin-bottom: 0; }
+
+  /* ---------- SECTION RHYTHM ---------- */
+  section { margin-bottom: 56px; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--marble);
+    margin: 0 0 14px;
+  }
+
+  p { color: var(--ink-bright); font-size: 15px; margin: 0 0 14px; }
+  p.lede { font-size: 16.5px; color: var(--marble); }
+
+  .loop {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--gold-dim);
+    line-height: 2;
+    background: var(--obsidian-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+
+  /* ---------- ERA LEDGER ENTRIES ---------- */
+  .era {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 20px;
+    padding: 24px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .era:first-of-type { border-top: none; padding-top: 0; }
+
+  .era-num {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--gold-dim);
+    line-height: 1;
+  }
+
+  .era-era {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .era-versions {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  /* ---------- ANCHOR METHOD ---------- */
+  .anchors {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: anchor;
+  }
+  .anchors li {
+    counter-increment: anchor;
+    position: relative;
+    padding: 12px 0 12px 40px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14.5px;
+    color: var(--ink-bright);
+  }
+  .anchors li:last-child { border-bottom: none; }
+  .anchors li::before {
+    content: counter(anchor);
+    position: absolute;
+    left: 0;
+    top: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .anchors strong { color: var(--marble); font-weight: 600; }
+
+  /* ---------- GLOSSARY ---------- */
+  .glossary dt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: var(--gold);
+    margin-top: 18px;
+  }
+  .glossary dd {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--ink-bright);
+  }
+
+  /* ---------- RECONCILIATION PUNCH LIST ---------- */
+  .punchlist {
+    border: 1px solid rgba(178,58,46,0.35);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .punch-item {
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(178,58,46,0.25);
+    background: rgba(178,58,46,0.04);
+  }
+  .punch-item:last-child { border-bottom: none; }
+
+  .punch-flag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--oxide);
+    margin-bottom: 8px;
+  }
+
+  .collision {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--marble);
+    margin-bottom: 6px;
+  }
+  .collision .vs { color: var(--ink); font-style: normal; margin: 0 8px; }
+
+  .punch-item p { font-size: 13.5px; margin: 0; color: var(--ink-bright); }
+
+  /* ---------- FOOTER / STATUS LEDGER ---------- */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 32px;
+    margin-top: 64px;
+  }
+
+  .status-ledger {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .status-ledger .oxide-text { color: var(--oxide); }
+
+  .colophon {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .fade-in {
+    animation: fadeUp 0.5s ease-out both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover fade-in">
+    <div class="stamp">UNRATIFIED<br>PENDING<br>RECONCILIATION</div>
+    <div class="eyebrow">Feral Gloss Empire · Governance Bureau · Reference Draft</div>
+    <h1 class="title">The Commerce Compiler Codex</h1>
+    <p class="subtitle">A record of the Commerce Compiler's evolution from manufacturing tool to enterprise operating architecture — held pending reconciliation against the ratified L0–L7 stack.</p>
+    <div class="version-line">EVOLUTION V1.0 → V2.3 · CAPTURE · STRUCTURE · MULTIPLY · MEASURE · LEARN · GOVERN · COMPOUND</div>
+  </div>
+
+  <div class="provenance fade-in">
+    <div class="provenance-label">Provenance &amp; Status</div>
+    <p><strong style="color:var(--marble)">Tag:</strong> SYNTHESIZED — compiled from source narrative, not verified against shipped code.</p>
+    <p><strong style="color:var(--marble)">Gate status:</strong> Has not entered the four-gate canon-lock process. No SBID, no ratification stamp, no Canonical Decisions Register entry.</p>
+    <p><strong style="color:var(--marble)">Blocking condition:</strong> Component names in this document collide with existing L0–L7 stub layers. See Reconciliation Punch List before this is read as canon.</p>
+  </div>
+
+  <section class="fade-in">
+    <div class="section-label">Executive Summary</div>
+    <p class="lede">The Commerce Compiler began with one question: how does a canon object become a repeatable commercial ecosystem?</p>
+    <p>The first answer was simple — creative object becomes product package. The architecture that followed was not: creative intelligence into commercial ecosystem, into market learning, into predictive strategy, into autonomous operations, into governed enterprise growth. What started as a manufacturing tool became an operating architecture for the whole enterprise.</p>
+  </section>
+
+  <section class="fade-in">
+    <div class="section-label">Master System Loop</div>
+    <div class="loop">
+      EVOLUTION VAULT<br>
+      → PRODUCT COMPILER<br>
+      → COMMERCE COMPILER<br>
+      → AGENT NETWORK<br>
+      → CUSTOMER SIGNALS<br>
+      → MARKET INTELLIGENCE<br>
+      → PREDICTIVE ENGINE<br>
+      → PORTFOLIO ALLOCATION<br>
+      → EXECUTIVE COMMAND<br>
+      → AUTONOMOUS OPERATIONS<br>
+      → SELF OPTIMIZATION<br>
+      → GOVERNANCE<br>
+      → DIGITAL TWIN<br>
+      → RESOURCE ORCHESTRATION
+    </div>
+  </section>
+
+  <section class="fade-in">
+    <div class="section-label">Evolution Eras</div>
+
+    <div class="era">
+      <div class="era-num">I</div>
+      <div>
+        <div class="era-era">Manufacturing Era</div>
+        <div class="era-versions">V1.0 — Product Generation Engine · V1.1 — Reliability Layer</div>
+        <p>JSON as contract, Python as execution — identity separated from behavior. V1.1 adds schema validation and Build Report Objects, giving the factory memory of its own manufacturing history.</p>
+      </div>
+    </div>
+
+    <div class="era">
+      <div class="era-num">II</div>
+      <div>
+        <div class="era-era">Multiplication Era</div>
+        <div class="era-versions">V1.2 — Product Family Spawning Engine</div>
+        <p>One canon object becomes an ecosystem. SKU doctrine locked: <code style="color:var(--gold)">FGE-[OBJECT_CODE]-[PRODUCT_TYPE]-[SEQUENCE]</code>.</p>
+      </div>
+    </div>
+
+    <div class="era">
+      <div class="era-num">III</div>
+      <div>
+        <div class="era-era">Distribution Era</div>
+        <div class="era-versions">V1.3 — Agent Execution Engine</div>
+        <p>The factory receives a workforce. A product isn't complete when it exists — it becomes valuable once it enters a controlled path toward discovery, conversion, collection, and feedback: specialized agents, SKU-to-campaign task routing, and market signals returned upstream.</p>
+      </div>
+    </div>
+
+    <div class="era">
+      <div class="era-num">IV</div>
+      <div>
+        <div class="era-era">Intelligence Era</div>
+        <div class="era-versions">V1.4 — Market Intelligence · V1.5 — Predictive Production</div>
+        <p>Claimed method: Bayesian optimization via Gaussian Process surrogate with Expected Improvement. The system moves from learning the past to forecasting the future — <em>unverified against implementation; flag for engineering audit before citation elsewhere.</em></p>
+      </div>
+    </div>
+
+    <div class="era">
+      <div class="era-num">V</div>
+      <div>
+        <div class="era-era">Enterprise Control Era</div>
+        <div class="era-versions">V1.9–V2.3 — Self-Optimization · Governance · Simulation · Digital Twin · Resource Orchestration</div>
+        <p>The factory gains long-term memory governance, simulation capability, and enterprise-wide resource orchestration.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in">
+    <div class="section-label">Anchor Method Connection</div>
+    <ol class="anchors">
+      <li><strong>Capture</strong> the core truth</li>
+      <li><strong>Convert</strong> identity into structure</li>
+      <li><strong>Multiply</strong> into an ecosystem</li>
+      <li><strong>Learn</strong> from the world</li>
+      <li><strong>Govern</strong> growth</li>
+      <li><strong>Compound</strong> value forever</li>
+    </ol>
+  </section>
+
+  <section class="fade-in">
+    <div class="section-label">Master Glossary</div>
+    <dl class="glossary">
+      <dt>Evolution Vault</dt>
+      <dd>The internal memory system containing canon, identity, artifacts, and learned knowledge.</dd>
+      <dt>Product Compiler</dt>
+      <dd>Transforms creative objects into product families.</dd>
+      <dt>Commerce Compiler</dt>
+      <dd>Transforms products into market-ready packages.</dd>
+      <dt>Agent Network</dt>
+      <dd>Autonomous workers executing specialized functions. <span style="color:var(--oxide)">Unmapped against Agent Orchestration stub layer — see punch list.</span></dd>
+      <dt>Market Intelligence</dt>
+      <dd>External reality memory generated from customer behavior.</dd>
+      <dt>Predictive Engine</dt>
+      <dd>Forecasting system determining likely opportunities.</dd>
+      <dt>Portfolio Allocation</dt>
+      <dd>Strategic distribution of limited resources.</dd>
+      <dt>Resource Orchestration</dt>
+      <dd>The mechanism that directs energy toward maximum long-term value. <span style="color:var(--oxide)">Unmapped against MAVEN — see punch list.</span></dd>
+    </dl>
+  </section>
+
+  <section class="fade-in">
+    <div class="section-label">Reconciliation Punch List</div>
+    <p>Three named components in this codex share names or functional territory with layers already stubbed in the ratified L0–L7 stack. None are mapped. Resolve before this document is cited anywhere external.</p>
+    <div class="punchlist">
+      <div class="punch-item">
+        <div class="punch-flag">Unresolved · Naming Collision</div>
+        <div class="collision">Agent Network <span class="vs">↔</span> Agent Orchestration (L0–L7 stub)</div>
+        <p>Determine whether these describe the same system under drifted terminology, or two distinct systems that both need to exist. No reconciliation without this being answered first.</p>
+      </div>
+      <div class="punch-item">
+        <div class="punch-flag">Unresolved · Naming Collision</div>
+        <div class="collision">Digital Twin (V2.2) <span class="vs">↔</span> Digital Twin (L0–L7 stub)</div>
+        <p>Identical name, no shared spec. Confirm single source of truth before either reference is used in downstream documentation.</p>
+      </div>
+      <div class="punch-item">
+        <div class="punch-flag">Unresolved · Naming Collision</div>
+        <div class="collision">Resource Orchestration (V2.3) <span class="vs">↔</span> MAVEN (economic interface)</div>
+        <p>Both claim the role of directing resources/value at the enterprise level. Overlap in function, not just name — highest-priority item on this list.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="status-ledger fade-in">
+      <span>SOURCE: COMMERCE COMPILER NARRATIVE, GROK-GENERATED</span>
+      <span class="oxide-text">STATUS: NOT CANON LOCKED</span>
+    </div>
+    <div class="colophon">Feral Gloss Empire · Governance Bureau · One · Only · Produced</div>
+  </footer>
+
+</div>
+</body>
+</html>

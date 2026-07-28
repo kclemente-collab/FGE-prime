@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "engine": "FGE SCENE TEMPLATE ENGINE v1.0",
+    "codex_name": "Doctrinal Camera Codex",
+    "version": "1.0",
+    "last_updated": "2026-07-10",
+    "canon_compliance": "Publishing Studio Constitution | 6-Pillar Connected | Zero-Drift Identity Lock",
+    "description": "Reusable, versioned, transportable camera angle and movement templates for consistent cinematic scene production. Designed for daily Hero Poster, Lookbook, Four-Card Set, and especially Six-Second Loop output. Every template enforces Feral Gloss material interaction, Active Rendering Protocol, and full Character-Companion-Location-Event-Relationship-Collection connectivity.",
+    "integration_points": [
+      "fge-character-posing-module (DPL)",
+      "fge-video-diary-locked",
+      "fge-video-diary-packager",
+      "shot-locker",
+      "fge-canon-lock-gate",
+      "fge-product-engine",
+      "Narrative Spine OS"
+    ]
+  },
+  "templates": {
+    "CAR-EXT-TRACK-HERO-01": {
+      "id": "CAR-EXT-TRACK-HERO-01",
+      "name": "Exterior Low-Angle Tracking Hero Pull-Back",
+      "category": "car_exterior",
+      "version": "1.0",
+      "purpose": "Heroic arrival or departure reveal. Establishes power, motion, and scale. Perfect for Seraphine supercar or any signature vehicle arrival at a Location.",
+      "camera_parameters": {
+        "type": "tracking",
+        "position": "exterior_low_rear_three_quarter",
+        "angle": "low_hero",
+        "focal_length": 35,
+        "height": "0.8m above ground",
+        "movement": {
+          "type": "smooth_pull_back_tracking",
+          "speed": "variable 40-80 km/h sync with vehicle",
+          "curve": "gentle_S_curve",
+          "duration_seconds": 6,
+          "shake": "subtle_road_vibration"
+        },
+        "framing": "car_occupies_lower_60_percent_frame_initially_then_reveals_full_vehicle_and_driver_silhouette"
+      },
+      "framing_rules": {
+        "character_visibility": "driver_silhouette_through_tinted_glass_or_open_window_hair_flow",
+        "body_interaction": "steering_wheel_hands_visible_subtle_grip_tension",
+        "environmental": "road_surface_reflections_passing_lights_streaks_city_or_desert_background"
+      },
+      "lighting_directive": "Active Rendering Protocol + tenebrism. Single strong side moonlight or streetlight source creating dramatic rim light on car body and hair. Deep shadows in cabin. Specular Feral Gloss highlights on paint and skin. Passing light strobes for motion energy.",
+      "material_interaction": "Feral Gloss Signature on car paint with liquid chrome reflections. Kintsugi gold vein accents on body lines if canon vehicle. Hair strands with wind stretch-snap physics. Skin micro-tremors and goosebumps from night air.",
+      "canon_locks": {
+        "required_character_gospel": true,
+        "location_tags": ["highway", "night_road", "arrival_approach"],
+        "event_tags": ["arrival", "departure", "chase_initiation"],
+        "relationship_echo": "optional_companion_in_passenger_seat_silhouette"
+      },
+      "prompt_block": "Cinematic exterior low-angle tracking shot of [CHARACTER] driving [VEHICLE] at night, smooth pull-back camera movement revealing the full car, dramatic tenebrism lighting with strong side rim light, Feral Gloss specular highlights on wet-look paint, hair flowing from open window, grounded realism hyper-realistic Olivia de Berardinis airbrush style, subtle road vibration, motion energy, black background void with passing light streaks, masterful composition",
+      "usage_notes": "Use for Hero Posters and opening frames of Six-Second Loops. Pairs excellently with INT-POV-DRIVER-01 for edit contrast. Lock identity before applying movement."
+    },
+    "CAR-INT-POV-DRIVER-01": {
+      "id": "CAR-INT-POV-DRIVER-01",
+      "name": "Interior Driver POV — Night Highway Immersion",
+      "category": "car_interior",
+      "version": "1.0",
+      "purpose": "First-person immersion. Puts viewer in the driver's seat. High intimacy and tension. Ideal for psychological or sensual driving moments.",
+      "camera_parameters": {
+        "type": "POV",
+        "position": "interior_driver_seat_over_shoulder_or_direct_POV",
+        "angle": "slightly_low_forward",
+        "focal_length": 28,
+        "height": "driver_eye_level",
+        "movement": {
+          "type": "forward_road_tracking_with_subtle_road_bob",
+          "speed": "matches_vehicle_speed",
+          "curve": "micro_road_undulation",
+          "duration_seconds": 6,
+          "shake": "realistic_road_vibration_increasing_with_speed"
+        },
+        "framing": "steering_wheel_and_hands_prominent_in_lower_frame_road_rushing_through_windshield_distant_lights_approaching"
+      },
+      "framing_rules": {
+        "character_visibility": "driver_hands_on_wheel_fingers_visible_grip_tension_forearms_partial_face_reflection_in_rearview_mirror",
+        "body_interaction": "wind_from_open_window_lifting_hair_across_face_subtle_breathing_chest_rise",
+        "environmental": "dashboard_glow_reflections_on_skin_passing_headlight_flares_through_windshield_night_highway_streaks"
+      },
+      "lighting_directive": "Tenebrism + practical sources. Dashboard and instrument cluster glow as primary fill. Strong passing car headlights creating harsh side flashes and rim light on cheekbones and hands. Deep cabin shadows. Specular wet highlights on skin and steering wheel.",
+      "material_interaction": "Earned Physics on hair (wind stretch-snap). Feral Hyperdermal Resonance on skin with passing light temperature shifts. Liquid chrome dashboard reflections. Subtle goosebumps on arms from night air.",
+      "canon_locks": {
+        "required_character_gospel": true,
+        "location_tags": ["night_highway", "interior_cabin"],
+        "event_tags": ["solo_drive", "intimate_moment", "tension_build"],
+        "relationship_echo": "optional_rearview_mirror_glimpse_of_companion_or_memory"
+      },
+      "prompt_block": "Intimate first-person driver POV inside luxury car at night on highway, hands gripping steering wheel, wind blowing hair across face from open window, dashboard glow lighting face and hands, passing headlights creating dramatic flashes and rim lighting, hyper-realistic grounded skin texture with subtle goosebumps, Feral Gloss specular reflections, Olivia de Berardinis inspired sensual airbrush rendering, cinematic motion, six second loop ready, black void background with light streaks",
+      "usage_notes": "Core template for Six-Second Loops and Lookbook interior panels. Extremely high addiction potential due to POV intimacy. Combine with subtle head-turn micro-movement for life."
+    },
+    "CAR-SIDE-PROFILE-WIND-01": {
+      "id": "CAR-SIDE-PROFILE-WIND-01",
+      "name": "Side Window Profile — Wind & Light Streaks",
+      "category": "car_interior_exterior_hybrid",
+      "version": "1.0",
+      "purpose": "Sensual character showcase during motion. Hair, expression, and environmental interaction in one frame. High erotic and cinematic value.",
+      "camera_parameters": {
+        "type": "side_tracking",
+        "position": "exterior_side_level_with_window",
+        "angle": "pure_profile_or_slight_3/4",
+        "focal_length": 50,
+        "height": "window_center",
+        "movement": {
+          "type": "parallel_tracking_at_constant_distance",
+          "speed": "matches_vehicle",
+          "curve": "straight_with_micro_road_rock",
+          "duration_seconds": 6,
+          "shake": "none_or_very_subtle"
+        },
+        "framing": "character_head_and_shoulders_filling_70_percent_of_frame_through_open_or_tinted_window_hair_streaming_backward_road_and_lights_blurring_behind"
+      },
+      "framing_rules": {
+        "character_visibility": "full_profile_face_hair_dynamically_flowing_eyes_slightly_squinted_against_wind_or_looking_forward_with_predatory_focus",
+        "body_interaction": "wind_lifting_and_stretching_hair_strands_across_face_and_neck_subtle_shoulder_tension_from_driving",
+        "environmental": "motion_blur_on_background_lights_creating_horizontal_streaks_reflections_on_car_body_and_skin"
+      },
+      "lighting_directive": "Active Rendering Protocol. Strong side/backlight source (moon or streetlights) creating beautiful rim and hair light. Passing lights creating traveling highlights across face and body. Deep shadow on near side of face for dramatic contrast. Tenebrism excellence.",
+      "material_interaction": "Hair as primary actor — Feral Gloss + wind physics with individual strand definition and stretch-snap. Skin with realistic subsurface scattering and micro wind reaction. Car paint showing liquid chrome motion reflections.",
+      "canon_locks": {
+        "required_character_gospel": true,
+        "location_tags": ["night_road", "coastal_highway", "urban_drive"],
+        "event_tags": ["sensual_drive", "hair_moment", "contemplative_motion"],
+        "relationship_echo": "optional_companion_hand_resting_on_thigh_or_steering_wheel_shared"
+      },
+      "prompt_block": "Cinematic side profile tracking shot of [CHARACTER] driving at night, wind dramatically blowing long hair backward through open car window, strong rim lighting and passing light streaks creating sensual highlights on skin and hair, hyper-realistic Olivia de Berardinis airbrush pinup style with baby-like youth skin texture, Feral Gloss material on hair and car, grounded realism, tenebrism, motion energy, black background, six second cinematic loop composition",
+      "usage_notes": "Highest visual addiction potential for Lookbooks and Hero Posters. Excellent for character showcase moments. Lock hair gospel before applying wind physics."
+    },
+    "CAR-REAR-3Q-MOTION-01": {
+      "id": "CAR-REAR-3Q-MOTION-01",
+      "name": "Rear Three-Quarter Dynamic Motion",
+      "category": "car_exterior",
+      "version": "1.0",
+      "purpose": "Classic cinematic car shot. Shows vehicle power, character presence, and environment simultaneously. Strong for chase or freedom narratives.",
+      "camera_parameters": {
+        "type": "rear_three_quarter_tracking",
+        "position": "elevated_rear_3/4",
+        "angle": "three_quarter_rear",
+        "focal_length": 40,
+        "height": "2.5m (drone or following vehicle)",
+        "movement": {
+          "type": "following_tracking",
+          "speed": "matches_or_slightly_slower",
+          "curve": "gentle_follow_with_road_undulation",
+          "duration_seconds": 6,
+          "shake": "realistic_following_vehicle_vibration"
+        },
+        "framing": "car_rear_3/4_composition_road_stretching_into_distance_ahead_character_silhouette_visible_in_driver_seat"
+      },
+      "framing_rules": {
+        "character_visibility": "driver_silhouette_through_rear_window_or_side_glass_hair_movement_visible",
+        "body_interaction": "subtle_head_movements_steering_inputs",
+        "environmental": "road_lines_rushing_toward_camera_distant_city_or_landscape_approaching"
+      },
+      "lighting_directive": "Tenebrism + practical. Strong rear or side light sources creating car body highlights. Taillight glow contributing to scene. Passing environment lights creating traveling reflections.",
+      "material_interaction": "Full Feral Gloss on car body with dynamic reflections changing as car moves. Exhaust or heat distortion if performance driving. Road surface interaction (splash if wet, dust if desert).",
+      "canon_locks": {
+        "required_character_gospel": true,
+        "location_tags": ["open_road", "highway", "chase_route"],
+        "event_tags": ["chase", "escape", "freedom_run", "night_drive"],
+        "relationship_echo": "optional_second_vehicle_or_companion_car_in_distance"
+      },
+      "prompt_block": "Dynamic rear three-quarter tracking shot following [VEHICLE] driven by [CHARACTER] at speed on night highway, smooth cinematic camera movement, dramatic lighting with strong car body highlights and taillight glow, motion blur on road, Feral Gloss wet-look paint reflections, hyper-realistic grounded style, Olivia de Berardinis level detail on character silhouette, black cinematic background, six second loop ready",
+      "usage_notes": "Workhorse template for action and scale. Easy to escalate into chase sequences by adding second vehicle or tension elements."
+    },
+    "CAR-DUTCH-TENSION-01": {
+      "id": "CAR-DUTCH-TENSION-01",
+      "name": "Dutch Angle Slow Push-In Tension",
+      "category": "car_interior",
+      "version": "1.0",
+      "purpose": "Psychological intensity or building heat. Slightly off-kilter framing signals unease, desire, or impending shift in power/relationship.",
+      "camera_parameters": {
+        "type": "dutch_push_in",
+        "position": "interior_passenger_or_rear_seat",
+        "angle": "dutch_tilt_15-25_degrees",
+        "focal_length": 35,
+        "height": "eye_level",
+        "movement": {
+          "type": "slow_push_in_with_subtle_dutch_hold",
+          "speed": "very_slow_creeping",
+          "curve": "almost_static_with_micro_advance",
+          "duration_seconds": 6,
+          "shake": "minimal_heartbeat_subtle"
+        },
+        "framing": "character_face_or_upper_body_filling_frame_as_camera_pushes_road_and_dashboard_elements_at_tilted_angle"
+      },
+      "framing_rules": {
+        "character_visibility": "intense_eye_contact_or_averted_gaze_hair_partially_obscuring_face_lip_part_slight",
+        "body_interaction": "subtle_shoulder_rise_with_breath_micro_tremor_in_hands",
+        "environmental": "dashboard_and_road_elements_tilted_creating_visual_tension"
+      },
+      "lighting_directive": "High contrast tenebrism. Single strong practical source (passing light or dashboard) creating deep shadows and bright highlights on face. Color temperature shift possible (cool night to warm interior).",
+      "material_interaction": "Skin texture hyper-detailed with micro sweat or flush if heat moment. Hair strands catching light. Eyes with liquid render physics and predatory or vulnerable depth.",
+      "canon_locks": {
+        "required_character_gospel": true,
+        "location_tags": ["interior_cabin", "parked_or_slow_moving"],
+        "event_tags": ["tension_build", "seduction", "confrontation", "intimate_reveal"],
+        "relationship_echo": "strong_companion_presence_or_memory_overlay"
+      },
+      "prompt_block": "Cinematic Dutch angle slow push-in inside car cabin at night, [CHARACTER] in frame with intense expression, hair partially obscuring face, strong tenebrism lighting with deep shadows and bright highlights on skin, hyper-realistic grounded realism with subtle micro tremors, Feral Gloss on skin and hair, Olivia de Berardinis sensual airbrush mastery, psychological tension, black background, six second loop composition",
+      "usage_notes": "Use sparingly for maximum impact. Excellent escalation tool in Lookbooks or as climax frame in Six-Second Loops. Requires strong character gospel lock to avoid drift in intense expressions."
+    }
+  },
+  "usage_guidelines": {
+    "how_to_apply": "1. Load desired template from this codex. 2. Merge with current Character gospel measurements and traits. 3. Inject specific Location and Event details. 4. Run through fge-canon-lock-gate. 5. Generate stills via fge-product-engine or motion via fge-video-diary-locked. 6. Lock final output in shot-locker or visual registry.",
+    "versioning_rule": "Minor changes (lighting tweaks, specific vehicle) = patch version. New movement language or major framing shift = minor version bump. Breaking change to canon locks = major version.",
+    "daily_production_boost": "Pre-load 2-3 relevant templates at session start. This enables hitting 1 Six-Second Loop daily target in under 30 minutes while maintaining wallworthiness.",
+    "addiction_mechanic": "Each template contains built-in 'hunger hooks' — wind physics, light interaction, micro-movement potential — that make viewers crave the next frame or loop iteration."
+  }
+}
