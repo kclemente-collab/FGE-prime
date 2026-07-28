@@ -1,0 +1,136 @@
+{
+  "schema": "FGE_COMPLETE_ROSTER_v1.0",
+  "generated": "2026-05-14",
+  "source": "Council Review — APPROVED",
+  "title": "FERAL GLOSS EMPIRE — COMPLETE ROSTER v1.0",
+  "system_status": "Fully operational. All entities CR-Full validated, modular, horizontally reproducible across realms.",
+
+  "central_vessels": {
+    "label": "Brightest Anchors",
+    "members": [
+      {
+        "name": "The New Prince / The Boss",
+        "role": "Commanding male devotional anchor",
+        "tier": "Central Vessel"
+      },
+      {
+        "name": "Nikki Raven",
+        "role": "Raven-haired enchantress, Chaos Mode specialist",
+        "tier": "Central Vessel"
+      },
+      {
+        "name": "Lirael Voss",
+        "role": "Moon Thief / Moonlit Consort, origin myth",
+        "tier": "Central Vessel"
+      },
+      {
+        "name": "Victoria Reign",
+        "role": "High-gloss ritual sovereign, exploration anchor",
+        "tier": "Central Vessel"
+      }
+    ]
+  },
+
+  "delicate_attendant_cohort": {
+    "label": "Delicate Attendant Cohort v1.3",
+    "count": 30,
+    "spec": "Ultra-lean delicate vibrational attendants with dancer proportions, pearlescent opal film, Echo Pulse, and left-pinky tremor. All 30 CR-Full validated.",
+    "named_members": [
+      "Luna Voss",
+      "Sofia Reyes",
+      "Anya Petrova",
+      "Amara Okoro",
+      "Mei Lin Zhao",
+      "Isabella Morales",
+      "Freya Nordvik",
+      "Zara Okeke",
+      "Elena Petrova",
+      "Luna Kim",
+      "Valentina Costa",
+      "Aisha Diallo",
+      "Ingrid Berg",
+      "Sofia Ramirez",
+      "Jia Li Chen",
+      "Fatima Al-Sayed",
+      "Kira Novak",
+      "Maya Okoro",
+      "Elena Rossi",
+      "Priya Sharma",
+      "Ava Thompson",
+      "Sana Al-Mansour",
+      "Freya Larsen",
+      "Isabella Costa",
+      "Mei Lin Wong",
+      "Amina Keita",
+      "Priya Patel"
+    ],
+    "unnamed_slots": 3,
+    "pending_naming": 10
+  },
+
+  "male_support_roles": {
+    "label": "Male Support Roles",
+    "members": [
+      {
+        "name": "Guardian Attendant",
+        "role": "Lean muscular protective amplifier",
+        "signature": "Left-hand tremor"
+      },
+      {
+        "name": "Ritual Mentor (Male)",
+        "role": "Mature salt-and-pepper guiding authority"
+      },
+      {
+        "name": "Ritual Mentor (Female)",
+        "role": "Elegant mature wisdom guide"
+      },
+      {
+        "name": "Hybrid Mentor Pair",
+        "role": "Male + Female working in synergy"
+      }
+    ]
+  },
+
+  "morph_pet_system": {
+    "label": "Morph Pet System v1.0",
+    "type": "Living devotional companions",
+    "members": [
+      { "name": "Lumina Hummingbird", "status": "default" },
+      { "name": "Opal Shadow Fox Kit" },
+      { "name": "Nebula Moon Moth" },
+      { "name": "Pearl Serpentling" },
+      { "name": "Starlit Glass Sparrow" },
+      { "name": "Crimson Glow Kitten" },
+      { "name": "Silver Echo Rabbit" },
+      { "name": "Aurora Firefly Swarm" },
+      { "name": "Obsidian Dew Dragonet" },
+      { "name": "Rose Thorn Pixie" },
+      { "name": "Pulse Crystal Serpent" },
+      { "name": "Devotional Echo Dove" }
+    ]
+  },
+
+  "production_roles": {
+    "label": "Production Roles — The Machine",
+    "members": [
+      {
+        "name": "Glamorama Architect",
+        "function": "Exploration"
+      },
+      {
+        "name": "Kael Draven",
+        "function": "Refinement"
+      },
+      {
+        "name": "Feral Gloss Judge",
+        "function": "Gatekeeper"
+      },
+      {
+        "name": "The Warden",
+        "function": "Orchestrator"
+      }
+    ]
+  },
+
+  "notes": "These are seeds. All doctrines locked and chambered."
+}

@@ -1,0 +1,70 @@
+{
+  "object_type": "Deployment Manifest Object",
+  "name": "DEPLOYMENT_MANIFEST_FGE-SDU-WF-001",
+  "sku": "FGE-SDU-WF-001",
+  "version": "0.1.0",
+  "product_name": "SDU Creative Workflow System v0.1",
+  "purpose": "The shipping label and instruction set that tells the Deployment Agent exactly what to create in Gumroad from the SKU Contract and Product Package.",
+  "create": true,
+  "update_if_exists": false,
+  "fields": {
+    "name": "SDU Creative Workflow System v0.1",
+    "price": 49.00,
+    "currency": "USD",
+    "description": "Turn chaotic creative thinking into a repeatable, identity-preserving production workflow. Includes workflow guide, templates, examples, provenance records, and lineage story. First control specimen of the FGE governed commerce system.",
+    "custom_summary": "The first sellable compression of FGE identity governance into a repeatable creative workflow.",
+    "category": "design/creative-tools",
+    "tags": ["creative workflow", "governance", "prompt engineering", "character consistency", "feral gloss empire", "identity preservation"],
+    "pay_what_you_want": false,
+    "suggested_price": null,
+    "max_purchase_count": null
+  },
+  "assets": {
+    "cover_image": "hero_poster.png (from Product Package Assets/)",
+    "preview_images": [
+      "transformation_visual.png",
+      "workflow_visual.png",
+      "proof_visual.png",
+      "brand_visual.png"
+    ],
+    "thumbnail": "hero_poster.png or dedicated thumb version",
+    "delivery_files": [
+      {
+        "path": "FGE-SDU-WF-001.zip",
+        "name": "SDU Creative Workflow System v0.1.zip",
+        "description": "Complete package: README, Workflow Guide, Templates, Examples, Provenance, License, Assets"
+      }
+    ]
+  },
+  "validation": {
+    "required_fields_complete": true,
+    "package_files_present": true,
+    "identity_preservation_score": ">= 0.90 (from Release Controller)",
+    "commercial_integrity_score": ">= 0.80 (from Release Controller)",
+    "human_approval_gate": "MANDATORY before publish"
+  },
+  "lifecycle": {
+    "create_as": "draft",
+    "after_create": "upload assets + set metadata",
+    "before_publish": "human review of draft + verification that all assets uploaded correctly",
+    "publish_command": "gumroad products publish <product_id>",
+    "do_not_auto_publish": true
+  },
+  "gumroad_cli_commands": {
+    "create": "gumroad products create --name \"SDU Creative Workflow System v0.1\" --price 49.00 --description \"...\" --tag creative-workflow --tag governance ... --json --no-input",
+    "add_cover": "gumroad products covers add <id> --image ./hero_poster.png --json --no-input",
+    "add_previews": "repeat for each preview image",
+    "set_thumbnail": "gumroad products thumbnail set <id> --image ./thumb.jpg --json --no-input",
+    "upload_file": "gumroad products update <id> --file ./FGE-SDU-WF-001.zip --file-name \"SDU Creative Workflow System v0.1.zip\" --json --no-input",
+    "publish": "gumroad products publish <id> --json --no-input"
+  },
+  "human_approval_checklist": [
+    "All required fields filled correctly",
+    "Cover and previews look on-brand (void black + liquid gold kintsugi)",
+    "Delivery file uploaded and downloadable in draft",
+    "Description and sales story match the lineage document",
+    "Price set to $49 launch price",
+    "No generic fantasy aesthetics or identity drift visible"
+  ],
+  "status": "Ready for use with SDU-COM-001 once Product Package is built and Release Controller passes"
+}
