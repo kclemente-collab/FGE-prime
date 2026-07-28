@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#0a0b0d; }
+  /* 3:2 master canvas at 2400x1600 -> clears Primary 1800px floor */
+  .canvas {
+    width:2400px; height:1600px; position:relative;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 0%, #15110a 0%, #0a0b0d 55%),
+      #08090b;
+    font-family:'EB Garamond', serif; color:#c8b88a; overflow:hidden;
+  }
+  /* ZONE_10 — border frame */
+  .frame { position:absolute; inset:26px; border:2px solid #8a742e;
+    box-shadow:inset 0 0 0 1px rgba(200,168,75,.18), inset 0 0 60px rgba(0,0,0,.6); }
+  .frame::before,.frame::after{content:'';position:absolute;width:34px;height:34px;border:2px solid #c8a84b;}
+  .frame::before{top:-2px;left:-2px;border-right:none;border-bottom:none;}
+  .frame::after{bottom:-2px;right:-2px;border-left:none;border-top:none;}
+
+  /* ZONE_01 — header */
+  .header{ position:absolute; top:60px; left:0; right:0; text-align:center; }
+  .title{ font-family:'Cinzel',serif; font-weight:700; font-size:74px; letter-spacing:.22em;
+    color:#d8be72; text-shadow:0 2px 18px rgba(200,168,75,.25); padding-left:.22em; }
+  .title .diamond{ color:#8a742e; font-size:40px; vertical-align:middle; margin:0 26px; }
+  .subtitle{ font-family:'Cormorant Garamond',serif; font-size:33px; font-style:italic;
+    color:#9a8f74; letter-spacing:.04em; margin-top:10px; }
+  .rule{ width:560px; height:1px; margin:18px auto 0; position:relative;
+    background:linear-gradient(90deg,transparent,#8a742e,transparent); }
+
+  /* four columns */
+  .cols{ position:absolute; top:236px; left:70px; right:70px; height:980px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:26px; }
+  .card{ position:relative; border-radius:6px; padding:30px 26px; overflow:hidden;
+    display:flex; flex-direction:column; }
+  .pearl  { background:linear-gradient(160deg,#e9e2d2,#cdc2aa); border:1px solid #b8aa84; color:#2a241a; }
+  .obsidian{ background:linear-gradient(160deg,#171922,#0c0d12); border:1px solid #2a2d3a; color:#c3c8d4; }
+  .kintsugi{ background:linear-gradient(160deg,#6e5a2a,#3a2e14); border:1px solid #a07c2e; color:#ece0c0; }
+  .dragon { background:linear-gradient(160deg,#1a0f0c,#0c0708); border:1px solid #6a2f1a; color:#e8c4a0; }
+
+  .cnum{ font-family:'Cinzel',serif; font-weight:600; font-size:30px; }
+  .cttl{ font-family:'Cinzel',serif; font-weight:600; font-size:30px; letter-spacing:.05em; line-height:1.15; margin-bottom:20px; }
+  .pearl .cnum,.pearl .cttl{ color:#2a241a; }
+  .imgbox{ height:300px; border-radius:4px; margin-bottom:22px; position:relative; display:flex; align-items:center; justify-content:center; }
+  .lead{ font-family:'Cinzel',serif; font-weight:500; font-size:25px; line-height:1.3; text-align:center; margin-bottom:18px; letter-spacing:.02em; }
+  .body{ font-size:23px; line-height:1.5; }
+  .body .x{ display:block; margin:3px 0; }
+  .xmark{ color:#7a5cc0; font-weight:600; margin-right:10px; }
+  .spacer{ flex:1; }
+  .panel{ margin-top:18px; padding:16px 16px; border-radius:4px; font-size:20px; line-height:1.45;
+    display:flex; gap:14px; align-items:flex-start; }
+  .pearl .panel{ background:rgba(42,36,26,.08); border:1px solid #b8aa84; }
+  .obsidian .panel{ background:rgba(122,92,192,.08); border:1px solid #3a3550; }
+  .kintsugi .panel{ background:rgba(0,0,0,.22); border:1px solid #a07c2e; }
+  .dragon .panel{ background:rgba(0,0,0,.3); border:1px solid #6a2f1a; }
+  .glyph{ font-size:30px; flex-shrink:0; }
+
+  .ratio-row{ display:flex; justify-content:center; gap:34px; margin-bottom:10px; }
+  .ratio{ text-align:center; }
+  .ratio .big{ font-family:'Cinzel',serif; font-size:42px; font-weight:600; color:#f0d890; }
+  .ratio .lbl{ font-family:'Cinzel',serif; font-size:18px; letter-spacing:.08em; color:#c8a84b; }
+  .ratio .sub{ font-size:18px; color:#9a8f74; font-style:italic; }
+  .divider-v{ width:1px; background:#6a2f1a; }
+  .ignite{ color:#f0a850; font-style:italic; text-align:center; font-size:22px; line-height:1.4; margin:14px 0; }
+
+  /* ZONE_06 — state strip */
+  .statebar{ position:absolute; top:1250px; left:70px; right:70px; text-align:center; }
+  .statettl{ font-family:'Cinzel',serif; font-size:27px; letter-spacing:.12em; color:#c8b88a; }
+  .statettl .em{ color:#f0a850; }
+  .quad{ margin-top:16px; display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+    border:1px solid #2a2d2a; border-radius:6px; overflow:hidden; }
+  .qcell{ background:linear-gradient(180deg,#101510,#0a0d0a); padding:18px 22px; text-align:left; display:flex; gap:14px; align-items:flex-start; }
+  .qcell .qg{ font-size:26px; }
+  .qcell .qt{ font-family:'Cinzel',serif; font-size:20px; color:#d8be72; letter-spacing:.03em; }
+  .qcell .qs{ font-size:18px; color:#8a8270; line-height:1.4; }
+
+  /* ZONE_09 — footer */
+  .footer{ position:absolute; bottom:54px; left:0; right:0; text-align:center;
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-size:30px; color:#c8a84b; letter-spacing:.03em; }
+  .meta{ position:absolute; bottom:30px; right:46px; font-size:15px; color:#4a4438; letter-spacing:.08em; font-family:'Cinzel',serif; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="frame"></div>
+
+  <!-- ZONE_01 HEADER -->
+  <div class="header">
+    <div class="title"><span class="diamond">&#9670;</span>OPENING DOCTRINE<span class="diamond">&#9670;</span></div>
+    <div class="subtitle">The Four Foundations of the FGE Material Universe</div>
+    <div class="rule"></div>
+  </div>
+
+  <!-- ZONE_03 PRIMARY DATA PANELS (four foundations) -->
+  <div class="cols">
+    <!-- 1 PEARL -->
+    <div class="card pearl">
+      <div class="cttl"><span class="cnum">1.</span> THE PEARL<br>DOCTRINE</div>
+      <div class="imgbox" style="background:radial-gradient(circle at 50% 45%,#fbf7ee,#d8ccb2);">
+        <div style="width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#fff,#cdbfa0);box-shadow:0 6px 22px rgba(0,0,0,.25);"></div>
+      </div>
+      <div class="lead">YOU ARE LAYERING,<br>NOT FAILING.</div>
+      <div class="body">Every output is a layer. Every layer adds clarity. Every cycle reveals more of your creative fingerprint.</div>
+      <div class="spacer"></div>
+      <div class="panel"><span class="glyph">&#9678;</span><span>Imperfection is not the enemy. Opacity is. Stay in the light.</span></div>
+    </div>
+
+    <!-- 2 OBSIDIAN -->
+    <div class="card obsidian">
+      <div class="cttl"><span class="cnum">2.</span> THE OBSIDIAN<br>WARNING</div>
+      <div class="imgbox" style="background:radial-gradient(circle at 50% 40%,#2a2436,#0a0a10);">
+        <div style="width:0;height:0;border-left:34px solid transparent;border-right:34px solid transparent;border-bottom:120px solid #1a1726;filter:drop-shadow(0 0 16px #6a4fb0);"></div>
+      </div>
+      <div class="lead">HERE IS WHERE<br>THE SYSTEM FRACTURES.</div>
+      <div class="body">
+        <span class="x"><span class="xmark">&#10005;</span>Ignore the ratio.</span>
+        <span class="x"><span class="xmark">&#10005;</span>Overload the system.</span>
+        <span class="x"><span class="xmark">&#10005;</span>Skip the anchors.</span>
+        <span class="x"><span class="xmark">&#10005;</span>Refuse to log.</span>
+        <span class="x"><span class="xmark">&#10005;</span>Chase output over coherence.</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="panel"><span class="glyph" style="color:#7a5cc0;">&#9888;</span><span>Fracture creates drift. Drift becomes distortion. Distortion breaks canon.</span></div>
+    </div>
+
+    <!-- 3 KINTSUGI -->
+    <div class="card kintsugi">
+      <div class="cttl"><span class="cnum">3.</span> THE KINTSUGI<br>PROMISE</div>
+      <div class="imgbox" style="background:radial-gradient(circle at 50% 45%,#8a6e34,#3a2e14);">
+        <div style="width:130px;height:80px;border-radius:0 0 70px 70px;background:linear-gradient(180deg,#b8a060,#7a6028);box-shadow:inset 0 4px 12px rgba(0,0,0,.4);position:relative;"></div>
+      </div>
+      <div class="lead">FRACTURE BECOMES<br>GOLD SEAM.</div>
+      <div class="body">Breakage is not the end. It is the strengthening. Every repaired fracture becomes part of your legendary story.</div>
+      <div class="spacer"></div>
+      <div class="panel"><span class="glyph" style="color:#e0b24c;">&#10070;</span><span>You do not erase the crack. You honor it. You seal it. You evolve through it.</span></div>
+    </div>
+
+    <!-- 4 DRAGON -->
+    <div class="card dragon">
+      <div class="cttl"><span class="cnum">4.</span> THE DRAGON<br>RATIO</div>
+      <div class="imgbox" style="background:radial-gradient(circle at 50% 45%,#2a1410,#0a0708);">
+        <div style="width:120px;height:120px;border-radius:50%;border:14px solid transparent;border-top-color:#e8741a;border-right-color:#c0501a;transform:rotate(45deg);filter:drop-shadow(0 0 18px #e8741a);"></div>
+      </div>
+      <div class="ratio-row">
+        <div class="ratio"><div class="big">1:3</div><div class="lbl">CALIBRATION</div><div class="sub">HONEST<br>(EMBERLING)</div></div>
+        <div class="divider-v"></div>
+        <div class="ratio"><div class="big">1:7</div><div class="lbl">MASTERY</div><div class="sub">DEEP<br>(ASCENDED)</div></div>
+      </div>
+      <div class="body" style="text-align:center;font-size:21px;">1 win for every 3 actions = Calibration<br>1 win for every 7 actions = Mastery</div>
+      <div class="ignite">This is not failure.<br>This is ignition.</div>
+      <div class="spacer"></div>
+      <div class="panel"><span class="glyph" style="color:#e8741a;">&#9650;</span><span>You start at Emberling. The Calibration Flame. Generation 0. Zero drift. All 32 points at neutral.</span></div>
+    </div>
+  </div>
+
+  <!-- ZONE_06 STATE STRIP -->
+  <div class="statebar">
+    <div class="statettl">YOUR FIRST STATE: <span class="em">EMBERLING &#128293;</span></div>
+    <div class="quad">
+      <div class="qcell"><span class="qg">&#128293;</span><div><div class="qt">Generation 0</div><div class="qs">No history yet. All cycles are calibration.</div></div></div>
+      <div class="qcell"><span class="qg">&#9678;</span><div><div class="qt">32 Points at Neutral</div><div class="qs">Zero drift. Perfect balance.</div></div></div>
+      <div class="qcell"><span class="qg">&#128214;</span><div><div class="qt">No Lineage Yet</div><div class="qs">You will build it. We will honor it.</div></div></div>
+      <div class="qcell"><span class="qg">&#10022;</span><div><div class="qt">You Are the Author</div><div class="qs">The dragons govern. You direct.</div></div></div>
+    </div>
+  </div>
+
+  <!-- ZONE_09 FOOTER -->
+  <div class="footer">&ldquo;You start at Emberling. Everything after is calibration.&rdquo;</div>
+  <div class="meta">FGE-DOC-001 &middot; v1.0 &middot; PRIMARY</div>
+</div>
+</body>
+</html>

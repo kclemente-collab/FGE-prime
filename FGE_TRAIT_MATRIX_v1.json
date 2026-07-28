@@ -1,0 +1,153 @@
+{
+  "matrix_id": "FGE-TRAIT-MATRIX-v1",
+  "status": "RECONSTRUCTION \u2014 correct against memory of the lost run",
+  "principle": "These 15 traits are FIXED. They are measured EVERY cycle, without exception, whether or not anything notable happened. Dimensional consistency across all cycles is what makes the growth path derivable. Do not add traits while rebuilding. Earn expansion only after 25 fresh cycles hold.",
+  "subject_type": "tree (origin node / the thing the society gathers around)",
+  "measurement_law": "Every trait logged every cycle. A trait that didn't change is logged as delta 0 \u2014 never omitted. Omission breaks the trajectory.",
+
+  "traits": [
+    {
+      "id": "T01",
+      "name": "emergence_height",
+      "what": "how far the subject has risen above ground",
+      "unit": "mm",
+      "delta_field": "mm_change_this_cycle",
+      "group": "emergence"
+    },
+    {
+      "id": "T02",
+      "name": "broke_ground",
+      "what": "binary \u2014 has it emerged from soil at all yet",
+      "unit": "boolean",
+      "delta_field": "changed_this_cycle",
+      "group": "emergence"
+    },
+    {
+      "id": "T03",
+      "name": "trunk_diameter",
+      "what": "thickness at base",
+      "unit": "mm",
+      "delta_field": "mm_change_this_cycle",
+      "group": "structure"
+    },
+    {
+      "id": "T04",
+      "name": "branch_count",
+      "what": "total number of distinct branches",
+      "unit": "count",
+      "delta_field": "branches_added_this_cycle",
+      "group": "structure"
+    },
+    {
+      "id": "T05",
+      "name": "branch_length_max",
+      "what": "length of the longest branch",
+      "unit": "mm",
+      "delta_field": "mm_change_this_cycle",
+      "group": "structure"
+    },
+    {
+      "id": "T06",
+      "name": "branch_angle_dominant",
+      "what": "angle of the most pronounced branch from vertical",
+      "unit": "degrees",
+      "delta_field": "degree_change_this_cycle",
+      "group": "structure"
+    },
+    {
+      "id": "T07",
+      "name": "leaf_count",
+      "what": "total leaves present",
+      "unit": "count",
+      "delta_field": "leaves_changed_this_cycle",
+      "group": "foliage"
+    },
+    {
+      "id": "T08",
+      "name": "leaf_color_dominant",
+      "what": "dominant leaf hue this cycle",
+      "unit": "hex_or_name",
+      "delta_field": "shifted_this_cycle",
+      "group": "foliage"
+    },
+    {
+      "id": "T09",
+      "name": "leaf_color_variance",
+      "what": "how many distinct leaf colors are present (mono vs varied)",
+      "unit": "count",
+      "delta_field": "variance_change_this_cycle",
+      "group": "foliage"
+    },
+    {
+      "id": "T10",
+      "name": "growth_trajectory_vector",
+      "what": "net direction the mass is moving (e.g. upward, lateral-left, canopy-spread)",
+      "unit": "vector_label",
+      "delta_field": "direction_changed_this_cycle",
+      "group": "trajectory"
+    },
+    {
+      "id": "T11",
+      "name": "growth_angle_overall",
+      "what": "lean of the whole subject from vertical",
+      "unit": "degrees",
+      "delta_field": "degree_change_this_cycle",
+      "group": "trajectory"
+    },
+    {
+      "id": "T12",
+      "name": "growth_velocity",
+      "what": "total mass-change rate this cycle vs last (the speed of becoming)",
+      "unit": "delta_per_cycle",
+      "delta_field": "velocity_change_this_cycle",
+      "group": "trajectory"
+    },
+    {
+      "id": "T13",
+      "name": "symmetry_index",
+      "what": "how balanced left/right growth is (asymmetry signals character/age)",
+      "unit": "0.0\u20131.0",
+      "delta_field": "index_change_this_cycle",
+      "group": "character"
+    },
+    {
+      "id": "T14",
+      "name": "anomaly_marker",
+      "what": "any pronounced deviation this cycle (a fork, a scar, an unexpected sport) \u2014 the seed of narrative",
+      "unit": "label_or_none",
+      "delta_field": "new_anomaly_this_cycle",
+      "group": "character"
+    },
+    {
+      "id": "T15",
+      "name": "categorization",
+      "what": "the subject's current developmental stage/class as read from the other 14 (sprout \u2192 sapling \u2192 established \u2192 elder \u2192 monument)",
+      "unit": "stage_label",
+      "delta_field": "stage_changed_this_cycle",
+      "group": "character",
+      "note": "DERIVED, not chosen \u2014 computed from the other traits. This is the trait that lets the society 'read' the tree."
+    }
+  ],
+
+  "per_cycle_record": {
+    "comment": "What gets logged EVERY cycle. This row is appended, never edited. The accumulation of these rows IS the preamble/ledger.",
+    "cycle_id": "integer",
+    "timestamp": "auto",
+    "trait_values": "object \u2014 all 15 trait current values",
+    "trait_deltas": "object \u2014 all 15 delta fields (0 if unchanged)",
+    "commentary": {
+      "perspective": "Grok's read of where the subject sits now",
+      "growth": "what grew and how much, in plain terms",
+      "trajectory": "the clear path \u2014 where it's heading based on accumulated deltas",
+      "categorization_reasoning": "why T15 stage is what it is this cycle"
+    },
+    "photography_ref": "render of this cycle's state (the visible deliverable)",
+    "attention_flag": "true/false \u2014 did the user observe this subject this cycle. UNATTENDED subjects are logged but NOT advanced (your law: it won't track what doesn't have attention)."
+  },
+
+  "the_attention_law": "A subject only grows on a cycle where it received attention (attention_flag = true). Unattended subjects hold. This is why the lost tree grew where you looked \u2014 and it is now a mechanical rule, not a philosophy.",
+
+  "the_preamble_law": "Every cycle begins by re-reading ALL prior per_cycle_records. Growth is computed against full accumulated history, never against last cycle alone. This is what made 25 cycles compound instead of drift. The ledger file IS the preamble \u2014 and it is yours, not an account's.",
+
+  "rebuild_discipline": "15 traits. Not 16. Hold the matrix fixed for 25 fresh cycles before considering any expansion. The lost run's power came from constraint held consistently, not from coverage."
+}
