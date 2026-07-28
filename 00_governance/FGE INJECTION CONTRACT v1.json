@@ -1,0 +1,108 @@
+{
+  "contract_id": "FGE-INJECTION-CONTRACT-v1",
+  "status": "TEST-ENABLING / PRE-DOCTRINE",
+  "depends_on": "FGE-LINEAGE-OBJECT-THIN-SPEC-v0.1",
+  "genre": "safari_documentation",
+  "one_line": "The world grows slowly on a mandatory tick. The user steers a little, documents a lot, and cannot undo what has grown.",
+
+  "core_laws": {
+    "LAW_TICK": "Evolution advances ONLY on the tick. The user cannot rush, skip, or rewind the tick. Growth is the engine's, not the user's.",
+    "LAW_APPEND_ONLY": "Nothing that has grown can be deleted, edited, or reverted. A dragon, once locked into the lineage, is permanent. (This is the append-only camera, enforced.)",
+    "LAW_STEER_NOT_AUTHOR": "The user injects directional pressure BEFORE a tick resolves. They influence what MIGHT grow next. They never author the result directly.",
+    "LAW_NEW_GAME_ONLY": "The only way to 'undo' is to start a new lineage (new game). An existing lineage is read-only history.",
+    "LAW_DELIVERABLE_IS_THE_IMAGE": "The product is the render (photo/video) of a state. The simulation exists to PRODUCE photographable states, not to be managed."
+  },
+
+  "disclaimer_shown_at_start": "This is a slow simulation. Your dragons grow on their own, on a timeline you cannot speed up. You may gently steer what grows next \u2014 but once something has grown, it is permanent. You cannot delete it, edit it, or change its past. You document; you do not control. To begin again, start a new lineage.",
+
+  "tick": {
+    "type": "mandatory_slow",
+    "user_can_rush": false,
+    "user_can_skip": false,
+    "user_can_rewind": false,
+    "resolution": "On each tick, at most ONE pending injection resolves into a new locked node, OR the world holds (no growth this tick). Holding is normal and expected \u2014 slowness is the point.",
+    "note": "Tick cadence is a tuning value, intentionally long. The voyeuristic feel depends on the user NOT being able to fast-forward."
+  },
+
+  "node_schema": {
+    "comment": "Every dragon is a node in the lineage graph. This is the unit the renderer photographs and the unit the map plots.",
+    "node_id": "string  (e.g. DRG-0001)",
+    "lineage_id": "string  (which game/run this belongs to)",
+    "parents": "array[node_id]  (0 for seed, 1 for age/trait, 2 for breed)",
+    "children": "array[node_id]",
+    "generation": "integer  (seed = 0)",
+    "born_on_tick": "integer",
+    "locked": "boolean  (only locked nodes count for lineage, render, and map)",
+    "genome_ref": "string  (points to the canon genome / invariant kernel)",
+    "visual_anchor_ref": "string  (the Anchor Vector that keeps identity recognizable across renders)",
+    "map_position": {
+      "comment": "MAPPABILITY. Every node gets deterministic coordinates so the lineage IS a map with no extra work.",
+      "x": "float  = generation (time axis, left to right)",
+      "y": "float  = lineage_lane (which bloodline branch, top to bottom)",
+      "derivation": "Coordinates are computed from graph position, never hand-placed. A new node's (x,y) is fixed the instant it locks."
+    },
+    "render_state": {
+      "ready": "boolean",
+      "ceremony": "enum [birth, elder_rite, territorial_clash, call_to_action, dormant]  (the FRAMING for the photo, not a simulated event)",
+      "render_ref": "string  (points to compositor output once photographed)"
+    }
+  },
+
+  "injections": {
+    "comment": "The CLOSED v1 set. Exactly three moves. Each is lock-gated. A wide menu is v3; v1 stays narrow so every result renders beautifully and consistently.",
+    "BREED": {
+      "inputs": ["parent_a: node_id (must be locked)", "parent_b: node_id (must be locked)"],
+      "produces": "one descendant node carrying both parent lineages",
+      "lock_gate": "Descendant must pass canon lock (genome compatible, no illegal cross-class traits). If it fails, NO node is created and the tick holds.",
+      "map_effect": "New node placed at generation = max(parents)+1, on a lane between the two parent lanes.",
+      "render_default_ceremony": "birth"
+    },
+    "AGE_ADVANCE": {
+      "inputs": ["subject: node_id (must be locked)", "direction: enum [juvenile, elder]"],
+      "produces": "a new node, SAME identity, advanced life stage \u2014 NOT a replacement (append-only; the prior stage persists)",
+      "lock_gate": "Anchor Vector must be preserved (same recognizable dragon). If identity drift exceeds tolerance, reject and hold.",
+      "map_effect": "New node placed adjacent on the same lineage lane, one generation step along the time axis.",
+      "render_default_ceremony": "elder_rite"
+    },
+    "TRAIT_PRESSURE": {
+      "inputs": ["subject: node_id (must be locked)", "pressure: enum [volcanic, glacial, abyssal]"],
+      "produces": "a new adapted node \u2014 same dragon, environment-shifted visual state (your Evolution Engine logic: pressure -> adaptation -> visual output)",
+      "lock_gate": "Adaptation must be biologically coherent for the genome (no aquatic lungs + volcanic respiration). Reject illegal combos and hold.",
+      "map_effect": "New node branches off the subject's lane as a sub-branch.",
+      "render_default_ceremony": "call_to_action"
+    }
+  },
+
+  "what_the_user_CANNOT_do": [
+    "delete any node",
+    "edit a locked node's genome, anatomy, or history",
+    "rewind or replay a past tick",
+    "fast-forward the tick",
+    "directly author a result (they steer pre-tick; the engine resolves)",
+    "force growth (the world may hold a tick with no change)",
+    "manage resources, traffic, conflict outcomes, or 'win/lose' states \u2014 there are none"
+  ],
+
+  "what_the_user_CAN_do": [
+    "queue ONE injection before a tick (breed / age / trait-pressure)",
+    "photograph any locked node, in any available ceremony framing (image or video)",
+    "collect renders into their lineage gallery (the trophy wall)",
+    "let the world simply grow and watch / document",
+    "start a NEW lineage at any time (the only reset)"
+  ],
+
+  "deliverables_per_node": {
+    "image": "compositor render of the node in chosen ceremony framing",
+    "video": "short loop of the node (the A/B video spec you already build)",
+    "map": "the lineage graph, auto-plotted from node map_position values \u2014 the user's 'territory'"
+  },
+
+  "handoff": {
+    "comment": "How this plugs into what you already have.",
+    "to_lineage_spine": "A locked node here = a locked descendant in the thin spec. DEPTH/ORIGIN/RARITY (and therefore VALUE) are computed from this graph directly.",
+    "to_compositor": "render_state.render_ref points at fge_compositor.py output. The contract decides WHAT to photograph; the compositor decides HOW.",
+    "to_canon": "lock_gate in every injection IS the compile->validate->lock lifecycle. No new lock machinery needed."
+  },
+
+  "map_is_free": "Because map_position is computed from generation (x) and lineage lane (y) at lock time, the lineage graph is a map with zero extra authoring. You said map deliverables are hard for you \u2014 this contract makes the map a byproduct of growth, not a thing you draw."
+}
