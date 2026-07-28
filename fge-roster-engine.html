@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FGE ROSTER ENGINE — Prompt Assembly System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #050507;
+    --deep: #0c0c10;
+    --surface: #111118;
+    --panel: #16161f;
+    --border: #1e1e2a;
+    --border-hi: #2a2a3a;
+    --gold: #c9a84c;
+    --gold-dim: #7a6230;
+    --gold-ghost: rgba(201,168,76,0.06);
+    --gold-glow: rgba(201,168,76,0.2);
+    --green: #00ff9d;
+    --green-ghost: rgba(0,255,157,0.06);
+    --amber: #f5a623;
+    --red: #c0392b;
+    --purple: #7c5cbf;
+    --purple-ghost: rgba(124,92,191,0.08);
+    --ivory: #e8e4d8;
+    --ivory-dim: #8a8678;
+    --ivory-muted: #3a3830;
+    --display: 'Cinzel', serif;
+    --body: 'Cormorant Garamond', serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--deep);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-bar {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    flex-shrink: 0;
+  }
+
+  .header-brand { flex: 1; }
+
+  .brand-name {
+    font-family: var(--display);
+    font-size: 16px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .brand-sub {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ivory-dim);
+    margin-top: 3px;
+  }
+
+  .header-counts {
+    display: flex;
+    gap: 20px;
+  }
+
+  .count-item { text-align: center; }
+
+  .count-val {
+    font-family: var(--display);
+    font-size: 20px;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+  }
+
+  .count-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ivory-muted);
+  }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    background: var(--deep);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-btn {
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ivory-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-ghost);
+  }
+
+  .filter-btn:active { transform: scale(0.97); }
+
+  .controls-right {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+
+  .run-all-btn {
+    padding: 8px 20px;
+    background: var(--gold);
+    border: none;
+    border-radius: 1px;
+    font-family: var(--display);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--void);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .run-all-btn:hover { background: #e0bb6a; }
+  .run-all-btn:disabled { background: var(--border-hi); color: var(--ivory-muted); cursor: not-allowed; }
+
+  /* ─── MASTER ANCHOR ─── */
+  .master-anchor {
+    margin: 16px 20px;
+    background: var(--panel);
+    border: 1px solid var(--gold-dim);
+    padding: 14px 16px;
+    position: relative;
+  }
+
+  .anchor-label {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+  }
+
+  .anchor-text {
+    font-family: var(--body);
+    font-size: 13px;
+    color: var(--ivory-dim);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ─── MODULE SLOTS ─── */
+  .module-slots {
+    margin: 0 20px 16px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .module-slot {
+    padding: 4px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 1px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ivory-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .module-slot.active {
+    border-color: var(--purple);
+    color: var(--purple);
+    background: var(--purple-ghost);
+  }
+
+  .module-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border-hi);
+    flex-shrink: 0;
+  }
+
+  .module-slot.active .module-dot { background: var(--purple); }
+
+  .module-add {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px dashed var(--border-hi);
+    border-radius: 1px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--ivory-muted);
+    cursor: pointer;
+    font-family: var(--mono);
+  }
+
+  /* ─── ROSTER GRID ─── */
+  .roster-grid {
+    padding: 0 20px 100px;
+    display: grid;
+    gap: 3px;
+  }
+
+  /* ─── CHARACTER CARD ─── */
+  .char-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .char-card:hover { border-color: var(--border-hi); }
+  .char-card.expanded { border-color: var(--gold-dim); }
+
+  .card-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-tier {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tier-crown { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); }
+  .tier-rare { background: var(--purple); }
+  .tier-common { background: var(--ivory-muted); }
+
+  .card-id {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--ivory-muted);
+    flex-shrink: 0;
+    width: 56px;
+  }
+
+  .card-name {
+    font-family: var(--display);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--ivory);
+    flex: 1;
+  }
+
+  .card-title {
+    font-family: var(--body);
+    font-size: 12px;
+    color: var(--ivory-dim);
+    font-style: italic;
+    flex: 1;
+    text-align: right;
+  }
+
+  .card-vector {
+    font-size: 9px;
+    color: var(--ivory-muted);
+    flex-shrink: 0;
+    display: none;
+  }
+
+  @media (min-width: 600px) { .card-vector { display: block; } }
+
+  .card-status {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 1px;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .status-ready { background: var(--green-ghost); border: 1px solid var(--green); color: var(--green); }
+  .status-pending { background: rgba(245,166,35,0.08); border: 1px solid var(--amber); color: var(--amber); }
+  .status-locked { background: var(--gold-ghost); border: 1px solid var(--gold-dim); color: var(--gold); }
+
+  .card-expand {
+    font-size: 10px;
+    color: var(--ivory-muted);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .char-card.expanded .card-expand { transform: rotate(180deg); }
+
+  /* ─── CARD BODY ─── */
+  .card-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .char-card.expanded .card-body { display: block; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  @media (max-width: 560px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+
+  .card-cell {
+    background: var(--surface);
+    padding: 12px 16px;
+  }
+
+  .cell-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ivory-muted);
+    margin-bottom: 6px;
+  }
+
+  .cell-value {
+    font-family: var(--body);
+    font-size: 14px;
+    color: var(--ivory-dim);
+    line-height: 1.5;
+  }
+
+  /* ─── LATTICE BARS ─── */
+  .lattice-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .lattice-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lattice-key {
+    font-size: 8px;
+    color: var(--ivory-muted);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .lattice-bar-bg {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .lattice-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .lattice-val {
+    font-size: 9px;
+    color: var(--gold);
+    width: 14px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ─── PROMPT OUTPUT ─── */
+  .prompt-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .prompt-label {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .prompt-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .prompt-btn {
+    padding: 3px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 1px;
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ivory-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .prompt-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .prompt-btn.generate { border-color: var(--gold-dim); color: var(--gold); background: var(--gold-ghost); }
+
+  .prompt-output {
+    font-family: var(--body);
+    font-size: 13px;
+    color: var(--ivory-dim);
+    font-style: italic;
+    line-height: 1.7;
+    min-height: 40px;
+  }
+
+  .prompt-placeholder {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ivory-muted);
+    font-style: normal;
+  }
+
+  /* ─── SCORE DISPLAY ─── */
+  .score-display {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .score-chip {
+    padding: 3px 8px;
+    border-radius: 1px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .score-pass { background: var(--green-ghost); border: 1px solid var(--green); color: var(--green); }
+  .score-warn { background: rgba(245,166,35,0.08); border: 1px solid var(--amber); color: var(--amber); }
+  .score-fail { background: rgba(192,57,43,0.08); border: 1px solid var(--red); color: var(--red); }
+
+  /* ─── LOADING ─── */
+  .loading-bar {
+    height: 1px;
+    background: var(--border);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .loading-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0;
+    animation: loadAnim 2s ease-in-out infinite;
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  @keyframes loadAnim {
+    0% { width: 0; opacity: 1; }
+    60% { width: 80%; opacity: 1; }
+    100% { width: 95%; opacity: 0.3; }
+  }
+
+  /* ─── BATCH RESULTS ─── */
+  .batch-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+  }
+
+  .batch-bar.visible { transform: translateY(0); }
+
+  .batch-progress {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .batch-progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.3s;
+  }
+
+  .batch-label {
+    font-size: 10px;
+    color: var(--ivory-dim);
+    white-space: nowrap;
+  }
+
+  .export-btn {
+    padding: 6px 16px;
+    background: var(--gold);
+    border: none;
+    border-radius: 1px;
+    font-family: var(--display);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--void);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 6px 16px;
+    border-radius: 1px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 300;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── IMPORT PANEL ─── */
+  .import-panel {
+    margin: 0 20px 16px;
+    background: var(--panel);
+    border: 1px dashed var(--border-hi);
+    padding: 16px;
+  }
+
+  .import-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ivory-muted);
+    margin-bottom: 8px;
+  }
+
+  .import-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .import-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ivory-dim);
+    outline: none;
+  }
+
+  .import-input:focus { border-color: var(--gold-dim); }
+
+  .import-btn {
+    padding: 6px 14px;
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-bar"></div>
+  <div class="header-brand">
+    <div class="brand-name">FGE ROSTER ENGINE</div>
+    <div class="brand-sub">Prompt Assembly System · Canon Engine v2.1</div>
+  </div>
+  <div class="header-counts">
+    <div class="count-item">
+      <span class="count-val" id="totalCount">0</span>
+      <span class="count-label">Characters</span>
+    </div>
+    <div class="count-item">
+      <span class="count-val" id="readyCount">0</span>
+      <span class="count-label">Ready</span>
+    </div>
+    <div class="count-item">
+      <span class="count-val" id="generatedCount">0</span>
+      <span class="count-label">Generated</span>
+    </div>
+  </div>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="filter-btn active" onclick="filterRoster('all', this)">All</button>
+  <button class="filter-btn" onclick="filterRoster('Crown', this)">Crown</button>
+  <button class="filter-btn" onclick="filterRoster('Rare', this)">Rare</button>
+  <button class="filter-btn" onclick="filterRoster('Goddess', this)">Goddess</button>
+  <button class="filter-btn" onclick="filterRoster('Queen', this)">Queen</button>
+  <button class="filter-btn" onclick="filterRoster('King', this)">King</button>
+  <button class="filter-btn" onclick="filterRoster('Council', this)">Council</button>
+  <button class="filter-btn" onclick="filterRoster('Mythic Creature', this)">Mythic</button>
+  <div class="controls-right">
+    <button class="run-all-btn" onclick="runAllPrompts()" id="runAllBtn">⚡ Generate All</button>
+  </div>
+</div>
+
+<!-- MASTER ANCHOR -->
+<div class="master-anchor">
+  <div class="anchor-label">Master Anchor Doctrine · Applied to All Characters</div>
+  <div class="anchor-text" id="masterAnchorText">Loading…</div>
+</div>
+
+<!-- MODULE SLOTS -->
+<div class="module-slots" id="moduleSlots">
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-VIS-001">
+    <div class="module-dot"></div>MOD-VIS-001
+  </div>
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-STY-001">
+    <div class="module-dot"></div>MOD-STY-001
+  </div>
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-CHR-002">
+    <div class="module-dot"></div>MOD-CHR-002
+  </div>
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-SYS-001">
+    <div class="module-dot"></div>MOD-SYS-001
+  </div>
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-SYS-002">
+    <div class="module-dot"></div>MOD-SYS-002
+  </div>
+  <div class="module-slot" onclick="toggleModule(this)" data-module="MOD-VIS-006">
+    <div class="module-dot"></div>MOD-VIS-006
+  </div>
+  <div class="module-add" onclick="addModule()">+ Add Module</div>
+</div>
+
+<!-- IMPORT PANEL -->
+<div class="import-panel">
+  <div class="import-label">Import Additional Roster (Android Roster, v2.0, etc.)</div>
+  <div class="import-row">
+    <input class="import-input" id="importInput" placeholder="Paste JSON roster here or drop file…" />
+    <button class="import-btn" onclick="importRoster()">Import</button>
+  </div>
+</div>
+
+<!-- ROSTER -->
+<div class="roster-grid" id="rosterGrid"></div>
+
+<!-- BATCH BAR -->
+<div class="batch-bar" id="batchBar">
+  <div class="batch-label" id="batchLabel">Generating…</div>
+  <div class="batch-progress">
+    <div class="batch-progress-fill" id="batchFill" style="width:0%"></div>
+  </div>
+  <button class="export-btn" onclick="exportAll()" id="exportBtn" style="display:none">Export All Prompts</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── ROSTER DATA ───
+const MASTER_ROSTER = {"schema":"FGE_ROSTER_v1.0","generated":"2026-05-03","author":"C.A.","doctrine":"Prompt Engine Matrix v2.0 — Feral Gloss Empire","master_anchor":"Olivia de Berardinis lineage, single-source moonlight tenebrism, subject brightest element, predatory buyer-engagement gaze, Phase 3 Afterglow flush, earned wet specular highlights only, sensual allure with rhythmic sensuality, --ar 2:3 --stylize 320 --v 6 --q 3 --style raw","lattice_key":{"S1_origin_scar":"Weight of origin trauma / founding event. Defines raw power baseline.","S2_body_logic":"Mastery and intentionality of physical presence. How the body serves the identity.","S3_frame_identity":"Visual strength of the character as a compositional anchor. How recognizable the silhouette.","S4_silhouette_signature":"Distinctiveness of outline across environments. Cross-scene persistence.","S5_behavioral_myth":"Depth of behavioral legend. How much story the character carries without speaking."},"total":20,"female":15,"male":5,"characters":[{"sb_id":"SB_301","name":"Nyxara Voss","gender":"Female","title":"Midnight Goddess of Seduction","category":"Goddess","tier":"Crown","graph_position":"Primary anchor — high connectivity, large node","dominance_lattice":{"S1_origin_scar":8,"S2_body_logic":10,"S3_frame_identity":9,"S4_silhouette_signature":9,"S5_behavioral_myth":10},"vector":"S1=8, S2=10, S3=9, S4=9, S5=10","matrix_defaults":{"realm":"The Haloed Eclipse","pose_foundation":"reclined_control","tension_state":"micro","camera_module":"eye_level_intimacy","hormone_level":3,"action_tension":"sustained_grip"},"core_idea":"Midnight seduction goddess — eternal pull, never fully seen"},{"sb_id":"SB_302","name":"Lirael Kai","gender":"Female","title":"Queen of Obsidian Flames","category":"Queen","tier":"Crown","graph_position":"Primary anchor — large node, central cluster adjacent","dominance_lattice":{"S1_origin_scar":9,"S2_body_logic":8,"S3_frame_identity":10,"S4_silhouette_signature":8,"S5_behavioral_myth":9},"vector":"S1=9, S2=8, S3=10, S4=8, S5=9","matrix_defaults":{"realm":"The Gilded Threshold","pose_foundation":"dominance_lean","tension_state":"full","camera_module":"low_angle_power","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Obsidian flame queen — sovereign authority, controlled destruction"},{"sb_id":"SB_303","name":"Sable Thorn","gender":"Female","title":"Council Siren of Desire","category":"Council","tier":"Crown","graph_position":"Mid-cluster — moderate node, bidirectional arrows","dominance_lattice":{"S1_origin_scar":7,"S2_body_logic":9,"S3_frame_identity":7,"S4_silhouette_signature":8,"S5_behavioral_myth":8},"vector":"S1=7, S2=9, S3=7, S4=8, S5=8","matrix_defaults":{"realm":"The Nocturnal Veil","pose_foundation":"twist_reveal","tension_state":"micro","camera_module":"eye_level_intimacy","hormone_level":3,"action_tension":"sustained_grip"},"core_idea":"Council siren — desire as political instrument"},{"sb_id":"SB_304","name":"Vespera Lune","gender":"Female","title":"Mythic Moon Serpent","category":"Mythic Creature","tier":"Crown","graph_position":"Mid-cluster peripheral — moderate node, outward arrows","dominance_lattice":{"S1_origin_scar":6,"S2_body_logic":7,"S3_frame_identity":9,"S4_silhouette_signature":10,"S5_behavioral_myth":9},"vector":"S1=6, S2=7, S3=9, S4=10, S5=9","matrix_defaults":{"realm":"The Haloed Eclipse","pose_foundation":"ascension_stretch","tension_state":"micro","camera_module":"profile_side_view","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Moon serpent — ancient coil, lunar patience, strikes without warning"},{"sb_id":"SB_305","name":"Kaelith","gender":"Male","title":"King of Eternal Hunger","category":"King","tier":"Crown","graph_position":"Core cluster — large purple node, high inbound connections","dominance_lattice":{"S1_origin_scar":10,"S2_body_logic":9,"S3_frame_identity":8,"S4_silhouette_signature":7,"S5_behavioral_myth":10},"vector":"S1=10, S2=9, S3=8, S4=7, S5=10","matrix_defaults":{"realm":"Crimson Fang","pose_foundation":"predator_stalk","tension_state":"full","camera_module":"low_angle_power","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"King of eternal hunger — never sated, never stopped"},{"sb_id":"SB_306","name":"Astra Voss","gender":"Female","title":"Pet Empress of Velvet Shadows","category":"Pet","tier":"Rare","graph_position":"Satellite — top of graph, single inbound from core cluster","dominance_lattice":{"S1_origin_scar":4,"S2_body_logic":6,"S3_frame_identity":7,"S4_silhouette_signature":8,"S5_behavioral_myth":5},"vector":"S1=4, S2=6, S3=7, S4=8, S5=5","matrix_defaults":{"realm":"Velvet Haze","pose_foundation":"reclined_control","tension_state":"relaxed","camera_module":"macro_focus","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Velvet shadow empress — soft dominance, dangerous comfort"},{"sb_id":"SB_307","name":"Seraphine Vale","gender":"Female","title":"Goddess of Liquid Starlight","category":"Goddess","tier":"Crown","graph_position":"Primary anchor — largest female node, maximum outbound connections","dominance_lattice":{"S1_origin_scar":7,"S2_body_logic":10,"S3_frame_identity":10,"S4_silhouette_signature":9,"S5_behavioral_myth":9},"vector":"S1=7, S2=10, S3=10, S4=9, S5=9","matrix_defaults":{"realm":"The Ocular Sanctum","pose_foundation":"ascension_stretch","tension_state":"full","camera_module":"progressive_push_zoom","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Liquid starlight goddess — dissolves boundaries, purifies through presence"},{"sb_id":"SB_308","name":"Draven Sol","gender":"Male","title":"God of Burning Dominance","category":"God","tier":"Crown","graph_position":"Core cluster — largest male node, highest connectivity","dominance_lattice":{"S1_origin_scar":9,"S2_body_logic":10,"S3_frame_identity":9,"S4_silhouette_signature":8,"S5_behavioral_myth":10},"vector":"S1=9, S2=10, S3=9, S4=8, S5=10","matrix_defaults":{"realm":"Eternal Forge","pose_foundation":"dominance_lean","tension_state":"full","camera_module":"low_angle_power","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Burning dominance god — forge fire, unbreakable will, heat you cannot look away from"},{"sb_id":"SB_309","name":"Lunaire Voss","gender":"Female","title":"Pet Moon Familiar","category":"Pet","tier":"Rare","graph_position":"Far satellite — upper right, weak thread to core","dominance_lattice":{"S1_origin_scar":3,"S2_body_logic":5,"S3_frame_identity":6,"S4_silhouette_signature":7,"S5_behavioral_myth":4},"vector":"S1=3, S2=5, S3=6, S4=7, S5=4","matrix_defaults":{"realm":"The Haloed Eclipse","pose_foundation":"reclined_control","tension_state":"relaxed","camera_module":"macro_focus","hormone_level":1,"action_tension":"sustained_grip"},"core_idea":"Moon familiar — soft light, orbits the powerful, amplifies without competing"},{"sb_id":"SB_310","name":"Thalira","gender":"Female","title":"Council Witch of Forgotten Names","category":"Council","tier":"Crown","graph_position":"Mid-cluster — strong node, connects mythic to core","dominance_lattice":{"S1_origin_scar":8,"S2_body_logic":7,"S3_frame_identity":8,"S4_silhouette_signature":7,"S5_behavioral_myth":10},"vector":"S1=8, S2=7, S3=8, S4=7, S5=10","matrix_defaults":{"realm":"The Nocturnal Veil","pose_foundation":"twist_reveal","tension_state":"micro","camera_module":"progressive_push_zoom","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Witch of forgotten names — erases identities, collects power"},{"sb_id":"SB_311","name":"Morgath Kane","gender":"Male","title":"King of Iron Silence","category":"King","tier":"Crown","graph_position":"Core cluster — second largest male node","dominance_lattice":{"S1_origin_scar":10,"S2_body_logic":8,"S3_frame_identity":9,"S4_silhouette_signature":8,"S5_behavioral_myth":9},"vector":"S1=10, S2=8, S3=9, S4=8, S5=9","matrix_defaults":{"realm":"Crimson Fang","pose_foundation":"predator_stalk","tension_state":"full","camera_module":"locked_frame_drift","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Iron silence king — power expressed through stillness, devastating when broken"},{"sb_id":"SB_312","name":"Elyndra","gender":"Female","title":"Queen of Shattered Glass","category":"Queen","tier":"Crown","graph_position":"Mid-cluster — strong female node, bidirectional to core males","dominance_lattice":{"S1_origin_scar":8,"S2_body_logic":9,"S3_frame_identity":8,"S4_silhouette_signature":10,"S5_behavioral_myth":8},"vector":"S1=8, S2=9, S3=8, S4=10, S5=8","matrix_defaults":{"realm":"Prism Fracture","pose_foundation":"dominance_lean","tension_state":"full","camera_module":"profile_side_view","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Shattered glass queen — beautiful at the breaking point, cuts everything she touches"},{"sb_id":"SB_313","name":"Zara Voss","gender":"Female","title":"Council Shadow Broker","category":"Council","tier":"Crown","graph_position":"Mid-cluster — connector node, bridges satellite to core","dominance_lattice":{"S1_origin_scar":6,"S2_body_logic":8,"S3_frame_identity":7,"S4_silhouette_signature":7,"S5_behavioral_myth":9},"vector":"S1=6, S2=8, S3=7, S4=7, S5=9","matrix_defaults":{"realm":"The Gilded Threshold","pose_foundation":"twist_reveal","tension_state":"micro","camera_module":"eye_level_intimacy","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Shadow broker — trades in information, loyalty, and silence"},{"sb_id":"SB_314","name":"Nyrael","gender":"Female","title":"Mythic Void Dragoness","category":"Mythic Creature","tier":"Crown","graph_position":"Mythic cluster — largest mythic node","dominance_lattice":{"S1_origin_scar":7,"S2_body_logic":6,"S3_frame_identity":10,"S4_silhouette_signature":10,"S5_behavioral_myth":8},"vector":"S1=7, S2=6, S3=10, S4=10, S5=8","matrix_defaults":{"realm":"Prism Fracture","pose_foundation":"ascension_stretch","tension_state":"full","camera_module":"profile_side_view","hormone_level":2,"action_tension":"explosive_release"},"core_idea":"Void dragoness — her silhouette alone ends conversations"},{"sb_id":"SB_315","name":"Celeste Voss","gender":"Female","title":"Goddess of Pulsing Afterglow","category":"Goddess","tier":"Crown","graph_position":"Far satellite — upper left, single thread from primary cluster","dominance_lattice":{"S1_origin_scar":5,"S2_body_logic":9,"S3_frame_identity":8,"S4_silhouette_signature":7,"S5_behavioral_myth":8},"vector":"S1=5, S2=9, S3=8, S4=7, S5=8","matrix_defaults":{"realm":"The Ocular Sanctum","pose_foundation":"reclined_control","tension_state":"relaxed","camera_module":"eye_level_intimacy","hormone_level":3,"action_tension":"sustained_grip"},"core_idea":"Afterglow goddess — exists in the moment after peak, infinite warmth"},{"sb_id":"SB_316","name":"Rogue","gender":"Male","title":"Pet Shadow Wolf King","category":"Pet","tier":"Rare","graph_position":"Lower satellite — bottom center, single thread from core","dominance_lattice":{"S1_origin_scar":6,"S2_body_logic":8,"S3_frame_identity":7,"S4_silhouette_signature":9,"S5_behavioral_myth":6},"vector":"S1=6, S2=8, S3=7, S4=9, S5=6","matrix_defaults":{"realm":"The Nocturnal Veil","pose_foundation":"predator_stalk","tension_state":"micro","camera_module":"low_angle_power","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Shadow wolf king — loyalty coded as threat, protection as dominance"},{"sb_id":"SB_317","name":"Isolde Vale","gender":"Female","title":"Council Oracle of Temptation","category":"Council","tier":"Crown","graph_position":"Lower mid-cluster — moderate node, inbound from core males","dominance_lattice":{"S1_origin_scar":6,"S2_body_logic":8,"S3_frame_identity":7,"S4_silhouette_signature":6,"S5_behavioral_myth":10},"vector":"S1=6, S2=8, S3=7, S4=6, S5=10","matrix_defaults":{"realm":"The Gilded Threshold","pose_foundation":"twist_reveal","tension_state":"micro","camera_module":"progressive_push_zoom","hormone_level":3,"action_tension":"sustained_grip"},"core_idea":"Oracle of temptation — sees the future, uses it as bait"},{"sb_id":"SB_318","name":"Kael Voss","gender":"Male","title":"King of Burning Tides","category":"King","tier":"Crown","graph_position":"Core cluster — central purple node, strong bidirectional","dominance_lattice":{"S1_origin_scar":9,"S2_body_logic":8,"S3_frame_identity":8,"S4_silhouette_signature":7,"S5_behavioral_myth":9},"vector":"S1=9, S2=8, S3=8, S4=7, S5=9","matrix_defaults":{"realm":"Eternal Forge","pose_foundation":"dominance_lean","tension_state":"full","camera_module":"low_angle_power","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Burning tides king — power moves in waves, impossible to hold back"},{"sb_id":"SB_319","name":"Sylvara","gender":"Female","title":"Mythic Starlit Sphinx","category":"Mythic Creature","tier":"Crown","graph_position":"Right cluster — moderate pink node, mythic satellite","dominance_lattice":{"S1_origin_scar":5,"S2_body_logic":7,"S3_frame_identity":9,"S4_silhouette_signature":10,"S5_behavioral_myth":9},"vector":"S1=5, S2=7, S3=9, S4=10, S5=9","matrix_defaults":{"realm":"The Haloed Eclipse","pose_foundation":"locked_embrace","tension_state":"micro","camera_module":"profile_side_view","hormone_level":2,"action_tension":"sustained_grip"},"core_idea":"Starlit sphinx — ancient riddle, impossible silhouette, always watching"},{"sb_id":"SB_320","name":"Vesper Kane","gender":"Male","title":"God of Velvet Eclipse","category":"God","tier":"Crown","graph_position":"Core cluster — large purple node, highest male connectivity","dominance_lattice":{"S1_origin_scar":8,"S2_body_logic":9,"S3_frame_identity":9,"S4_silhouette_signature":8,"S5_behavioral_myth":10},"vector":"S1=8, S2=9, S3=9, S4=8, S5=10","matrix_defaults":{"realm":"The Nocturnal Veil","pose_foundation":"dominance_lean","tension_state":"full","camera_module":"locked_frame_drift","hormone_level":3,"action_tension":"explosive_release"},"core_idea":"Velvet eclipse god — covers everything, reveals nothing, controls all"}]};
+
+// ─── MODULE LIBRARY ───
+const MODULE_LIBRARY = {
+  'MOD-VIS-001': 'molten hormone light wash, skin luminosity at peak hormone flush',
+  'MOD-STY-001': 'frame tremble + micro-vibration, tension visible in the architecture',
+  'MOD-CHR-002': 'violent hormonal contrast, body logic at maximum intentionality',
+  'MOD-SYS-001': 'intent lock enforced, no ambient drift, every element serves the subject',
+  'MOD-SYS-002': 'JSON memory persistence, identity anchor held across scene transitions',
+  'MOD-VIS-006': 'depth haze with foreground dissolution, background into atmospheric void',
+  'MOD-VIS-005': 'air fracture + surface tension break at skin boundary',
+  'MOD-STY-002': 'hormonal crash landing, post-peak stillness with residual heat',
+  'MOD-VIS-004': 'brushed metal + biological contrast, synthetic against organic warmth',
+  'MOD-VIS-003': 'burning hot skin temperature visible in specular response',
+  'MOD-VIS-002': 'volumetric cinematic atmosphere, light has mass and direction'
+};
+
+let allCharacters = [...MASTER_ROSTER.characters];
+let activeModules = new Set();
+let generatedPrompts = {};
+let currentFilter = 'all';
+
+// ─── INIT ───
+function init() {
+  document.getElementById('masterAnchorText').textContent = MASTER_ROSTER.master_anchor;
+  document.getElementById('totalCount').textContent = allCharacters.length;
+  renderRoster(allCharacters);
+}
+
+// ─── RENDER ROSTER ───
+function renderRoster(characters) {
+  const grid = document.getElementById('rosterGrid');
+  grid.innerHTML = '';
+
+  characters.forEach((char, idx) => {
+    const lattice = char.dominance_lattice;
+    const avgScore = (Object.values(lattice).reduce((a,b) => a+b, 0) / 5).toFixed(1);
+    const tierClass = char.tier === 'Crown' ? 'tier-crown' : char.tier === 'Rare' ? 'tier-rare' : 'tier-common';
+    const hasPrompt = generatedPrompts[char.sb_id];
+
+    const card = document.createElement('div');
+    card.className = 'char-card';
+    card.id = `card-${char.sb_id}`;
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${char.sb_id}')">
+        <div class="card-tier ${tierClass}"></div>
+        <div class="card-id">${char.sb_id}</div>
+        <div class="card-name">${char.name}</div>
+        <div class="card-title">${char.title}</div>
+        <div class="card-vector">${char.vector}</div>
+        <div class="card-status ${hasPrompt ? 'status-ready' : 'status-locked'}">${hasPrompt ? 'Ready' : char.tier}</div>
+        <div class="card-expand">▾</div>
+      </div>
+      <div class="card-body">
+        <div class="card-grid">
+          <div class="card-cell">
+            <div class="cell-label">Dominance Lattice</div>
+            <div class="lattice-grid">
+              ${Object.entries(lattice).map(([k,v]) => `
+                <div class="lattice-row">
+                  <div class="lattice-key">${k.split('_')[0]}</div>
+                  <div class="lattice-bar-bg"><div class="lattice-bar-fill" style="width:${v*10}%"></div></div>
+                  <div class="lattice-val">${v}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="card-cell">
+            <div class="cell-label">Matrix Defaults</div>
+            <div class="cell-value">
+              <div style="margin-bottom:4px"><span style="color:var(--ivory-muted);font-size:10px">Realm</span> ${char.matrix_defaults.realm}</div>
+              <div style="margin-bottom:4px"><span style="color:var(--ivory-muted);font-size:10px">Pose</span> ${char.matrix_defaults.pose_foundation}</div>
+              <div style="margin-bottom:4px"><span style="color:var(--ivory-muted);font-size:10px">Camera</span> ${char.matrix_defaults.camera_module}</div>
+              <div style="margin-bottom:4px"><span style="color:var(--ivory-muted);font-size:10px">Tension</span> ${char.matrix_defaults.tension_state}</div>
+              <div><span style="color:var(--ivory-muted);font-size:10px">Action</span> ${char.matrix_defaults.action_tension}</div>
+            </div>
+          </div>
+          <div class="card-cell" style="grid-column: 1 / -1">
+            <div class="cell-label">Core Idea</div>
+            <div class="cell-value" style="font-size:15px">${char.core_idea}</div>
+          </div>
+        </div>
+        <div class="prompt-section" id="prompt-${char.sb_id}">
+          <div class="prompt-header">
+            <div class="prompt-label">Assembled Render Prompt</div>
+            <div class="prompt-actions">
+              <button class="prompt-btn generate" onclick="generatePrompt('${char.sb_id}', event)">⚡ Generate</button>
+              <button class="prompt-btn" onclick="copyPrompt('${char.sb_id}', event)">Copy</button>
+            </div>
+          </div>
+          <div id="prompt-output-${char.sb_id}" class="prompt-output">
+            <span class="prompt-placeholder">${hasPrompt ? generatedPrompts[char.sb_id].prompt : 'Tap Generate to assemble prompt from matrix data…'}</span>
+          </div>
+          ${hasPrompt ? renderScores(generatedPrompts[char.sb_id].scores) : ''}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  updateCounts();
+}
+
+function renderScores(scores) {
+  if (!scores) return '';
+  return `<div class="score-display">
+    ${Object.entries(scores).map(([k,v]) => `
+      <div class="score-chip ${v >= 4 ? 'score-pass' : v === 3 ? 'score-warn' : 'score-fail'}">${k}: ${v}</div>
+    `).join('')}
+  </div>`;
+}
+
+// ─── TOGGLE CARD ───
+function toggleCard(id) {
+  const card = document.getElementById(`card-${id}`);
+  card.classList.toggle('expanded');
+}
+
+// ─── FILTER ───
+function filterRoster(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = filter === 'all' ? allCharacters : allCharacters.filter(c =>
+    c.tier === filter || c.category === filter || c.category.replace('_', ' ') === filter
+  );
+  renderRoster(filtered);
+}
+
+// ─── MODULES ───
+function toggleModule(el) {
+  const mod = el.dataset.module;
+  if (activeModules.has(mod)) {
+    activeModules.delete(mod);
+    el.classList.remove('active');
+  } else {
+    activeModules.add(mod);
+    el.classList.add('active');
+  }
+}
+
+function addModule() {
+  const name = prompt('Enter module ID (e.g. MOD-VIS-007):');
+  if (!name) return;
+  const content = prompt(`Enter module content for ${name}:`);
+  if (!content) return;
+  MODULE_LIBRARY[name] = content;
+  const slot = document.createElement('div');
+  slot.className = 'module-slot';
+  slot.dataset.module = name;
+  slot.onclick = () => toggleModule(slot);
+  slot.innerHTML = `<div class="module-dot"></div>${name}`;
+  document.getElementById('moduleSlots').insertBefore(slot, document.querySelector('.module-add'));
+  showToast(`Module ${name} added`);
+}
+
+// ─── ASSEMBLE PROMPT ───
+function assemblePrompt(char) {
+  const md = char.matrix_defaults;
+  const lattice = char.dominance_lattice;
+  const totalPower = Object.values(lattice).reduce((a,b) => a+b, 0);
+
+  const moduleText = activeModules.size > 0
+    ? Array.from(activeModules).map(m => MODULE_LIBRARY[m] || m).join(', ')
+    : '';
+
+  const prompt = [
+    `${char.name}, ${char.title.toLowerCase()},`,
+    `${char.core_idea}.`,
+    `Realm: ${md.realm}.`,
+    `${md.pose_foundation.replace(/_/g,' ')} pose,`,
+    `${md.tension_state} tension state,`,
+    `${md.camera_module.replace(/_/g,' ')} framing,`,
+    `${md.action_tension.replace(/_/g,' ')}.`,
+    moduleText ? `Applied modules: ${moduleText}.` : '',
+    MASTER_ROSTER.master_anchor
+  ].filter(Boolean).join(' ');
+
+  return prompt;
+}
+
+// ─── GENERATE SINGLE ───
+async function generatePrompt(id, event) {
+  if (event) event.stopPropagation();
+  const char = allCharacters.find(c => c.sb_id === id);
+  if (!char) return;
+
+  const outputEl = document.getElementById(`prompt-output-${id}`);
+  const promptSection = document.getElementById(`prompt-${id}`);
+
+  outputEl.innerHTML = '<div class="loading-bar"><div class="loading-bar-fill"></div></div><div class="prompt-placeholder">Assembling prompt…</div>';
+
+  const assembled = assemblePrompt(char);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are the FGE Prompt Assembly Engine. Given a character's assembled base prompt, return a JSON object with two keys:
+"prompt": a polished, production-ready Grok render prompt (200-300 words) that expands the base prompt with specific visual language — lighting, skin luminosity, material textures, atmospheric depth, and the Olivia de Berardinis lineage aesthetic. Make it immediately usable in Grok.
+"scores": an object with keys Identity, Iris, Light, Proportion, Signal — each scored 1-5 based on how well the assembled prompt serves the character's canon doctrine.
+Return ONLY valid JSON. No markdown, no explanation.`,
+        messages: [{ role: 'user', content: `Character: ${char.name} — ${char.title}\nBase prompt: ${assembled}\nCore idea: ${char.core_idea}` }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.map(b => b.text || '').join('');
+    let parsed;
+
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      parsed = { prompt: assembled, scores: null };
+    }
+
+    generatedPrompts[id] = parsed;
+
+    outputEl.innerHTML = `<span style="color:var(--ivory)">${parsed.prompt}</span>`;
+    if (parsed.scores) {
+      outputEl.innerHTML += renderScores(parsed.scores);
+    }
+
+    // Update card status
+    const statusEl = document.querySelector(`#card-${id} .card-status`);
+    if (statusEl) {
+      statusEl.className = 'card-status status-ready';
+      statusEl.textContent = 'Ready';
+    }
+
+    updateCounts();
+
+  } catch (err) {
+    outputEl.innerHTML = `<span style="color:var(--red)">Generation failed: ${err.message}</span>`;
+    outputEl.innerHTML += `<br><span class="prompt-placeholder" style="color:var(--ivory-dim)">${assembled}</span>`;
+    generatedPrompts[id] = { prompt: assembled, scores: null };
+  }
+}
+
+// ─── RUN ALL ───
+async function runAllPrompts() {
+  const btn = document.getElementById('runAllBtn');
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+
+  const batchBar = document.getElementById('batchBar');
+  const batchFill = document.getElementById('batchFill');
+  const batchLabel = document.getElementById('batchLabel');
+  batchBar.classList.add('visible');
+
+  const toGenerate = allCharacters.filter(c => !generatedPrompts[c.sb_id]);
+  let done = 0;
+
+  for (const char of toGenerate) {
+    batchLabel.textContent = `Generating ${char.name}… (${done + 1}/${toGenerate.length})`;
+    batchFill.style.width = `${(done / toGenerate.length) * 100}%`;
+
+    // Expand card
+    const card = document.getElementById(`card-${char.sb_id}`);
+    if (card && !card.classList.contains('expanded')) card.classList.add('expanded');
+
+    await generatePrompt(char.sb_id, null);
+    done++;
+
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  batchFill.style.width = '100%';
+  batchLabel.textContent = `All ${done} prompts generated`;
+  document.getElementById('exportBtn').style.display = 'block';
+  btn.disabled = false;
+  btn.textContent = '⚡ Generate All';
+  updateCounts();
+}
+
+// ─── COPY PROMPT ───
+function copyPrompt(id, event) {
+  if (event) event.stopPropagation();
+  const data = generatedPrompts[id];
+  if (!data) { showToast('Generate prompt first'); return; }
+  navigator.clipboard.writeText(data.prompt).then(() => showToast('Prompt copied'));
+}
+
+// ─── EXPORT ALL ───
+function exportAll() {
+  const lines = allCharacters
+    .filter(c => generatedPrompts[c.sb_id])
+    .map(c => `=== ${c.name} (${c.sb_id}) ===\n${generatedPrompts[c.sb_id].prompt}`)
+    .join('\n\n');
+
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'FGE_roster_prompts.txt';
+  a.click();
+  showToast('Prompts exported');
+}
+
+// ─── IMPORT ROSTER ───
+function importRoster() {
+  const input = document.getElementById('importInput').value.trim();
+  if (!input) return;
+
+  try {
+    const data = JSON.parse(input);
+    const newChars = data.characters || [];
+    const existing = new Set(allCharacters.map(c => c.sb_id));
+    const added = newChars.filter(c => !existing.has(c.sb_id));
+    allCharacters = [...allCharacters, ...added];
+    document.getElementById('importInput').value = '';
+    renderRoster(allCharacters);
+    showToast(`${added.length} characters imported`);
+  } catch {
+    showToast('Invalid JSON — check format');
+  }
+}
+
+// ─── COUNTS ───
+function updateCounts() {
+  document.getElementById('totalCount').textContent = allCharacters.length;
+  document.getElementById('generatedCount').textContent = Object.keys(generatedPrompts).length;
+  document.getElementById('readyCount').textContent = Object.values(generatedPrompts).filter(p => p.scores && Object.values(p.scores).every(v => v >= 4)).length;
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ─── START ───
+init();
+</script>
+</body>
+</html>

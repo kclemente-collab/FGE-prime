@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attend AI - AI-Driven Attendance Monitoring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .status-present { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .status-absent { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+        .status-late { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .sidebar-link.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .prediction-card { border-left: 4px solid; }
+        .prediction-high { border-color: #10b981; }
+        .prediction-medium { border-color: #f59e0b; }
+        .prediction-low { border-color: #ef4444; }
+        .scanner-ring { animation: scan 2s linear infinite; }
+        @keyframes scan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900">
+        <div class="w-full max-w-md p-8 rounded-2xl glass border border-slate-700">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                    <i data-lucide="brain" class="w-10 h-10 text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold gradient-text mb-2">Smart Attend AI</h1>
+                <p class="text-slate-400">AI-Driven Attendance Monitoring</p>
+            </div>
+            <div class="space-y-4">
+                <button onclick="login('teacher')" class="w-full p-4 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 transition-all flex items-center justify-center gap-3 group">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                    <span class="font-semibold">Login as Teacher</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <button onclick="login('student')" class="w-full p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 transition-all flex items-center justify-center gap-3 group">
+                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    <span class="font-semibold">Login as Student</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+            <div class="mt-6 p-4 rounded-lg bg-slate-800/50 border border-slate-700">
+                <div class="flex items-center gap-2 text-sm text-slate-400">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Secure AI-powered facial recognition</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-slate-800/50 border-r border-slate-700 z-40">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                        <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg">Smart Attend</span>
+                </div>
+                <nav class="space-y-2" id="sidebarNav">
+                    <!-- Dynamic navigation -->
+                </nav>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-700">
+                <div class="flex items-center gap-3">
+                    <img src="http://static.photos/people/200x200/42" alt="User" class="w-10 h-10 rounded-full border-2 border-violet-500">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium truncate" id="userName">Dr. Sarah Chen</p>
+                        <p class="text-xs text-slate-400" id="userRole">Teacher</p>
+                    </div>
+                    <button onclick="logout()" class="p-2 hover:bg-slate-700 rounded-lg transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 min-h-screen">
+            <!-- Header -->
+            <header class="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-lg border-b border-slate-700">
+                <div class="flex items-center justify-between px-8 py-4">
+                    <div>
+                        <h2 class="text-2xl font-bold" id="pageTitle">Dashboard</h2>
+                        <p class="text-slate-400 text-sm" id="currentDate">Loading...</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                            <span class="status-dot status-present animate-pulse"></span>
+                            <span class="text-sm text-emerald-400 font-medium">System Online</span>
+                        </div>
+                        <button class="p-2 hover:bg-slate-800 rounded-lg transition-colors relative">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="p-8" id="contentArea">
+                <!-- Dynamic content -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Face Recognition Modal -->
+    <div id="faceModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="w-full max-w-lg p-8 rounded-2xl bg-slate-800 border border-slate-700 text-center">
+            <div class="relative w-64 h-64 mx-auto mb-6">
+                <div class="absolute inset-0 rounded-full border-4 border-violet-500/30 scanner-ring"></div>
+                <div class="absolute inset-4 rounded-full border-4 border-purple-500/20" style="animation: scan 3s linear infinite reverse;"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i data-lucide="scan-face" class="w-24 h-24 text-violet-400"></i>
+                </div>
+                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent animate-pulse"></div>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Face Recognition</h3>
+            <p class="text-slate-400 mb-6">Please look at the camera for attendance verification</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeFaceModal()" class="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors">Cancel</button>
+                <button onclick="completeFaceScan()" class="px-6 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 transition-colors">Simulate Scan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let currentUser = null;
+        let currentView = 'dashboard';
+        let attendanceData = [];
+        let predictions = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updateDate();
+            generateMockData();
+        });
+
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', options);
+        }
+
+        function generateMockData() {
+            const students = ['Emma Wilson', 'James Chen', 'Sophia Martinez', 'Michael Brown', 'Olivia Davis', 
+                            'William Taylor', 'Ava Anderson', 'Noah Thomas', 'Isabella Jackson', 'Liam White'];
+            const courses = ['Mathematics 101', 'Computer Science', 'Physics', 'English Literature', 'Chemistry'];
+            
+            attendanceData = students.map((name, i) => ({
+                id: i + 1,
+                name,
+                course: courses[Math.floor(Math.random() * courses.length)],
+                present: Math.floor(Math.random() * 20) + 75,
+                absent: Math.floor(Math.random() * 5),
+                late: Math.floor(Math.random() * 3),
+                lastAttendance: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                status: Math.random() > 0.3 ? 'present' : Math.random() > 0.5 ? 'late' : 'absent',
+                trend: Math.random() > 0.5 ? 'up' : 'down',
+                riskScore: Math.floor(Math.random() * 100)
+            }));
+
+            predictions = attendanceData.map(s => ({
+                ...s,
+                predictedAttendance: Math.min(100, s.present + Math.floor(Math.random() * 10 - 3)),
+                riskLevel: s.riskScore > 70 ? 'low' : s.riskScore > 40 ? 'medium' : 'high',
+                recommendation: s.riskScore > 70 ? 'Excellent attendance pattern' : 
+                               s.riskScore > 40 ? 'Monitor closely, send reminders' : 'Intervention needed, schedule meeting'
+            }));
+        }
+
+        function login(role) {
+            currentUser = { role, name: role === 'teacher' ? 'Dr. Sarah Chen' : 'Emma Wilson' };
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = role === 'teacher' ? 'Teacher' : 'Student';
+            renderSidebar();
+            navigate('dashboard');
+            lucide.createIcons();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            const items = currentUser.role === 'teacher' ? [
+                { id: 'dashboard', icon: 'layout-dashboard', label: 'Dashboard' },
+                { id: 'attendance', icon: 'users', label: 'Take Attendance' },
+                { id: 'analytics', icon: 'bar-chart-3', label: 'AI Analytics' },
+                { id: 'predictions', icon: 'brain-circuit', label: 'Predictions' },
+                { id: 'reports', icon: 'file-text', label: 'Reports' },
+                { id: 'students', icon: 'graduation-cap', label: 'Students' }
+            ] : [
+                { id: 'dashboard', icon: 'layout-dashboard', label: 'My Dashboard' },
+                { id: 'attendance', icon: 'check-circle', label: 'My Attendance' },
+                { id: 'mark-attendance', icon: 'scan-face', label: 'Mark Attendance' },
+                { id: 'analytics', icon: 'trending-up', label: 'My Analytics' },
+                { id: 'predictions', icon: 'sparkles', label: 'AI Insights' }
+            ];
+
+            nav.innerHTML = items.map(item => `
+                <button onclick="navigate('${item.id}')" 
+                        class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${currentView === item.id ? 'active' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}"
+                        data-view="${item.id}">
+                    <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                    <span class="font-medium">${item.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function navigate(view) {
+            currentView = view;
+            document.querySelectorAll('.sidebar-link').forEach(el => {
+                el.classList.toggle('active', el.dataset.view === view);
+                el.classList.toggle('text-slate-400', el.dataset.view !== view);
+            });
+            
+            const titles = {
+                dashboard: 'Dashboard',
+                attendance: 'Attendance Management',
+                'mark-attendance': 'Mark Your Attendance',
+                analytics: 'AI Analytics',
+                predictions: 'Predictive Insights',
+                reports: 'Reports',
+                students: 'Student Management'
+            };
+            document.getElementById('pageTitle').textContent = titles[view] || view;
+
+            renderContent(view);
+            lucide.createIcons();
+        }
+
+        function renderContent(view) {
+            const content = document.getElementById('contentArea');
+            
+            switch(view) {
+                case 'dashboard':
+                    content.innerHTML = renderDashboard();
+                    break;
+                case 'attendance':
+                    content.innerHTML = currentUser.role === 'teacher' ? renderAttendanceManager() : renderMyAttendance();
+                    break;
+                case 'mark-attendance':
+                    content.innerHTML = renderMarkAttendance();
+                    break;
+                case 'analytics':
+                    content.innerHTML = renderAnalytics();
+                    break;
+                case 'predictions':
+                    content.innerHTML = renderPredictions();
+                    break;
+                case 'reports':
+                    content.innerHTML = renderReports();
+                    break;
+                case 'students':
+                    content.innerHTML = renderStudents();
+                    break;
+            }
+            
+            setTimeout(() => {
+                lucide.createIcons();
+                initCharts();
+            }, 100);
+        }
+
+        function renderDashboard() {
+            const stats = [
+                { label: 'Total Students', value: '248', change: '+12%', icon: 'users', color: 'violet' },
+                { label: 'Today\'s Attendance', value: '94.2%', change: '+3.5%', icon: 'check-circle', color: 'emerald' },
+                { label: 'AI Predictions', value: '18', change: '5 at risk', icon: 'brain', color: 'amber' },
+                { label: 'Classes Today', value: '6', change: '2 remaining', icon: 'calendar', color: 'blue' }
+            ];
+
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${stats.map(stat => `
+                            <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover-lift">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-xl bg-${stat.color}-500/10">
+                                        <i data-lucide="${stat.icon}" class="w-6 h-6 text-${stat.color}-400"></i>
+                                    </div>
+                                    <span class="text-sm ${stat.change.includes('+') ? 'text-emerald-400' : 'text-amber-400'}">${stat.change}</span>
+                                </div>
+                                <p class="text-3xl font-bold mb-1">${stat.value}</p>
+                                <p class="text-slate-400 text-sm">${stat.label}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Main Dashboard Content -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Attendance Chart -->
+                        <div class="lg:col-span-2 p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-semibold text-lg">Attendance Trends</h3>
+                                <select class="px-3 py-1 rounded-lg bg-slate-700 text-sm border border-slate-600">
+                                    <option>Last 7 Days</option>
+                                    <option>Last 30 Days</option>
+                                    <option>This Semester</option>
+                                </select>
+                            </div>
+                            <canvas id="attendanceChart" height="120"></canvas>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="space-y-4">
+                            <div class="p-6 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-600/20 border border-violet-500/30">
+                                <h3 class="font-semibold mb-4 flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-5 h-5 text-violet-400"></i>
+                                    Quick Actions
+                                </h3>
+                                <div class="space-y-3">
+                                    <button onclick="navigate('attendance')" class="w-full p-3 rounded-xl bg-violet-600 hover:bg-violet-500 transition-colors flex items-center gap-3">
+                                        <i data-lucide="camera" class="w-5 h-5"></i>
+                                        <span>Start Face Recognition</span>
+                                    </button>
+                                    <button onclick="navigate('predictions')" class="w-full p-3 rounded-xl bg-slate-700 hover:bg-slate-600 transition-colors flex items-center gap-3">
+                                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                        <span>View AI Predictions</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity -->
+                            <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                                <h3 class="font-semibold mb-4">Recent Activity</h3>
+                                <div class="space-y-3">
+                                    ${['Face scan completed - Room 301', 'AI alert: 3 students at risk', 'Report generated for CS101'].map(activity => `
+                                        <div class="flex items-center gap-3 text-sm">
+                                            <div class="w-2 h-2 rounded-full bg-violet-400"></div>
+                                            <span class="text-slate-300">${activity}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- At-Risk Students -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-lg flex items-center gap-2">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
+                                AI-Identified At-Risk Students
+                            </h3>
+                            <button class="text-violet-400 text-sm hover:text-violet-300">View All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left text-slate-400 text-sm border-b border-slate-700">
+                                        <th class="pb-3 font-medium">Student</th>
+                                        <th class="pb-3 font-medium">Course</th>
+                                        <th class="pb-3 font-medium">Attendance</th>
+                                        <th class="pb-3 font-medium">Risk Score</th>
+                                        <th class="pb-3 font-medium">AI Recommendation</th>
+                                        <th class="pb-3 font-medium">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    ${predictions.filter(p => p.riskScore < 50).slice(0, 3).map(s => `
+                                        <tr class="border-b border-slate-700/50">
+                                            <td class="py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-xs font-bold">
+                                                        ${s.name.split(' ').map(n => n[0]).join('')}
+                                                    </div>
+                                                    <span class="font-medium">${s.name}</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 text-slate-400">${s.course}</td>
+                                            <td class="py-4">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-24 h-2 rounded-full bg-slate-700">
+                                                        <div class="h-full rounded-full ${s.present > 80 ? 'bg-emerald-500' : s.present > 60 ? 'bg-amber-500' : 'bg-red-500'}" style="width: ${s.present}%"></div>
+                                                    </div>
+                                                    <span>${s.present}%</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-4">
+                                                <span class="px-2 py-1 rounded-full text-xs ${s.riskScore > 70 ? 'bg-emerald-500/20 text-emerald-400' : s.riskScore > 40 ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}">
+                                                    ${s.riskScore}%
+                                                </span>
+                                            </td>
+                                            <td class="py-4 text-slate-400 max-w-xs truncate">${s.recommendation}</td>
+                                            <td class="py-4">
+                                                <button class="px-3 py-1 rounded-lg bg-violet-600/20 text-violet-400 text-xs hover:bg-violet-600/30 transition-colors">Contact</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAttendanceManager() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- Face Recognition Section -->
+                    <div class="p-8 rounded-2xl bg-gradient-to-br from-violet-600/10 to-purple-600/10 border border-violet-500/30 text-center">
+                        <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-violet-600/20 flex items-center justify-center">
+                            <i data-lucide="scan-face" class="w-12 h-12 text-violet-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">AI Face Recognition Attendance</h3>
+                        <p class="text-slate-400 mb-6 max-w-md mx-auto">Use our advanced AI-powered facial recognition system to automatically mark attendance. The system identifies students in real-time.</p>
+                        <button onclick="openFaceModal()" class="px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 transition-all flex items-center gap-3 mx-auto">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
+                            <span class="font-semibold">Start Face Scan</span>
+                        </button>
+                    </div>
+
+                    <!-- Manual Attendance -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-lg">Manual Attendance - Mathematics 101</h3>
+                            <div class="flex gap-3">
+                                <button class="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-400 text-sm hover:bg-emerald-600/30 transition-colors">
+                                    Mark All Present
+                                </button>
+                                <button class="px-4 py-2 rounded-lg bg-violet-600 text-sm hover:bg-violet-500 transition-colors">
+                                    Save Attendance
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${attendanceData.map(s => `
+                                <div class="p-4 rounded-xl bg-slate-700/50 border border-slate-600 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <img src="http://static.photos/people/200x200/${s.id + 10}" alt="${s.name}" class="w-10 h-10 rounded-full">
+                                        <div>
+                                            <p class="font-medium text-sm">${s.name}</p>
+                                            <p class="text-xs text-slate-400">ID: 2024${String(s.id).padStart(3, '0')}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="toggleStatus(this, 'present')" class="p-2 rounded-lg ${s.status === 'present' ? 'bg-emerald-600 text-white' : 'bg-slate-600 text-slate-400'} hover:bg-emerald-500 transition-colors" title="Present">
+                                            <i data-lucide="check" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="toggleStatus(this, 'late')" class="p-2 rounded-lg ${s.status === 'late' ? 'bg-amber-600 text-white' : 'bg-slate-600 text-slate-400'} hover:bg-amber-500 transition-colors" title="Late">
+                                            <i data-lucide="clock" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="toggleStatus(this, 'absent')" class="p-2 rounded-lg ${s.status === 'absent' ? 'bg-red-600 text-white' : 'bg-slate-600 text-slate-400'} hover:bg-red-500 transition-colors" title="Absent">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMarkAttendance() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="p-8 rounded-2xl bg-slate-800/50 border border-slate-700 text-center">
+                            <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-600/20 flex items-center justify-center relative">
+                                <div class="absolute inset-0 rounded-full border-2 border-violet-500/30 animate-pulse"></div>
+                                <i data-lucide="user" class="w-16 h-16 text-violet-400"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Mark Your Attendance</h3>
+                            <p class="text-slate-400 mb-8">Use facial recognition or enter your student ID to mark attendance</p>
+                            
+                            <div class="space-y-4">
+                                <button onclick="openFaceModal()" class="w-full p-6 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 transition-all flex items-center justify-center gap-4 group">
+                                    <i data-lucide="scan-face" class="w-8 h-8"></i>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-lg">Face Recognition</p>
+                                        <p class="text-sm text-violet-200">Quick and secure verification</p>
+                                    </div>
+                                    <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-2 transition-transform"></i>
+                                </button>
+                                
+                                <div class="relative">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="w-full border-t border-slate-600"></div>
+                                    </div>
+                                    <div class="relative flex justify-center text-sm">
+                                        <span class="px-2 bg-slate-800 text-slate-400">Or</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <input type="text" placeholder="Enter Student ID" class="flex-1 px-4 py-3 rounded-xl bg-slate-700 border border-slate-600 focus:border-violet-500 focus:outline-none">
+                                    <button class="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 transition-colors font-medium">
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Today's Classes -->
+                        <div class="mt-6 p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <h3 class="font-semibold mb-4">Your Classes Today</h3>
+                            <div class="space-y-3">
+                                ${[
+                                    { time: '09:00 AM', course: 'Mathematics 101', room: 'Room 301', status: 'completed' },
+                                    { time: '11:00 AM', course: 'Computer Science', room: 'Lab 205', status: 'current' },
+                                    { time: '02:00 PM', course: 'Physics', room: 'Room 402', status: 'upcoming' }
+                                ].map(cls => `
+                                    <div class="flex items-center gap-4 p-4 rounded-xl ${cls.status === 'current' ? 'bg-violet-600/20 border border-violet-500/30' : 'bg-slate-700/30'}">
+                                        <div class="text-center min-w-[80px]">
+                                            <p class="text-sm font-medium">${cls.time}</p>
+                                            <span class="text-xs ${cls.status === 'completed' ? 'text-emerald-400' : cls.status === 'current' ? 'text-violet-400' : 'text-slate-400'}">
+                                                ${cls.status === 'completed' ? '✓ Done' : cls.status === 'current' ? '● Now' : '○ Upcoming'}
+                                            </span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-medium">${cls.course}</p>
+                                            <p class="text-sm text-slate-400">${cls.room}</p>
+                                        </div>
+                                        ${cls.status === 'current' ? '<span class="px-3 py-1 rounded-full bg-violet-600 text-xs">Mark Now</span>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMyAttendance() {
+            const myData = predictions[0];
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- Personal Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-600/20 to-teal-600/20 border border-emerald-500/30">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-3 rounded-xl bg-emerald-500/20">
+                                    <i data-lucide="check-circle" class="w-6 h-6 text-emerald-400"></i>
+                                </div>
+                                <span class="text-emerald-400 font-medium">Present</span>
+                            </div>
+                            <p class="text-4xl font-bold text-emerald-400">${myData.present}%</p>
+                            <p class="text-sm text-slate-400 mt-1">Classes attended</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-gradient-to-br from-amber-600/20 to-orange-600/20 border border-amber-500/30">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-3 rounded-xl bg-amber-500/20">
+                                    <i data-lucide="clock" class="w-6 h-6 text-amber-400"></i>
+                                </div>
+                                <span class="text-amber-400 font-medium">Late</span>
+                            </div>
+                            <p class="text-4xl font-bold text-amber-400">${myData.late}</p>
+                            <p class="text-sm text-slate-400 mt-1">Times late</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-gradient-to-br from-red-600/20 to-rose-600/20 border border-red-500/30">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-3 rounded-xl bg-red-500/20">
+                                    <i data-lucide="x-circle" class="w-6 h-6 text-red-400"></i>
+                                </div>
+                                <span class="text-red-400 font-medium">Absent</span>
+                            </div>
+                            <p class="text-4xl font-bold text-red-400">${myData.absent}</p>
+                            <p class="text-sm text-slate-400 mt-1">Classes missed</p>
+                        </div>
+                    </div>
+
+                    <!-- Attendance History -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <h3 class="font-semibold text-lg mb-6">Attendance History</h3>
+                        <div class="space-y-3">
+                            ${Array.from({length: 10}, (_, i) => {
+                                const date = new Date();
+                                date.setDate(date.getDate() - i);
+                                const status = Math.random() > 0.2 ? 'present' : Math.random() > 0.5 ? 'late' : 'absent';
+                                const statusConfig = {
+                                    present: { icon: 'check-circle', color: 'emerald', label: 'Present' },
+                                    late: { icon: 'clock', color: 'amber', label: 'Late' },
+                                    absent: { icon: 'x-circle', color: 'red', label: 'Absent' }
+                                };
+                                const config = statusConfig[status];
+                                return `
+                                    <div class="flex items-center justify-between p-4 rounded-xl bg-slate-700/30">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 rounded-xl bg-${config.color}-500/20 flex items-center justify-center">
+                                                <i data-lucide="${config.icon}" class="w-6 h-6 text-${config.color}-400"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Mathematics 101</p>
+                                                <p class="text-sm text-slate-400">${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                                            </div>
+                                        </div>
+                                        <span class="px-3 py-1 rounded-full bg-${config.color}-500/20 text-${config.color}-400 text-sm font-medium">
+                                            ${config.label}
+                                        </span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAnalytics() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- AI Insights Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${[
+                            { label: 'Avg. Attendance Rate', value: '87.3%', trend: '+5.2%', icon: 'trending-up', color: 'emerald' },
+                            { label: 'AI Prediction Accuracy', value: '94.8%', trend: '+2.1%', icon: 'target', color: 'violet' },
+                            { label: 'Early Warning Alerts', value: '23', trend: '-8', icon: 'bell', color: 'amber' },
+                            { label: 'Intervention Success', value: '78%', trend: '+12%', icon: 'award', color: 'blue' }
+                        ].map(stat => `
+                            <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover-lift">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="p-3 rounded-xl bg-${stat.color}-500/10">
+                                        <i data-lucide="${stat.icon}" class="w-6 h-6 text-${stat.color}-400"></i>
+                                    </div>
+                                    <span class="text-sm ${stat.trend.includes('+') ? 'text-emerald-400' : 'text-amber-400'}">${stat.trend}</span>
+                                </div>
+                                <p class="text-3xl font-bold mb-1">${stat.value}</p>
+                                <p class="text-slate-400 text-sm">${stat.label}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <h3 class="font-semibold text-lg mb-6">Course-wise Attendance</h3>
+                            <canvas id="courseChart" height="200"></canvas>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <h3 class="font-semibold text-lg mb-6">Attendance by Time of Day</h3>
+                            <canvas id="timeChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- AI Pattern Analysis -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <h3 class="font-semibold text-lg mb-6 flex items-center gap-2">
+                            <i data-lucide="brain-circuit" class="w-5 h-5 text-violet-400"></i>
+                            AI Pattern Analysis
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${[
+                                { title: 'Peak Absence Days', desc: 'Monday and Friday show 23% higher absence rates', icon: 'calendar-x', color: 'red' },
+                                { title: 'Weather Correlation', desc: 'Rainy days correlate with 15% lower attendance', icon: 'cloud-rain', color: 'blue' },
+                                { title: 'Success Pattern', desc: 'Students with >90% attendance have 3.5x better grades', icon: 'graduation-cap', color: 'emerald' }
+                            ].map(insight => `
+                                <div class="p-5 rounded-xl bg-slate-700/30 border border-slate-600">
+                                    <div class="w-12 h-12 rounded-xl bg-${insight.color}-500/20 flex items-center justify-center mb-4">
+                                        <i data-lucide="${insight.icon}" class="w-6 h-6 text-${insight.color}-400"></i>
+                                    </div>
+                                    <h4 class="font-semibold mb-2">${insight.title}</h4>
+                                    <p class="text-sm text-slate-400">${insight.desc}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPredictions() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- Prediction Overview -->
+                    <div class="p-6 rounded-2xl bg-gradient-to-r from-violet-600/20 via-purple-600/20 to-pink-600/20 border border-violet-500/30">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="p-3 rounded-xl bg-violet-500/20">
+                                <i data-lucide="sparkles" class="w-8 h-8 text-violet-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">AI Predictive Analytics</h3>
+                                <p class="text-slate-400">Machine learning models analyzing attendance patterns</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div class="p-4 rounded-xl bg-slate-800/50">
+                                <p class="text-2xl font-bold text-emerald-400">156</p>
+                                <p class="text-sm text-slate-400">Students on track</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-800/50">
+                                <p class="text-2xl font-bold text-amber-400">67</p>
+                                <p class="text-sm text-slate-400">Need monitoring</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-800/50">
+                                <p class="text-2xl font-bold text-red-400">25</p>
+                                <p class="text-sm text-slate-400">At high risk</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predictive Insights -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <h3 class="font-semibold text-lg mb-6">Next Week Predictions</h3>
+                            <canvas id="predictionChart" height="200"></canvas>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                            <h3 class="font-semibold text-lg mb-6">Risk Distribution</h3>
+                            <canvas id="riskChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Individual Predictions -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-lg">Student Risk Predictions</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 rounded-lg bg-slate-700 text-sm hover:bg-slate-600">All</button>
+                                <button class="px-3 py-1 rounded-lg bg-red-600/20 text-red-400 text-sm">High Risk</button>
+                                <button class="px-3 py-1 rounded-lg bg-amber-600/20 text-amber-400 text-sm">Medium</button>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            ${predictions.slice(0, 5).map(s => `
+                                <div class="prediction-card prediction-${s.riskLevel} p-5 rounded-xl bg-slate-700/30">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <img src="http://static.photos/people/200x200/${s.id + 20}" alt="${s.name}" class="w-12 h-12 rounded-full">
+                                            <div>
+                                                <p class="font-semibold">${s.name}</p>
+                                                <p class="text-sm text-slate-400">${s.course}</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium ${s.riskLevel === 'high' ? 'bg-emerald-500/20 text-emerald-400' : s.riskLevel === 'medium' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}">
+                                                ${s.riskLevel.toUpperCase()} RISK
+                                            </span>
+                                            <p class="text-sm text-slate-400 mt-1">Predicted: ${s.predictedAttendance}%</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 p-3 rounded-lg bg-slate-800/50">
+                                        <p class="text-sm"><span class="text-violet-400 font-medium">AI Recommendation:</span> ${s.recommendation}</p>
+                                    </div>
+                                    <div class="mt-3 flex gap-2">
+                                        <button class="px-3 py-1 rounded-lg bg-violet-600/20 text-violet-400 text-xs hover:bg-violet-600/30">Send Alert</button>
+                                        <button class="px-3 py-1 rounded-lg bg-slate-600/20 text-slate-400 text-xs hover:bg-slate-600/30">Schedule Meeting</button>
+                                        <button class="px-3 py-1 rounded-lg bg-slate-600/20 text-slate-400 text-xs hover:bg-slate-600/30">View Details</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReports() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${[
+                            { title: 'Monthly Attendance Report', desc: 'Complete attendance analysis for all courses', icon: 'file-bar-chart', color: 'blue' },
+                            { title: 'AI Prediction Report', desc: 'Machine learning insights and forecasts', icon: 'brain', color: 'violet' },
+                            { title: 'At-Risk Students Report', desc: 'Detailed analysis of students needing intervention', icon: 'alert-triangle', color: 'red' }
+                        ].map(report => `
+                            <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 hover-lift cursor-pointer group">
+                                <div class="w-14 h-14 rounded-xl bg-${report.color}-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <i data-lucide="${report.icon}" class="w-7 h-7 text-${report.color}-400"></i>
+                                </div>
+                                <h3 class="font-semibold text-lg mb-2">${report.title}</h3>
+                                <p class="text-sm text-slate-400 mb-4">${report.desc}</p>
+                                <div class="flex gap-2">
+                                    <button class="flex-1 py-2 rounded-lg bg-${report.color}-600/20 text-${report.color}-400 text-sm hover:bg-${report.color}-600/30 transition-colors">
+                                        Download PDF
+                                    </button>
+                                    <button class="flex-1 py-2 rounded-lg bg-slate-700 text-sm hover:bg-slate-600 transition-colors">
+                                        Preview
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Scheduled Reports -->
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-lg">Scheduled Reports</h3>
+                            <button class="px-4 py-2 rounded-lg bg-violet-600 text-sm hover:bg-violet-500 transition-colors">
+                                + Schedule New
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            ${[
+                                { name: 'Weekly Summary', freq: 'Every Monday', next: 'Tomorrow', status: 'active' },
+                                { name: 'Monthly Analytics', freq: '1st of month', next: 'Dec 1, 2024', status: 'active' },
+                                { name: 'Semester Report', freq: 'End of semester', next: 'Dec 15, 2024', status: 'pending' }
+                            ].map(schedule => `
+                                <div class="flex items-center justify-between p-4 rounded-xl bg-slate-700/30">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                                            <i data-lucide="calendar" class="w-5 h-5 text-violet-400"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">${schedule.name}</p>
+                                            <p class="text-sm text-slate-400">${schedule.freq} • Next: ${schedule.next}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="px-3 py-1 rounded-full text-xs ${schedule.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
+                                            ${schedule.status}
+                                        </span>
+                                        <button class="p-2 hover:bg-slate-600 rounded-lg transition-colors">
+                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStudents() {
+            return `
+                <div class="space-y-6 slide-in">
+                    <!-- Search and Filter -->
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 relative">
+                            <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" placeholder="Search students by name or ID..." 
+                                   class="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-violet-500 focus:outline-none">
+                        </div>
+                        <select class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-violet-500 focus:outline-none">
+                            <option>All Courses</option>
+                            <option>Mathematics 101</option>
+                            <option>Computer Science</option>
+                            <option>Physics</option>
+                        </select>
+                        <select class="px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-violet-500 focus:outline-none">
+                            <option>All Status</option>
+                            <option>At Risk</option>
+                            <option>Good Standing</option>
+                            <option>Excellent</option>
+                        </select>
+                    </div>
+
+                    <!-- Students Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${attendanceData.map(s => `
+                            <div class="p-5 rounded-2xl bg-slate-800/50 border border-slate-700 hover-lift">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="http://static.photos/people/200x200/${s.id + 30}" alt="${s.name}" class="w-14 h-14 rounded-full">
+                                        <div>
+                                            <p class="font-semibold">${s.name}</p>
+                                            <p class="text-sm text-slate-400">ID: 2024${String(s.id).padStart(3, '0')}</p>
+                                        </div>
+                                    </div>
+                                    <span class="status-dot ${s.status === 'present' ? 'status-present' : s.status === 'late' ? 'status-late' : 'status-absent'}"></span>
+                                </div>
+                                <div class="space-y-3 mb-4">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-400">Course</span>
+                                        <span>${s.course}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-400">Attendance</span>
+                                        <span class="${s.present > 80 ? 'text-emerald-400' : s.present > 60 ? 'text-amber-400' : 'text-red-400'}">${s.present}%</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-400">Last Seen</span>
+                                        <span>${s.lastAttendance}</span>
+                                    </div>
+                                </div>
+                                <div class="h-2 rounded-full bg-slate-700 mb-4">
+                                    <div class="h-full rounded-full ${s.present > 80 ? 'bg-emerald-500' : s.present > 60 ? 'bg-amber-500' : 'bg-red-500'}" style="width: ${s.present}%"></div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="flex-1 py-2 rounded-lg bg-violet-600/20 text-violet-400 text-sm hover:bg-violet-600/30 transition-colors">Profile</button>
+                                    <button class="flex-1 py-2 rounded-lg bg-slate-700 text-sm hover:bg-slate-600 transition-colors">Message</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Face Recognition Modal
+        function openFaceModal() {
+            document.getElementById('faceModal').classList.remove('hidden');
+        }
+
+        function closeFaceModal() {
+            document.getElementById('faceModal').classList.add('hidden');
+        }
+
+        function completeFaceScan() {
+            closeFaceModal();
+            // Show success notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 p-4 rounded-xl bg-emerald-600 text-white flex items-center gap-3 slide-in';
+            notification.innerHTML = `
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                <div>
+                    <p class="font-semibold">Face Recognized!</p>
+                    <p class="text-sm text-emerald-200">Attendance marked successfully</p>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            lucide.createIcons();
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function toggleStatus(btn, status) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('button').forEach(b => {
+                b.className = b.className.replace(/bg-(emerald|amber|red)-600 text-white/, 'bg-slate-600 text-slate-400');
+            });
+            const colors = { present: 'emerald', late: 'amber', absent: 'red' };
+            btn.className = btn.className.replace('bg-slate-600 text-slate-400', `bg-${colors[status]}-600 text-white`);
+        }
+
+        // Chart Initialization
+        function initCharts() {
+            const charts = ['attendanceChart', 'courseChart', 'timeChart', 'predictionChart', 'riskChart'];
+            
+            charts.forEach(id => {
+                const ctx = document.getElementById(id)?.getContext('2d');
+                if (!ctx) return;
+
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
+                };
+
+                if (id === 'attendanceChart') {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                            datasets: [{
+                                label: 'Attendance %',
+                                data: [92, 88, 95, 91, 85],
+                                borderColor: '#8b5cf6',
+                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Predicted',
+                                data: [90, 87, 93, 89, 83],
+                                borderColor: '#10b981',
+                                borderDash: [5, 5],
+                                fill: false,
+                                tension: 0.4
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                } else if (id === 'courseChart') {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Math', 'CS', 'Physics', 'English', 'Chemistry'],
+                            datasets: [{
+                                label: 'Avg Attendance %',
+                                data: [87, 94, 82, 91, 85],
+                                backgroundColor: ['#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ef4444']
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                } else if (id === 'timeChart') {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Morning (8-12)', 'Afternoon (12-4)', 'Evening (4-8)'],
+                            datasets: [{
+                                data: [45, 35, 20],
+                                backgroundColor: ['#8b5cf6', '#10b981', '#f59e0b']
+                            }]
+                        },
+                        options: { ...commonOptions, cutout: '60%' }
+                    });
+                } else if (id === 'predictionChart') {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                            datasets: [{
+                                label: 'Predicted Attendance',
+                                data: [89, 87, 85, 83],
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                fill: true
+                            }, {
+                                label: 'With Intervention',
+                                data: [89, 90, 91, 92],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                } else if (id === 'riskChart') {
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                            datasets: [{
+                                data: [156, 67, 25],
+                                backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                }
+            });
+        }
+    </script>
+<script src="https://deepsite.hf.co/deepsite-badge.js"></script>
+</body>
+</html>

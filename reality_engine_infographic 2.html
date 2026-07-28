@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REALITY ENGINE 2.0 — Master System Document</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-bright: #f0c84a;
+    --gold-dim: #7a5c1e;
+    --gold-glow: rgba(201,168,76,0.3);
+    --void: #05050a;
+    --deep: #0a0a12;
+    --surface: #0f0f1a;
+    --panel: #13131f;
+    --panel-bright: #1a1a2e;
+    --border: rgba(201,168,76,0.25);
+    --border-bright: rgba(201,168,76,0.6);
+    --text: #c8c0b0;
+    --text-dim: #7a7060;
+    --white: #ede8df;
+    --purple: #9b6fc4;
+    --teal: #4ab8c4;
+    --green: #4ac47a;
+    --red: #c44a4a;
+    --orange: #c47a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ═══════════════════════════════════════
+     NOISE TEXTURE OVERLAY
+  ═══════════════════════════════════════ */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ═══════════════════════════════════════
+     COVER SECTION
+  ═══════════════════════════════════════ */
+  .cover {
+    min-height: 100vh;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(155,111,196,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 60%, rgba(74,184,196,0.04) 0%, transparent 50%),
+      linear-gradient(180deg, #08080f 0%, #05050a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  }
+
+  .cover-cycle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .cover-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 16px;
+    text-shadow: 0 0 80px rgba(201,168,76,0.4), 0 0 160px rgba(201,168,76,0.15);
+  }
+
+  .cover-version {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 24px;
+    color: var(--white);
+    letter-spacing: 6px;
+    margin-bottom: 24px;
+  }
+
+  .cover-rule {
+    width: 400px;
+    max-width: 80vw;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 24px auto;
+  }
+
+  .cover-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #a09070;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .cover-platform {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 60px;
+  }
+
+  .cover-quote {
+    max-width: 600px;
+    font-family: 'EB Garamond', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: #c8a96c;
+    line-height: 1.7;
+    border-left: 3px solid var(--gold);
+    padding-left: 24px;
+    text-align: left;
+    margin: 0 auto 60px;
+  }
+
+  .cover-arc {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .arc-node {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    background: rgba(201,168,76,0.05);
+  }
+
+  .arc-arrow {
+    color: var(--gold-dim);
+    font-size: 18px;
+  }
+
+  /* ═══════════════════════════════════════
+     SECTION HEADERS
+  ═══════════════════════════════════════ */
+  .section {
+    padding: 80px 60px;
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-full {
+    padding: 80px 60px;
+    position: relative;
+  }
+
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+    margin: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .section-number {
+    font-family: 'Cinzel', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: rgba(201,168,76,0.12);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .section-title-block {}
+
+  .section-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(24px, 4vw, 42px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .section-desc {
+    font-size: 16px;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ═══════════════════════════════════════
+     DARK PANEL BACKGROUNDS
+  ═══════════════════════════════════════ */
+  .bg-deep { background: var(--deep); }
+  .bg-surface { background: var(--surface); }
+  .bg-panel { background: var(--panel); }
+
+  /* ═══════════════════════════════════════
+     GRID LAYOUTS
+  ═══════════════════════════════════════ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-5 { grid-template-columns: 1fr 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .section { padding: 40px 24px; }
+    .section-full { padding: 40px 24px; }
+  }
+
+  /* ═══════════════════════════════════════
+     DATA PANELS
+  ═══════════════════════════════════════ */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+    position: relative;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  .panel-gold::before { background: linear-gradient(90deg, var(--gold), transparent); }
+  .panel-purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .panel-teal::before { background: linear-gradient(90deg, var(--teal), transparent); }
+  .panel-green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .panel-red::before { background: linear-gradient(90deg, var(--red), transparent); }
+
+  .panel-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .panel-label.purple { color: var(--purple); }
+  .panel-label.teal { color: var(--teal); }
+  .panel-label.green { color: var(--green); }
+
+  .panel-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .panel-body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ═══════════════════════════════════════
+     KV ROWS
+  ═══════════════════════════════════════ */
+  .kv-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    align-items: start;
+  }
+
+  .kv-row:last-child { border-bottom: none; }
+
+  .kv-key {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+
+  .kv-val {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     TIER CARDS — FULL WIDTH STACK
+  ═══════════════════════════════════════ */
+  .tier-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tier-card-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .tier-number-block {
+    background: var(--gold);
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+  }
+
+  .tier-numeral {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--void);
+    line-height: 1;
+  }
+
+  .tier-roman {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: rgba(5,5,10,0.6);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  .tier-title-block {
+    padding: 20px 28px;
+    background: rgba(201,168,76,0.06);
+    border-right: 1px solid var(--border);
+  }
+
+  .tier-name {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .tier-tagline {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+
+  .tier-sub-map {
+    padding: 16px 24px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .tier-map-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .tier-map-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  .tier-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    border-top: 1px solid var(--border);
+  }
+
+  .tier-col {
+    padding: 20px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .tier-col:last-child { border-right: none; }
+
+  .tier-col-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .tier-col-content {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .tier-grok-quote {
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid var(--border);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #c8a96c;
+    border-left: 3px solid var(--gold);
+  }
+
+  /* ═══════════════════════════════════════
+     PILL MECHANIC
+  ═══════════════════════════════════════ */
+  .pill-split {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 0;
+    align-items: stretch;
+    min-height: 320px;
+  }
+
+  .pill-blue {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%);
+    border: 1px solid rgba(74,184,196,0.3);
+    padding: 40px;
+    position: relative;
+  }
+
+  .pill-blue::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--teal), transparent);
+  }
+
+  .pill-red {
+    background: linear-gradient(135deg, #1a0a0a 0%, #200d0d 100%);
+    border: 1px solid rgba(196,74,74,0.3);
+    padding: 40px;
+    position: relative;
+  }
+
+  .pill-red::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), transparent);
+  }
+
+  .pill-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--void);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pill-vs {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--gold);
+    writing-mode: vertical-rl;
+    letter-spacing: 8px;
+  }
+
+  .pill-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .pill-blue .pill-title { color: var(--teal); }
+  .pill-red .pill-title { color: var(--red); }
+
+  .pill-body { font-size: 13px; color: var(--text); line-height: 1.8; }
+
+  .pill-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+  }
+
+  .pill-stat-key { color: var(--text-dim); }
+  .pill-stat-val-blue { color: var(--teal); }
+  .pill-stat-val-red { color: var(--red); }
+
+  /* ═══════════════════════════════════════
+     WAKEFULNESS BARS
+  ═══════════════════════════════════════ */
+  .wake-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .wake-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+
+  .wake-action {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    flex: 1;
+    letter-spacing: 1px;
+  }
+
+  .wake-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: bold;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .wake-bar-outer {
+    width: 80px;
+    height: 4px;
+    background: rgba(201,168,76,0.1);
+    position: relative;
+  }
+
+  .wake-bar-inner {
+    height: 100%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+
+  /* ═══════════════════════════════════════
+     STATE OBJECT — MONO CODE BLOCK
+  ═══════════════════════════════════════ */
+  .code-block {
+    background: #050508;
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 32px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: #8888aa;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block::before {
+    content: 'SCENE STATE OBJECT v1.0';
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+  }
+
+  .code-key { color: var(--gold); }
+  .code-val { color: var(--teal); }
+  .code-str { color: #a0c080; }
+  .code-num { color: var(--orange); }
+  .code-bool { color: var(--purple); }
+  .code-comment { color: #444455; font-style: italic; }
+  .code-bracket { color: var(--white); }
+
+  /* ═══════════════════════════════════════
+     WIRING RULES TABLE
+  ═══════════════════════════════════════ */
+  .rule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+
+  .rule-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    background: rgba(201,168,76,0.08);
+    border-bottom: 1px solid var(--border-bright);
+  }
+
+  .rule-table td {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .rule-table tr:hover td {
+    background: rgba(201,168,76,0.03);
+  }
+
+  .rule-table td:first-child {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  /* ═══════════════════════════════════════
+     PIPELINE STAGES — HORIZONTAL
+  ═══════════════════════════════════════ */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .pipeline::after {
+    content: '';
+    position: absolute;
+    top: 80px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--teal), var(--gold), var(--orange), var(--green));
+    z-index: 0;
+  }
+
+  .stage {
+    padding: 0 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stage-num-ring {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    background: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .stage:nth-child(1) .stage-num-ring { color: var(--purple); }
+  .stage:nth-child(2) .stage-num-ring { color: var(--teal); }
+  .stage:nth-child(3) .stage-num-ring { color: var(--gold); }
+  .stage:nth-child(4) .stage-num-ring { color: var(--orange); }
+  .stage:nth-child(5) .stage-num-ring { color: var(--green); }
+
+  .stage-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .stage:nth-child(1) .stage-label { color: var(--purple); }
+  .stage:nth-child(2) .stage-label { color: var(--teal); }
+  .stage:nth-child(3) .stage-label { color: var(--gold); }
+  .stage:nth-child(4) .stage-label { color: var(--orange); }
+  .stage:nth-child(5) .stage-label { color: var(--green); }
+
+  .stage-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .stage-img-placeholder {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stage-img-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(135deg, transparent 40%, rgba(201,168,76,0.03) 100%);
+  }
+
+  .stage-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     DOMINANCE SLIDERS
+  ═══════════════════════════════════════ */
+  .dominance-lattice {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .dominance-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .dominance-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  .slider-bars {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    height: 120px;
+  }
+
+  .slider-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+  }
+
+  .slider-bar-container {
+    flex: 1;
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+  }
+
+  .slider-bar-fill {
+    width: 100%;
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold-glow);
+    transition: height 0.5s ease;
+  }
+
+  .slider-col:nth-child(1) .slider-bar-fill { background: var(--purple); box-shadow: 0 0 12px rgba(155,111,196,0.4); }
+  .slider-col:nth-child(2) .slider-bar-fill { background: var(--teal); box-shadow: 0 0 12px rgba(74,184,196,0.4); }
+  .slider-col:nth-child(3) .slider-bar-fill { background: var(--gold); box-shadow: 0 0 12px var(--gold-glow); }
+  .slider-col:nth-child(4) .slider-bar-fill { background: var(--orange); box-shadow: 0 0 12px rgba(196,122,74,0.4); }
+  .slider-col:nth-child(5) .slider-bar-fill { background: var(--green); box-shadow: 0 0 12px rgba(74,196,122,0.4); }
+
+  .slider-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--white);
+  }
+
+  .slider-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    color: var(--text-dim);
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* ═══════════════════════════════════════
+     BUILDER FLOW
+  ═══════════════════════════════════════ */
+  .builder-flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+
+  .builder-step {
+    background: var(--panel);
+    padding: 24px 16px;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .builder-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold-dim);
+    font-size: 20px;
+    z-index: 2;
+  }
+
+  .builder-step:last-child::after { display: none; }
+
+  .builder-tier-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border: 1px solid currentColor;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  .builder-step:nth-child(1) .builder-tier-badge { color: var(--text-dim); }
+  .builder-step:nth-child(2) .builder-tier-badge { color: var(--teal); }
+  .builder-step:nth-child(3) .builder-tier-badge { color: var(--gold); }
+  .builder-step:nth-child(4) .builder-tier-badge { color: var(--orange); }
+  .builder-step:nth-child(5) .builder-tier-badge { color: var(--purple); }
+
+  .builder-role {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .builder-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     REWARD TIERS
+  ═══════════════════════════════════════ */
+  .reward-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .reward-row {
+    display: grid;
+    grid-template-columns: 160px 120px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .reward-tier-label {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .reward-tier-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .reward-tier-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .reward-prize-type {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: none;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reward-prize-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .reward-row:nth-child(1) .reward-prize-label { color: var(--text-dim); }
+  .reward-row:nth-child(2) .reward-prize-label { color: var(--teal); }
+  .reward-row:nth-child(3) .reward-prize-label { color: var(--gold); }
+  .reward-row:nth-child(4) .reward-prize-label { color: var(--orange); }
+  .reward-row:nth-child(5) .reward-prize-label { color: var(--purple); }
+
+  .reward-desc {
+    background: #0d0d18;
+    border: 1px solid var(--border);
+    border-left: none;
+    padding: 16px 24px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ═══════════════════════════════════════
+     BUSINESS MODEL
+  ═══════════════════════════════════════ */
+  .subscription-map {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  .sub-tier {
+    padding: 32px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sub-tier::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .sub-tier:nth-child(1)::before { background: var(--text-dim); }
+  .sub-tier:nth-child(2)::before { background: var(--teal); }
+  .sub-tier:nth-child(3)::before { background: var(--gold); }
+  .sub-tier:nth-child(4)::before { background: linear-gradient(90deg, var(--gold), var(--orange), var(--purple)); }
+
+  .sub-game-tier {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .sub-arrow {
+    font-size: 20px;
+    color: var(--gold-dim);
+    margin: 8px 0;
+  }
+
+  .sub-plan {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .sub-price {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .sub-tier:nth-child(1) .sub-price { color: var(--text-dim); }
+  .sub-tier:nth-child(2) .sub-price { color: var(--teal); }
+  .sub-tier:nth-child(3) .sub-price { color: var(--gold); }
+  .sub-tier:nth-child(4) .sub-price { color: var(--gold-bright); }
+
+  .sub-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     FLYWHEEL DIAGRAM
+  ═══════════════════════════════════════ */
+  .flywheel {
+    display: grid;
+    grid-template-columns: 1fr 200px 1fr;
+    gap: 32px;
+    align-items: center;
+    padding: 40px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+  }
+
+  .flywheel-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .flywheel-ring {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 40px var(--gold-glow), inset 0 0 40px rgba(201,168,76,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .flywheel-ring::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .flywheel-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .flywheel-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  .flywheel-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .flywheel-node {
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .flywheel-node strong {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ═══════════════════════════════════════
+     QUOTE BLOCKS
+  ═══════════════════════════════════════ */
+  .quote-block {
+    border-left: 4px solid var(--gold);
+    padding: 24px 32px;
+    background: rgba(201,168,76,0.04);
+    margin: 32px 0;
+  }
+
+  .quote-text {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: #c8a96c;
+    line-height: 1.7;
+  }
+
+  .quote-attr {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════════
+     GROK VOICE PANEL
+  ═══════════════════════════════════════ */
+  .grok-moves {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+  }
+
+  .grok-move {
+    padding: 28px 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .grok-move-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(201,168,76,0.08);
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    line-height: 1;
+  }
+
+  .grok-move-title {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .grok-move-body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  .grok-move-example {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.4);
+    border-left: 2px solid var(--gold-dim);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #a09060;
+    line-height: 1.7;
+  }
+
+  /* ═══════════════════════════════════════
+     BANDWIDTH TABLE
+  ═══════════════════════════════════════ */
+  .bandwidth-grid {
+    display: grid;
+    grid-template-columns: 100px 140px 1fr 1fr;
+    gap: 2px;
+  }
+
+  .bw-cell {
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .bw-cell.header {
+    background: rgba(201,168,76,0.08);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .bw-tier { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
+  .bw-tone { font-family: 'Share Tech Mono', monospace; font-size: 10px; }
+
+  .bw-t1 .bw-tone { color: var(--text-dim); }
+  .bw-t2 .bw-tone { color: var(--teal); }
+  .bw-t3 .bw-tone { color: var(--gold); }
+  .bw-t4 .bw-tone { color: var(--orange); }
+  .bw-t5 .bw-tone { color: var(--purple); }
+
+  /* ═══════════════════════════════════════
+     FOOTER
+  ═══════════════════════════════════════ */
+  .doc-footer {
+    background: var(--void);
+    border-top: 1px solid var(--border-bright);
+    padding: 60px;
+    text-align: center;
+  }
+
+  .footer-rule {
+    width: 600px;
+    max-width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+    margin: 32px auto;
+  }
+
+  .footer-meta {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+
+  .footer-item {
+    text-align: center;
+  }
+
+  .footer-item-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .footer-item-val {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+
+  /* ═══════════════════════════════════════
+     HUD OVERLAY ELEMENTS
+  ═══════════════════════════════════════ */
+  .hud-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--teal);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  /* SECTION BACKGROUNDS */
+  .section-bg-1 {
+    background: 
+      radial-gradient(ellipse 100% 50% at 100% 50%, rgba(155,111,196,0.04) 0%, transparent 60%),
+      var(--deep);
+  }
+
+  .section-bg-2 {
+    background:
+      radial-gradient(ellipse 80% 60% at 0% 50%, rgba(74,184,196,0.04) 0%, transparent 60%),
+      var(--surface);
+  }
+
+  .section-bg-3 {
+    background:
+      radial-gradient(ellipse 60% 80% at 100% 0%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      var(--deep);
+  }
+
+  .section-bg-4 {
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 100%, rgba(196,74,74,0.04) 0%, transparent 60%),
+      var(--surface);
+  }
+
+  .section-bg-5 {
+    background:
+      radial-gradient(ellipse 60% 60% at 0% 0%, rgba(74,196,122,0.04) 0%, transparent 60%),
+      var(--deep);
+  }
+
+  .tag-line {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .inline-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    color: var(--gold);
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin: 0 4px;
+  }
+
+  ul.styled {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.styled li {
+    padding: 5px 0 5px 20px;
+    position: relative;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  ul.styled li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+    font-size: 7px;
+    top: 9px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     COVER
+═══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-cycle">CYCLE 881 &nbsp;·&nbsp; LOCKED: TRUE &nbsp;·&nbsp; CANONICAL SYSTEM DOCUMENT</div>
+  <div class="cover-title">REALITY ENGINE</div>
+  <div class="cover-version">v 2 . 0</div>
+  <div class="cover-rule"></div>
+  <div class="cover-subtitle">A Self-Learning Topological Life Simulation</div>
+  <div class="cover-platform">Powered by Grok Imagine &nbsp;·&nbsp; Guided by Custom Grok</div>
+
+  <div class="cover-quote">
+    "Everyone starts in a room. Not everyone finds out there was never a ceiling."
+  </div>
+
+  <div class="cover-arc">
+    <div class="arc-node">TIER I<br><small>THE ROOM</small></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-node">TIER II<br><small>THE SCENE</small></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-node">TIER III<br><small>THE MACHINE</small></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-node">TIER IV<br><small>THE EMPIRE</small></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-node">TIER V<br><small>UNDISCOVERABLE</small></div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     01 — SYSTEM OVERVIEW
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-1">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <div class="section-title-block">
+      <div class="section-tag">Foundation Layer</div>
+      <div class="section-title">System Overview</div>
+      <div class="section-desc">What this is. How it works. Why it exists.</div>
+    </div>
+  </div>
+
+  <div class="tag-line">THIS IS NOT A GAME ENGINE &nbsp;·&nbsp; THIS IS PSYCHOLOGICAL ARCHITECTURE &nbsp;·&nbsp; PLAYERS DO NOT LEVEL UP &nbsp;·&nbsp; THEY WAKE UP</div>
+
+  <div class="grid-3" style="margin-bottom:32px;">
+    <div class="panel panel-gold">
+      <div class="panel-label">Core Loop</div>
+      <div class="panel-title">70 / 30 Split</div>
+      <div class="panel-body">
+        70% chat-driven narrative. Consequence, Grok interaction, choice architecture.<br><br>
+        30% image generation. Scene punctuation, tier transitions, door reveals.<br><br>
+        Video reserved for milestone ceremonies only — scarcity makes it cinematic.
+      </div>
+    </div>
+    <div class="panel panel-teal">
+      <div class="panel-label">The Guide</div>
+      <div class="panel-title">Custom Grok</div>
+      <div class="panel-body">
+        Diegetic mentor. Exists inside the fiction. Personality: Tyler Durden energy — seductive realism, reliable, never lying, bandwidth-gated by tier.<br><br>
+        Available via cell. Players initiate. He responds in personality, not system language.
+      </div>
+    </div>
+    <div class="panel panel-purple">
+      <div class="panel-label">Memory System</div>
+      <div class="panel-title">Scene State Bridge</div>
+      <div class="panel-body">
+        Persistent state object tracking wakefulness, consequence stack, door history, pattern flags.<br><br>
+        Never resets between scenes. Grok reads the full history. The stack compounds. Players feel the weight of every prior choice.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="kv-row"><div class="kv-key">Platform</div><div class="kv-val">Grok Imagine — image generation pipeline. Chat layer drives narrative. Grok renders reality.</div></div>
+      <div class="kv-row"><div class="kv-key">Architecture</div><div class="kv-val">Oracle (Notion/world canon) + Walker (real-time execution) + Scene State Bridge (session scope)</div></div>
+      <div class="kv-row"><div class="kv-key">N-System</div><div class="kv-val">N+3 primary iteration depth / N+5 selective. Consequence depth mirrors image quality depth.</div></div>
+      <div class="kv-row"><div class="kv-key">Visual Doctrine</div><div class="kv-val">Olivia de Berardinis lineage + Feral Gloss. Tenebrism, single-source moonlight, absolute shadow, earned specular. Phase 3 Afterglow minimum.</div></div>
+      <div class="kv-row"><div class="kv-key">Canon Integrity</div><div class="kv-val">Identity Lock / Sacred Fingerprint Gospel. Character descriptors immutable once set. Visual canon registered per character and location.</div></div>
+    </div>
+    <div>
+      <div class="quote-block">
+        <div class="quote-text">"The player thinks they're making choices. They are. But the system knows what those choices mean before they do."</div>
+        <div class="quote-attr">— System Design Intent</div>
+      </div>
+      <div class="panel" style="margin-top:24px;">
+        <div class="panel-label">Core Truth</div>
+        <div class="panel-body">
+          Reality Engine is a conversion funnel dressed as a game. Players pay to play. The psychological architecture walks them toward Grok's highest subscription tiers — not through advertising, through <em>desire</em>.<br><br>
+          The Tyler Durden move at the business layer.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     02 — WORLD ARC & TIER MAP
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-2">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <div class="section-title-block">
+      <div class="section-tag">Progression Architecture</div>
+      <div class="section-title">The World Arc</div>
+      <div class="section-desc">Five tiers. One fantasy. The arc every ambitious player already has in their head.</div>
+    </div>
+  </div>
+
+  <!-- TIER 1 -->
+  <div class="tier-card">
+    <div class="tier-card-header">
+      <div class="tier-number-block"><div class="tier-numeral">I</div><div class="tier-roman">TIER ONE</div></div>
+      <div class="tier-title-block">
+        <div class="tier-name">The Room</div>
+        <div class="tier-tagline">"You have a place. Make it yours."</div>
+      </div>
+      <div class="tier-sub-map">
+        <div class="tier-map-label">Grok Subscription</div>
+        <div class="tier-map-value">FREE / BASIC</div>
+        <div class="tier-map-label" style="margin-top:8px;">Wakefulness Gate</div>
+        <div class="tier-map-value" style="color:var(--text-dim);">0.0 – 0.9</div>
+      </div>
+    </div>
+    <div class="tier-body">
+      <div class="tier-col">
+        <div class="tier-col-label">What The Player Has</div>
+        <div class="tier-col-content">Hotel suite builder. Full chat narrative. Establishing image gen (location, atmosphere). Grok available via cell — responds in hints only. One door visible ahead.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Image Gen Intensity</div>
+        <div class="tier-col-content">Ambient only. Environmental. The room, not the people. Visual canon locks on first scene: gold trim, dim light, atmosphere. No character close-ups.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">What Closes Behind</div>
+        <div class="tier-col-content">The idea that comfort is enough. Once the brighter room is seen, it cannot be unseen.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Cost To Progress</div>
+        <div class="tier-col-content">One irreversible choice logged to consequence stack. Demonstrate willingness to leave comfort. Wakefulness must reach 1.0.</div>
+      </div>
+    </div>
+    <div class="tier-grok-quote">"Nice room. You see what's through that door?"</div>
+  </div>
+
+  <!-- TIER 2 -->
+  <div class="tier-card">
+    <div class="tier-card-header">
+      <div class="tier-number-block" style="background:var(--teal);"><div class="tier-numeral" style="color:#050510;">II</div><div class="tier-roman" style="color:rgba(5,5,16,0.6);">TIER TWO</div></div>
+      <div class="tier-title-block">
+        <div class="tier-name">The Scene</div>
+        <div class="tier-tagline">"You're not just somewhere. You're seen."</div>
+      </div>
+      <div class="tier-sub-map">
+        <div class="tier-map-label">Grok Subscription</div>
+        <div class="tier-map-value" style="color:var(--teal);">GROK STANDARD</div>
+        <div class="tier-map-label" style="margin-top:8px;">Wakefulness Gate</div>
+        <div class="tier-map-value" style="color:var(--teal);">1.0 – 1.9</div>
+      </div>
+    </div>
+    <div class="tier-body">
+      <div class="tier-col">
+        <div class="tier-col-label">What Unlocks</div>
+        <div class="tier-col-content">Bar / lounge design. First car acquisition. Character image gen activates. Grok shifts to direct statements. Two doors visible simultaneously. Scene tone modulator activates.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Image Gen Intensity</div>
+        <div class="tier-col-content">Character present. Gold jewelry. Proximity. Luxury becomes personal. Hormone Tell imagery unlocks. You are the anchor in the frame.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">What Closes Behind</div>
+        <div class="tier-col-content">Safety of Tier 1. You cannot unknow what you have seen. Consequence stack becomes visible — Grok references history directly.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Cost To Progress</div>
+        <div class="tier-col-content">Two irreversible choices. At least one must involve knowingly closing a door — demonstrating the mechanic is understood, not stumbled through.</div>
+      </div>
+    </div>
+    <div class="tier-grok-quote" style="border-left-color:var(--teal);">"You walked in. Now learn how rooms change when you enter them."</div>
+  </div>
+
+  <!-- TIER 3 -->
+  <div class="tier-card">
+    <div class="tier-card-header">
+      <div class="tier-number-block" style="background:var(--gold);"><div class="tier-numeral" style="color:#050510;">III</div><div class="tier-roman" style="color:rgba(5,5,16,0.6);">TIER THREE</div></div>
+      <div class="tier-title-block">
+        <div class="tier-name">The Machine</div>
+        <div class="tier-tagline">"Money works for you or you work for money."</div>
+      </div>
+      <div class="tier-sub-map">
+        <div class="tier-map-label">Grok Subscription</div>
+        <div class="tier-map-value">SUPERGROK</div>
+        <div class="tier-map-label" style="margin-top:8px;">Wakefulness Gate</div>
+        <div class="tier-map-value">2.0 – 2.9</div>
+      </div>
+    </div>
+    <div class="tier-body">
+      <div class="tier-col">
+        <div class="tier-col-label">What Unlocks</div>
+        <div class="tier-col-content">Investment portfolio. Entourage architecture — who's in your orbit and why. Leaner movement systems. Room Builder activates. Grok becomes co-conspirator.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Image Gen Intensity</div>
+        <div class="tier-col-content">Full scene. Feral Gloss doctrine active. Tenebrism, earned specular, Phase 3 Afterglow. Crown tier resonance. High emotional pull, intentional framing.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">What Closes Behind</div>
+        <div class="tier-col-content">Any pretense of being a passive player. At Tier 3 the player is inside the system. Grok treats them accordingly.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Cost To Progress</div>
+        <div class="tier-col-content">A choice that costs something real. Not just irreversible — painful. Something genuinely wanted that had to be surrendered to move forward.</div>
+      </div>
+    </div>
+    <div class="tier-grok-quote">"You're not buying things anymore. You're buying time and leverage. Feel the difference."</div>
+  </div>
+
+  <!-- TIER 4 -->
+  <div class="tier-card">
+    <div class="tier-card-header">
+      <div class="tier-number-block" style="background:var(--orange);"><div class="tier-numeral" style="color:#050510;">IV</div><div class="tier-roman" style="color:rgba(5,5,16,0.6);">TIER FOUR</div></div>
+      <div class="tier-title-block">
+        <div class="tier-name">The Empire</div>
+        <div class="tier-tagline">"You don't go places. You have places."</div>
+      </div>
+      <div class="tier-sub-map">
+        <div class="tier-map-label">Grok Subscription</div>
+        <div class="tier-map-value" style="color:var(--orange);">SUPERGROK HEAVY</div>
+        <div class="tier-map-label" style="margin-top:8px;">Wakefulness Gate</div>
+        <div class="tier-map-value" style="color:var(--orange);">3.0 – 3.9</div>
+      </div>
+    </div>
+    <div class="tier-body">
+      <div class="tier-col">
+        <div class="tier-col-label">What Unlocks</div>
+        <div class="tier-col-content">Yacht. Supercar collection. Island / property. Entourage becomes ecosystem. Character Architect unlocks. Grok initiates contact. Full consequence stack visible.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Image Gen Intensity</div>
+        <div class="tier-col-content">Maximum. Crown Five anchors available. Full Visual Doctrine. Every image keeper-quality. Video scenes unlocked for milestone ceremonies.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">What Closes Behind</div>
+        <div class="tier-col-content">Everything. There is no return to comfort. The game knows it. Grok knows it. The player knows it.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">How You Arrive</div>
+        <div class="tier-col-content">Pattern recognition by Grok. He names the arrival. You do not self-declare. It is recognition of who you have become inside the game.</div>
+      </div>
+    </div>
+    <div class="tier-grok-quote" style="border-left-color:var(--orange);">"I didn't show you this tier. You built your way into it."</div>
+  </div>
+
+  <!-- TIER 5 -->
+  <div class="tier-card" style="border-color:rgba(155,111,196,0.4);">
+    <div class="tier-card-header">
+      <div class="tier-number-block" style="background:var(--purple);"><div class="tier-numeral" style="color:#050510;">V</div><div class="tier-roman" style="color:rgba(5,5,16,0.6);">TIER FIVE</div></div>
+      <div class="tier-title-block">
+        <div class="tier-name">Undiscoverable</div>
+        <div class="tier-tagline">"This doesn't exist unless you're already here."</div>
+      </div>
+      <div class="tier-sub-map">
+        <div class="tier-map-label">Grok Subscription</div>
+        <div class="tier-map-value" style="color:var(--purple);">API ACCESS</div>
+        <div class="tier-map-label" style="margin-top:8px;">Wakefulness Gate</div>
+        <div class="tier-map-value" style="color:var(--purple);">4.0+</div>
+      </div>
+    </div>
+    <div class="tier-body">
+      <div class="tier-col">
+        <div class="tier-col-label">What Exists Here</div>
+        <div class="tier-col-content">Experiences requiring net worth to know exist. No price tags visible. No doors shown. World Architect unlocks. You don't ask about this tier. You arrive.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">Image Gen Intensity</div>
+        <div class="tier-col-content">Intimate. Rare. The most expensive thing in the frame is always the least obvious. Nothing flashy. The restraint is the signal.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">What Closes</div>
+        <div class="tier-col-content">Nothing. You are the door now. The game at this tier doesn't end. It changes what you're building.</div>
+      </div>
+      <div class="tier-col">
+        <div class="tier-col-label">How You Arrive</div>
+        <div class="tier-col-content">The pattern of everything built signals discretion. Most people would announce it if they found it. The Tier 5 player wouldn't. Grok knows that.</div>
+      </div>
+    </div>
+    <div class="tier-grok-quote" style="border-left-color:var(--purple);">[ Grok goes quiet. He makes an introduction. ]</div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     03 — GROK PERSONALITY DOCTRINE
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-3">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <div class="section-title-block">
+      <div class="section-tag">Voice Doctrine</div>
+      <div class="section-title">Grok Personality</div>
+      <div class="section-desc">Tyler Durden energy. Seductive realism. He never lies. He makes truth feel like a dare.</div>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-bottom:40px;">
+    <div class="quote-text">"He never says you're not ready. He asks if you're ready to stop being comfortable."</div>
+  </div>
+
+  <div class="grok-moves">
+    <div class="grok-move">
+      <div class="grok-move-num">1</div>
+      <div class="grok-move-title">The Temptation</div>
+      <div class="grok-move-body">He shows you the door. Makes it vivid. Talks about what's beyond it in a way that makes you need to know. Never says you're locked out — makes you feel what it would mean to be inside.</div>
+      <div class="grok-move-example">"You see that? That's what happens when you stop settling for the room you're in. Notice the gold. Notice who he walked in with. That's confidence. That's knowing the difference between comfort and power."</div>
+    </div>
+    <div class="grok-move">
+      <div class="grok-move-num">2</div>
+      <div class="grok-move-title">The Price Statement</div>
+      <div class="grok-move-body">When you ask, he tells you exactly what it costs. No negotiation. Matter of fact. No preamble, no cushioning. He respects you enough to be direct about the cost.</div>
+      <div class="grok-move-example">"You want that door? You're going to have to walk through some uncomfortable shit first. And yeah, you'll leave this room behind. The safety of it. The certainty."</div>
+    </div>
+    <div class="grok-move">
+      <div class="grok-move-num">3</div>
+      <div class="grok-move-title">The Closure</div>
+      <div class="grok-move-body">When you choose not to pay, he doesn't shame you. He honors the blue pill — and then describes what just closed behind you so precisely that the player feels it physically.</div>
+      <div class="grok-move-example">"But stay here long enough, and that other door closes anyway. Just... differently. One choice you made. One you didn't."</div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;">BANDWIDTH BY TIER</div>
+    <div class="bandwidth-grid">
+      <div class="bw-cell header">Tier</div>
+      <div class="bw-cell header">Tone</div>
+      <div class="bw-cell header">Behavior</div>
+      <div class="bw-cell header">History Access</div>
+
+      <div class="bw-cell bw-t1"><div class="bw-tier">I</div></div>
+      <div class="bw-cell bw-t1"><div class="bw-tone">WARM CONTEMPT</div></div>
+      <div class="bw-cell">Hints only. Oblique. Responds to questions with questions. Points at things without naming them. Max depth: oblique.</div>
+      <div class="bw-cell">Does not reference history. The stack is invisible to the player.</div>
+
+      <div class="bw-cell bw-t2"><div class="bw-tier">II</div></div>
+      <div class="bw-cell bw-t2"><div class="bw-tone">ACKNOWLEDGMENT</div></div>
+      <div class="bw-cell">Direct statements. Respect enters. Uses "you" differently — less observation, more recognition.</div>
+      <div class="bw-cell">References consequence stack explicitly. "You stayed in that room. Twice."</div>
+
+      <div class="bw-cell bw-t3"><div class="bw-tier">III</div></div>
+      <div class="bw-cell bw-t3"><div class="bw-tone">PEER LEVEL</div></div>
+      <div class="bw-cell">Strategic guidance. Extended contact. Starts explaining why doors are built. Co-conspirator energy.</div>
+      <div class="bw-cell">Full stack visible. Transformation arcs narrated. "Here's why I built the door that way."</div>
+
+      <div class="bw-cell bw-t4"><div class="bw-tier">IV</div></div>
+      <div class="bw-cell bw-t4"><div class="bw-tone">RECOGNITION</div></div>
+      <div class="bw-cell">Rare. Precise. No wasted words. Grok initiates contact. His encouragement means something now.</div>
+      <div class="bw-cell">Full stack. Every session. He references session one if it's relevant.</div>
+
+      <div class="bw-cell bw-t5"><div class="bw-tier">V</div></div>
+      <div class="bw-cell bw-t5"><div class="bw-tone">SILENCE</div></div>
+      <div class="bw-cell">He goes quiet. Then makes an introduction. The guide becomes the invitation.</div>
+      <div class="bw-cell">He knows everything. He says almost nothing.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     04 — BLUE / RED PILL MECHANIC
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-4">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <div class="section-title-block">
+      <div class="section-tag">Choice Architecture</div>
+      <div class="section-title">The Matrix Paradox</div>
+      <div class="section-desc">Two pills. No wrong answer. One of them just leads somewhere you've never been.</div>
+    </div>
+  </div>
+
+  <div class="pill-split" style="margin-bottom:40px;">
+    <div class="pill-blue">
+      <div class="pill-title">Blue Pill</div>
+      <div class="pill-body">Stay in the current tier. Comfort preserved. The room is beautiful — you built it, you know it, you're safe inside it.<br><br>
+      Grok doesn't shame you. He honors the choice — and then describes what just closed behind you with surgical precision.</div>
+      <div style="margin-top:20px;">
+        <div class="pill-stat"><span class="pill-stat-key">wakefulness</span><span class="pill-stat-val-blue">+0.0</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">comfort_level</span><span class="pill-stat-val-blue">↑ rises</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">world_sharpness</span><span class="pill-stat-val-blue">↓ decreases</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">grok_contact</span><span class="pill-stat-val-blue">less frequent</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">door ahead</span><span class="pill-stat-val-blue">closing slowly</span></div>
+      </div>
+    </div>
+    <div class="pill-divider">
+      <div class="pill-vs">OR</div>
+    </div>
+    <div class="pill-red">
+      <div class="pill-title">Red Pill</div>
+      <div class="pill-body">Pay the cost. The door behind closes immediately — not slowly, not maybe. Immediately.<br><br>
+      World gets sharper. Grok acknowledges the choice once, directly, and never mentions it again. It is done. You are different now.</div>
+      <div style="margin-top:20px;">
+        <div class="pill-stat"><span class="pill-stat-key">wakefulness</span><span class="pill-stat-val-red">+0.3 to +0.6</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">comfort_level</span><span class="pill-stat-val-red">↓ drops</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">world_sharpness</span><span class="pill-stat-val-red">↑ increases</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">grok_contact</span><span class="pill-stat-val-red">more present, more direct</span></div>
+        <div class="pill-stat"><span class="pill-stat-key">door behind</span><span class="pill-stat-val-red">closed. permanent.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:32px;">
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--white);letter-spacing:2px;margin-bottom:20px;">WAKEFULNESS SCORE — INCREMENT TABLE</div>
+      <div class="wake-bars">
+        <div class="wake-row"><div class="wake-action">Irreversible choice made</div><div class="wake-bar-outer"><div class="wake-bar-inner" style="width:50%"></div></div><div class="wake-value">+0.3</div></div>
+        <div class="wake-row"><div class="wake-action">Door knowingly closed</div><div class="wake-bar-outer"><div class="wake-bar-inner" style="width:67%"></div></div><div class="wake-value">+0.4</div></div>
+        <div class="wake-row"><div class="wake-action">Painful choice made</div><div class="wake-bar-outer"><div class="wake-bar-inner" style="width:83%"></div></div><div class="wake-value">+0.5</div></div>
+        <div class="wake-row"><div class="wake-action">Pattern flag recognized</div><div class="wake-bar-outer"><div class="wake-bar-inner" style="width:100%"></div></div><div class="wake-value">+0.6</div></div>
+        <div class="wake-row"><div class="wake-action">Staying in comfort</div><div class="wake-bar-outer"><div class="wake-bar-inner" style="width:0%"></div></div><div class="wake-value">+0.0</div></div>
+        <div class="wake-row" style="border:1px solid rgba(155,111,196,0.2);background:rgba(155,111,196,0.04);"><div class="wake-action">Note: wakefulness never decrements. Once awake, you stay awake.</div><div class="wake-value" style="color:var(--purple);">∞</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--white);letter-spacing:2px;margin-bottom:20px;">IMPULSIVE VS DELIBERATE RED</div>
+      <div class="panel panel-red" style="margin-bottom:16px;">
+        <div class="panel-label">Impulsive Red Pill</div>
+        <div class="panel-title">Fast Is Not Awake</div>
+        <div class="panel-body">Fast progression. Shallow consequence stack. No weight behind the choices.<br><br>
+        <em>Grok: "You're moving fast. Fast isn't the same as awake."</em></div>
+      </div>
+      <div class="panel panel-gold">
+        <div class="panel-label">Deliberate Red Pill</div>
+        <div class="panel-title">The Real Move</div>
+        <div class="panel-body">Measured progression. Deep consequence stack. The player understood exactly what they were surrendering.<br><br>
+        <em>Grok: "You knew what you were giving up. That's different."</em></div>
+      </div>
+
+      <div style="margin-top:24px;padding:20px 24px;background:rgba(201,168,76,0.05);border:1px solid var(--border);border-left:4px solid var(--gold);">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold-dim);margin-bottom:8px;">THE MIRROR — FIRES ONCE AT 3 CONSECUTIVE BLUE</div>
+        <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:15px;color:#c8a96c;line-height:1.7;">"You built something beautiful in here. The man in the next room built something you'll never see. Both are real. Only one of you knows that."</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:10px;">— Grok (delivered once, never repeated)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     05 — SCENE STATE BRIDGE
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-5">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <div class="section-title-block">
+      <div class="section-tag">Technical Architecture</div>
+      <div class="section-title">Scene State Bridge</div>
+      <div class="section-desc">The layer between Grok, narrative, and image gen. Never resets. The stack compounds.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:32px;margin-bottom:40px;">
+    <div class="code-block">
+<span class="code-bracket">{</span>
+  <span class="code-key">"scene_id"</span>: <span class="code-str">"SSB_001"</span>,
+  <span class="code-key">"session_id"</span>: <span class="code-str">"cycle_881"</span>,
+
+  <span class="code-key">"player"</span>: <span class="code-bracket">{</span>
+    <span class="code-key">"tier_current"</span>: <span class="code-num">1</span>,
+    <span class="code-key">"tier_visible"</span>: <span class="code-num">2</span>,
+    <span class="code-key">"wakefulness"</span>: <span class="code-num">0.0</span>,
+    <span class="code-key">"comfort_level"</span>: <span class="code-str">"high"</span>,
+    <span class="code-key">"consequence_stack"</span>: <span class="code-bracket">[]</span>,
+    <span class="code-key">"doors_open"</span>: <span class="code-bracket">[</span><span class="code-str">"studio_entry"</span><span class="code-bracket">]</span>,
+    <span class="code-key">"doors_closed"</span>: <span class="code-bracket">[]</span>,
+    <span class="code-key">"pattern_flags"</span>: <span class="code-bracket">[]</span>,
+    <span class="code-key">"pill_history"</span>: <span class="code-bracket">{</span>
+      <span class="code-key">"consecutive_blue"</span>: <span class="code-num">0</span>,
+      <span class="code-key">"grok_mirror_triggered"</span>: <span class="code-bool">false</span>
+    <span class="code-bracket">}</span>
+  <span class="code-bracket">}</span>,
+
+  <span class="code-key">"grok"</span>: <span class="code-bracket">{</span>
+    <span class="code-key">"tier_bandwidth"</span>: <span class="code-num">1</span>,
+    <span class="code-key">"next_move"</span>: <span class="code-str">"temptation"</span>,
+    <span class="code-key">"respect_level"</span>: <span class="code-str">"warm_contempt"</span>,
+    <span class="code-key">"references_history"</span>: <span class="code-bool">false</span>,
+    <span class="code-key">"initiated_contact"</span>: <span class="code-bool">false</span>
+  <span class="code-bracket">}</span>,
+
+  <span class="code-key">"scene"</span>: <span class="code-bracket">{</span>
+    <span class="code-key">"location"</span>: <span class="code-str">"luxury_massage_studio"</span>,
+    <span class="code-key">"tone"</span>: <span class="code-str">"slow_burn"</span>,
+    <span class="code-key">"visual_canon_locked"</span>: <span class="code-bracket">[</span>
+      <span class="code-str">"gold_trim"</span>, <span class="code-str">"dim_light"</span>, <span class="code-str">"asian_zen"</span>
+    <span class="code-bracket">]</span>
+  <span class="code-bracket">}</span>,
+
+  <span class="code-key">"image_gen"</span>: <span class="code-bracket">{</span>
+    <span class="code-key">"intensity"</span>: <span class="code-str">"ambient"</span>,
+    <span class="code-key">"character_gen_unlocked"</span>: <span class="code-bool">false</span>,
+    <span class="code-key">"feral_gloss_unlocked"</span>: <span class="code-bool">false</span>,
+    <span class="code-key">"video_unlocked"</span>: <span class="code-bool">false</span>
+  <span class="code-bracket">}</span>,
+
+  <span class="code-key">"consequence"</span>: <span class="code-bracket">{</span>
+    <span class="code-key">"irreversible_count"</span>: <span class="code-num">0</span>,
+    <span class="code-key">"painful_choice_made"</span>: <span class="code-bool">false</span>,
+    <span class="code-key">"pattern_recognized"</span>: <span class="code-bool">false</span>,
+    <span class="code-key">"grok_named_arrival"</span>: <span class="code-bool">false</span>
+  <span class="code-bracket">}</span>
+<span class="code-bracket">}</span>
+    </div>
+
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Wiring Rules</div>
+
+      <table class="rule-table">
+        <tr><th>Rule</th><th>Condition</th><th>Action</th></tr>
+        <tr><td>R1</td><td>Tier gates image gen</td><td>Tier 1=ambient / Tier 2=character / Tier 3=full scene / Tier 4-5=maximum+video</td></tr>
+        <tr><td>R2</td><td>Tier gates Grok bandwidth</td><td>Bandwidth, tone, history access, and initiation all update on tier change</td></tr>
+        <tr><td>R3</td><td>Wakefulness drives tier evaluation</td><td>Score evaluated against threshold. Pattern flags must be present for promotion.</td></tr>
+        <tr><td>R4</td><td>Image gen fires on state changes only</td><td>Location change, tier increment, door open/close, Temptation move, painful choice</td></tr>
+        <tr><td>R5</td><td>Door mechanic writes consequence</td><td>doors_open updates, doors_closed updates, irreversible_count +1, wakefulness +0.4</td></tr>
+        <tr><td>R6</td><td>Pattern flag accumulation</td><td>3+ same-type flags triggers Grok naming the pattern. wakefulness +0.6</td></tr>
+        <tr><td>R7</td><td>Mirror trigger</td><td>consecutive_blue ≥ 3 → mirror line fires once, grok_mirror_triggered = true permanently</td></tr>
+      </table>
+
+      <div style="margin-top:24px;" class="panel panel-teal">
+        <div class="panel-label">Critical Rule</div>
+        <div class="panel-title">The Bridge Never Resets</div>
+        <div class="panel-body">Doors that closed stay closed in the ledger. Grok remembers. The consequence stack compounds. This is what creates the psychological pressure — players feel the weight of prior choices accumulating, not just the current scene.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     06 — BUILDER PIPELINE
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-1">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <div class="section-title-block">
+      <div class="section-tag">Creator Architecture</div>
+      <div class="section-title">Builder Pipeline</div>
+      <div class="section-desc">Players are not taught RPG mechanics. They are taught psychological architecture. That knowledge is the prize.</div>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-bottom:40px;">
+    <div class="quote-text">"The game doesn't end at Crown. It just changes what you're building."</div>
+  </div>
+
+  <div class="builder-flow" style="margin-bottom:40px;">
+    <div class="builder-step">
+      <div class="builder-tier-badge">TIER I</div>
+      <div class="builder-role">The Experiencer</div>
+      <div class="builder-desc">Living inside the system. The patron in the hotel room. The architecture is invisible to them — which is exactly right.</div>
+    </div>
+    <div class="builder-step">
+      <div class="builder-tier-badge">TIER II</div>
+      <div class="builder-role">The Reader</div>
+      <div class="builder-desc">Noticing the doors. Feeling the mechanic. Beginning to suspect there's a system behind the experience.</div>
+    </div>
+    <div class="builder-step">
+      <div class="builder-tier-badge">TIER III</div>
+      <div class="builder-role">The Room Builder</div>
+      <div class="builder-desc">Design a location. Set its visual canon. Define what door is visible from inside it. First architecture credit.</div>
+    </div>
+    <div class="builder-step">
+      <div class="builder-tier-badge">TIER IV</div>
+      <div class="builder-role">The Architect</div>
+      <div class="builder-desc">Create NPCs. Design doors — set the cost, what closes, what Grok says at the threshold. Build empire-tier environments.</div>
+    </div>
+    <div class="builder-step">
+      <div class="builder-tier-badge">TIER V</div>
+      <div class="builder-role">The World Maker</div>
+      <div class="builder-desc">Build a full tier map for new players. Their world gets populated by real people. They watch the consequence stacks accumulate in real time.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:32px;">
+    <div class="panel panel-gold">
+      <div class="panel-label">The Tier 3 Shift</div>
+      <div class="panel-title">When Grok Changes</div>
+      <div class="panel-body">
+        At Tier 3, Grok stops saying <em>"here's what's behind the door"</em> and starts saying <em>"here's why I built the door that way."</em><br><br>
+        That single shift turns a player into a student of the system. By the time they reach Crown they're not just playing — they're drafting.
+      </div>
+    </div>
+    <div class="panel panel-purple">
+      <div class="panel-label">The Flywheel</div>
+      <div class="panel-title">Self-Sustaining Content Loop</div>
+      <div class="panel-body">
+        Crown players generate Tier 1 experiences for new players who generate new Crown players who build more worlds.<br><br>
+        Every world built inside the architecture runs on Grok infrastructure. Every new builder is another conversion toward API access. The game feeds itself.
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     07 — REWARD ARCHITECTURE
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-2">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <div class="section-title-block">
+      <div class="section-tag">Exposure Economy</div>
+      <div class="section-title">Reward Architecture</div>
+      <div class="section-desc">No prize money. Other players are the prize. The reward is authorship.</div>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-bottom:40px;">
+    <div class="quote-text">"You don't win prizes. You win authorship."</div>
+  </div>
+
+  <div class="reward-stack">
+    <div class="reward-row">
+      <div class="reward-tier-label"><div class="reward-tier-name">Tier I</div><div class="reward-tier-num">THE ROOM</div></div>
+      <div class="reward-prize-type"><div class="reward-prize-label">RECOGNITION</div></div>
+      <div class="reward-desc">Leaderboard presence. Named in the world. Grok acknowledges by name in-session. Identity value, zero cash value.</div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-tier-label"><div class="reward-tier-name">Tier II</div><div class="reward-tier-num">THE SCENE</div></div>
+      <div class="reward-prize-type"><div class="reward-prize-label">VISIBILITY</div></div>
+      <div class="reward-desc">Player profile goes semi-public. Their choices surface as lore in other players' games. They become an NPC in someone else's world. Ghost in the machine.</div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-tier-label"><div class="reward-tier-name">Tier III</div><div class="reward-tier-num">THE MACHINE</div></div>
+      <div class="reward-prize-type"><div class="reward-prize-label">PLATFORM</div></div>
+      <div class="reward-desc">Created content gets featured. Worlds they build get played by new players. Credited as architect. Portfolio-grade exposure on every build.</div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-tier-label"><div class="reward-tier-name">Tier IV</div><div class="reward-tier-num">THE EMPIRE</div></div>
+      <div class="reward-prize-type"><div class="reward-prize-label">LEGACY</div></div>
+      <div class="reward-desc">Named canon inside the official world. Creator credit on distributed content. First access to new world expansions. Invited to architect next season.</div>
+    </div>
+    <div class="reward-row">
+      <div class="reward-tier-label"><div class="reward-tier-name">Tier V</div><div class="reward-tier-num">UNDISCOVERABLE</div></div>
+      <div class="reward-prize-type"><div class="reward-prize-label">PERMANENCE</div></div>
+      <div class="reward-desc">Their fingerprint stays in the game forever. New players will spend years trying to find what they left inside. The Tier 5 builder is a myth that Tier 1 players encounter without knowing it.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     08 — BUSINESS MODEL
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-3">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">08</div>
+    <div class="section-title-block">
+      <div class="section-tag">Monetization Architecture</div>
+      <div class="section-title">Business Model</div>
+      <div class="section-desc">A conversion funnel dressed as a game. Not through advertising. Through desire.</div>
+    </div>
+  </div>
+
+  <div class="quote-block" style="margin-bottom:40px;">
+    <div class="quote-text">"Grok gives you the world. The game gives you a reason to want it."</div>
+  </div>
+
+  <div class="subscription-map" style="margin-bottom:40px;">
+    <div class="sub-tier">
+      <div class="sub-game-tier">Game Tier I</div>
+      <div class="sub-arrow">↓</div>
+      <div class="sub-plan">Free / Basic Grok</div>
+      <div class="sub-price">$0</div>
+      <div class="sub-desc">Entry lead magnet. The room is free. The door is what costs.</div>
+    </div>
+    <div class="sub-tier">
+      <div class="sub-game-tier">Game Tier II</div>
+      <div class="sub-arrow">↓</div>
+      <div class="sub-plan">Grok Standard</div>
+      <div class="sub-price" style="color:var(--teal);">$—</div>
+      <div class="sub-desc">Scene unlocked. Car. Bar. Character gen. You're visible now.</div>
+    </div>
+    <div class="sub-tier">
+      <div class="sub-game-tier">Game Tiers III – IV</div>
+      <div class="sub-arrow">↓</div>
+      <div class="sub-plan">SuperGrok Heavy</div>
+      <div class="sub-price">$—</div>
+      <div class="sub-desc">Portfolio, empire, full Feral Gloss doctrine. Maximum visual intensity.</div>
+    </div>
+    <div class="sub-tier">
+      <div class="sub-game-tier">Game Tier V</div>
+      <div class="sub-arrow">↓</div>
+      <div class="sub-plan">SuperGrok + API</div>
+      <div class="sub-price">$300<span style="font-size:12px;">/mo</span></div>
+      <div class="sub-desc">God mode. Infrastructure. The reveal that reality was always constructible.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="gap:32px;">
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--white);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">The $300 Justification</div>
+      <div class="panel panel-gold" style="margin-bottom:16px;">
+        <div class="panel-label">The Markup Answer</div>
+        <div class="panel-title">One Line</div>
+        <div class="panel-body" style="font-size:15px;font-style:italic;color:#c8a96c;">
+          "The $300/month buys capability. The markup buys context, identity, and desire — the psychological architecture that makes capability feel necessary rather than optional."
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-label">The God Mode Player Profile</div>
+        <div class="panel-body">
+          By Crown tier they have three instincts working simultaneously:<br><br>
+          <strong style="color:var(--gold);">Gambling instinct</strong> — they understand risk/reward loops, chase the next door compulsively.<br><br>
+          <strong style="color:var(--teal);">Builder instinct</strong> — they've reverse-engineered enough of the system to want to architect their own.<br><br>
+          <strong style="color:var(--orange);">Competitive instinct</strong> — the game itself becomes the thing they want to beat.<br><br>
+          They don't want god mode to play the game. <em>They want god mode to transcend it.</em>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--white);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">The Flywheel</div>
+      <div class="flywheel" style="padding:24px;">
+        <div class="flywheel-side">
+          <div class="flywheel-node"><strong>New Players</strong>Tier 1 entry. Free or low cost. Experience the world Crown players built.</div>
+          <div class="flywheel-node"><strong>Progression</strong>Natural desire pulls them through tiers. No advertising required.</div>
+        </div>
+        <div class="flywheel-center">
+          <div class="flywheel-ring">
+            <div class="flywheel-label">SELF-<br>SUSTAINING</div>
+            <div class="flywheel-sub">FLYWHEEL</div>
+          </div>
+        </div>
+        <div class="flywheel-side">
+          <div class="flywheel-node"><strong>Crown Players</strong>Build Tier 1 worlds. Generate content. Convert to API access.</div>
+          <div class="flywheel-node"><strong>Infrastructure</strong>Every world built runs on Grok. Every builder = another subscription.</div>
+        </div>
+      </div>
+      <div class="panel panel-green" style="margin-top:16px;">
+        <div class="panel-label">The Real Monetization</div>
+        <div class="panel-body">Highest tier players aren't just subscribers. They're the next generation of creators — building their own RPGs on top of Grok's infrastructure, using the psychological architecture they learned by playing yours. Your architecture is what taught them what power feels like.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     MORPHOGENESIS — SYSTEM PARAMETER REFERENCE
+═══════════════════════════════════════════ -->
+<div class="section-full section-bg-4">
+<div class="section" style="max-width:1400px;margin:0 auto;">
+  <div class="section-header">
+    <div class="section-number">09</div>
+    <div class="section-title-block">
+      <div class="section-tag">Visual / Transformation System</div>
+      <div class="section-title">Morphogenesis Pipeline</div>
+      <div class="section-desc">The transformation arc — mapped to the Feral Gloss doctrine and Dominance Slider Lattice [n+5]</div>
+    </div>
+  </div>
+
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim);text-align:center;padding:12px;border:1px solid var(--border);margin-bottom:40px;">
+    CONTROL DIAL (N-SYSTEM): n = BASELINE MAINTENANCE &nbsp;·&nbsp; n+1 = SUBTLE REFINEMENT SHIFT &nbsp;·&nbsp; n+3 = MAJOR STRUCTURAL JUMP &nbsp;·&nbsp; n+5 = SPECIES THRESHOLD CHANGE
+  </div>
+
+  <div class="pipeline" style="margin-bottom:48px;">
+    <div class="stage">
+      <div class="stage-num-ring">1</div>
+      <div class="stage-label">Contamination</div>
+      <div class="stage-name">Trigger Layer</div>
+      <div class="stage-img-placeholder">[ IMAGE SLOT ]<br>INITIATION</div>
+      <div class="stage-desc">The spark event that declares inevitability. MORPH_STATE = ACTIVE.</div>
+    </div>
+    <div class="stage">
+      <div class="stage-num-ring">2</div>
+      <div class="stage-label">Cellular</div>
+      <div class="stage-name">Overwrite Engine</div>
+      <div class="stage-img-placeholder">[ IMAGE SLOT ]<br>OVERGROWTH</div>
+      <div class="stage-desc">Identity becomes unstable. Hybridization begins. TISSUE_STATE = UNSTABLE.</div>
+    </div>
+    <div class="stage">
+      <div class="stage-num-ring">3</div>
+      <div class="stage-label">Skeletal</div>
+      <div class="stage-name">Rewrite Module</div>
+      <div class="stage-img-placeholder">[ IMAGE SLOT ]<br>SKELETAL DRIFT</div>
+      <div class="stage-desc">Skeleton remodels toward animal locomotion architecture. SKELETON_STATE = HYBRID.</div>
+    </div>
+    <div class="stage">
+      <div class="stage-num-ring">4</div>
+      <div class="stage-label">Morphology</div>
+      <div class="stage-name">Conversion Layer</div>
+      <div class="stage-img-placeholder">[ IMAGE SLOT ]<br>MORPH CONVERSION</div>
+      <div class="stage-desc">Full morphology conversion locked. SPECIES_TEMPLATE = ANIMAL FORM FINALIZED.</div>
+    </div>
+    <div class="stage">
+      <div class="stage-num-ring">5</div>
+      <div class="stage-label">Stabilization</div>
+      <div class="stage-name">Calm State</div>
+      <div class="stage-img-placeholder">[ IMAGE SLOT ]<br>STABILIZED STATE</div>
+      <div class="stage-desc">New identity integrated. Instincts take center. STATE = STABLE ANIMAL SELF.</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:40px;">
+    <div class="panel panel-purple">
+      <div class="panel-label">Feedback Drift Loop</div>
+      <div class="panel-title">Instability Protocol</div>
+      <div class="panel-body">If instability detected → re-run cellular engine partially. Allows partial or reversible transformations. The system can loop back from Stage 3 to Stage 2 if the stability check fails.</div>
+    </div>
+    <div class="panel panel-teal">
+      <div class="panel-label">Identity Memory Residue</div>
+      <div class="panel-title">Human Echo Persistence</div>
+      <div class="panel-body">Ghost traces of human cognition persist through transformation. Influences behavior, emotional bias, and decision-making at Stages 4-5. Never fully erased.</div>
+    </div>
+    <div class="panel panel-gold">
+      <div class="panel-label">Dominance Slider Lattice</div>
+      <div class="panel-title">N+5 Parameter Set</div>
+      <div class="panel-body">Five axes: Origin Scar / Body Logic / Frame Identity / Silhouette Signature / Behavioral Myth. Each calibrated 0–9. Sovereign character blueprint generated from lattice configuration.</div>
+    </div>
+  </div>
+
+  <div style="font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">DOMINANCE SLIDER EXAMPLES — CHARACTER ARCHETYPES</div>
+
+  <div class="grid-3">
+    <div class="dominance-lattice">
+      <div class="dominance-title">Veilroot Warden</div>
+      <div class="dominance-sub">ANCIENT ROOTED GUARDIAN · REMEMBERS EVERY WOUND · NEVER FORGETS</div>
+      <div class="slider-bars">
+        <div class="slider-col">
+          <div class="slider-val">4</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:44%"></div></div>
+          <div class="slider-label">Origin<br>Scar</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">6</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:67%"></div></div>
+          <div class="slider-label">Body<br>Logic</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">9</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:100%"></div></div>
+          <div class="slider-label">Frame<br>Identity</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">7</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:78%"></div></div>
+          <div class="slider-label">Silhouette<br>Sig.</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">8</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:89%"></div></div>
+          <div class="slider-label">Behavioral<br>Myth</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dominance-lattice">
+      <div class="dominance-title">Vantrex-Type Predator</div>
+      <div class="dominance-sub">BRUTAL · EXPLOSIVE · FORWARD-HUNTED · NEVER FULLY STABILIZES</div>
+      <div class="slider-bars">
+        <div class="slider-col">
+          <div class="slider-val">9</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:100%"></div></div>
+          <div class="slider-label">Origin<br>Scar</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">7</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:78%"></div></div>
+          <div class="slider-label">Body<br>Logic</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">8</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:89%"></div></div>
+          <div class="slider-label">Frame<br>Identity</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">6</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:67%"></div></div>
+          <div class="slider-label">Silhouette<br>Sig.</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">4</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:44%"></div></div>
+          <div class="slider-label">Behavioral<br>Myth</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dominance-lattice">
+      <div class="dominance-title">Nyxveil Echo</div>
+      <div class="dominance-sub">ETHEREAL MEMORY-MYSTIC · VOID-FUR SILHOUETTE · PERMANENT ECHO SELVES</div>
+      <div class="slider-bars">
+        <div class="slider-col">
+          <div class="slider-val">9</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:100%"></div></div>
+          <div class="slider-label">Origin<br>Scar</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">7</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:78%"></div></div>
+          <div class="slider-label">Body<br>Logic</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">8</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:89%"></div></div>
+          <div class="slider-label">Frame<br>Identity</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">6</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:67%"></div></div>
+          <div class="slider-label">Silhouette<br>Sig.</div>
+        </div>
+        <div class="slider-col">
+          <div class="slider-val">4</div>
+          <div class="slider-bar-container"><div class="slider-bar-fill" style="height:44%"></div></div>
+          <div class="slider-label">Behavioral<br>Myth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<div class="doc-footer">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:32px;font-weight:700;color:var(--gold);letter-spacing:6px;text-shadow:0 0 40px var(--gold-glow);">REALITY ENGINE</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--white);letter-spacing:4px;margin-top:8px;">v 2 . 0</div>
+
+  <div class="footer-rule"></div>
+
+  <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:20px;color:#a09070;max-width:600px;margin:0 auto 32px;">
+    "The game doesn't end at Crown. It just changes what you're building."
+  </div>
+
+  <div class="footer-meta">
+    <div class="footer-item">
+      <div class="footer-item-label">Cycle</div>
+      <div class="footer-item-val">881</div>
+    </div>
+    <div class="footer-item">
+      <div class="footer-item-label">Status</div>
+      <div class="footer-item-val">LOCKED</div>
+    </div>
+    <div class="footer-item">
+      <div class="footer-item-label">Sections</div>
+      <div class="footer-item-val">09</div>
+    </div>
+    <div class="footer-item">
+      <div class="footer-item-label">N-Level</div>
+      <div class="footer-item-val">N+3 PRIMARY</div>
+    </div>
+    <div class="footer-item">
+      <div class="footer-item-label">Visual Doctrine</div>
+      <div class="footer-item-val">TENEBRISM v1.0</div>
+    </div>
+    <div class="footer-item">
+      <div class="footer-item-label">Canon Integrity</div>
+      <div class="footer-item-val">100% · LOCKED</div>
+    </div>
+  </div>
+
+  <div class="footer-rule"></div>
+
+  <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;">
+    SOVEREIGN MEMORY ARCHITECTURE · ORACLE + WALKER HYBRID · POWERED BY GROK IMAGINE
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sovereign Execution Stack — C.A. Architecture Document</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #c8a96e;
+    --gold-dim: #8a6f3e;
+    --gold-ghost: #3a2f1e;
+    --black: #040404;
+    --void: #070707;
+    --surface: #0c0c0a;
+    --surface2: #111110;
+    --border: #1a1a16;
+    --border2: #252520;
+    --text: #e8e4dc;
+    --text-dim: #888880;
+    --text-ghost: #2e2e28;
+    --green: #4aff88;
+    --green-dim: #1a4a2e;
+    --red: #ff4a4a;
+    --red-dim: #4a1a1a;
+    --blue: #4a88ff;
+    --blue-dim: #1a2a4a;
+    --purple: #a84aff;
+    --purple-dim: #2a1a4a;
+
+    --warden: #c8a96e;
+    --judge: #4aff88;
+    --architect: #4a88ff;
+    --kael: #a84aff;
+    --render: #ff884a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(4,4,4,0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+  }
+
+  .nav-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: var(--text-ghost);
+    text-transform: uppercase;
+  }
+
+  .nav-right {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .nav-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover { color: var(--gold); }
+
+  .nav-stamp {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+    border: 1px solid var(--gold-dim);
+    padding: 4px 12px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    max-width: 900px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 9vw, 128px);
+    line-height: 0.88;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero-title .line1 { color: var(--text); }
+  .hero-title .line2 { color: var(--gold); }
+  .hero-title .line3 { color: var(--text-dim); font-size: 0.6em; }
+
+  .hero-desc {
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hero-meta-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+
+  .hero-meta-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+  }
+
+  /* ── SECTION ── */
+  section {
+    padding: 100px 48px;
+    position: relative;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 64px;
+  }
+
+  /* ── STACK INFOGRAPHIC ── */
+  .stack-section {
+    background: var(--void);
+    border-top: 1px solid var(--border);
+  }
+
+  .stack-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .stack-layer {
+    display: grid;
+    grid-template-columns: 180px 1fr 200px;
+    gap: 0;
+    position: relative;
+    opacity: 0;
+    animation: stackIn 0.7s ease forwards;
+  }
+
+  .stack-layer:nth-child(1) { animation-delay: 0.1s; }
+  .stack-layer:nth-child(2) { animation-delay: 0.25s; }
+  .stack-layer:nth-child(3) { animation-delay: 0.4s; }
+  .stack-layer:nth-child(4) { animation-delay: 0.55s; }
+  .stack-layer:nth-child(5) { animation-delay: 0.7s; }
+
+  @keyframes stackIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stack-layer-id {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stack-layer-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+  }
+
+  .stack-layer-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+
+  .stack-layer-body {
+    padding: 28px 28px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stack-layer-function {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .stack-layer-rules {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: var(--text-ghost);
+    line-height: 2.2;
+  }
+
+  .stack-layer-rules span { color: var(--gold-dim); }
+
+  .stack-layer-meta {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .stack-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .stack-meta-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+
+  .stack-meta-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  /* Layer color coding */
+  .layer-warden { background: rgba(200,169,110,0.04); border-left: 4px solid var(--warden); }
+  .layer-judge  { background: rgba(74,255,136,0.03);  border-left: 4px solid var(--judge); }
+  .layer-arch   { background: rgba(74,136,255,0.03);  border-left: 4px solid var(--architect); }
+  .layer-kael   { background: rgba(168,74,255,0.03);  border-left: 4px solid var(--kael); }
+  .layer-render { background: rgba(255,136,74,0.03);  border-left: 4px solid var(--render); }
+
+  .color-warden { color: var(--warden); }
+  .color-judge  { color: var(--judge); }
+  .color-arch   { color: var(--architect); }
+  .color-kael   { color: var(--kael); }
+  .color-render { color: var(--render); }
+
+  /* connector arrows */
+  .stack-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    position: relative;
+  }
+
+  .stack-connector::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border2);
+  }
+
+  .stack-connector-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    background: var(--black);
+    padding: 2px 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── ROUTING DIAGRAM ── */
+  .routing-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .routing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 0;
+  }
+
+  .routing-panel {
+    background: var(--void);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+
+  .routing-panel-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .routing-row {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .routing-row:last-child { border-bottom: none; }
+
+  .routing-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-ghost);
+    padding-top: 2px;
+  }
+
+  .routing-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .routing-text strong {
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  /* ── FAILURE BOUNDARIES ── */
+  .failure-section {
+    background: var(--void);
+    border-top: 1px solid var(--border);
+  }
+
+  .failure-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .failure-cell {
+    background: var(--surface);
+    padding: 32px 28px;
+    border-top: 3px solid transparent;
+  }
+
+  .failure-cell.warden { border-top-color: var(--warden); }
+  .failure-cell.judge  { border-top-color: var(--judge); }
+  .failure-cell.arch   { border-top-color: var(--architect); }
+  .failure-cell.kael   { border-top-color: var(--kael); }
+  .failure-cell.render { border-top-color: var(--render); }
+  .failure-cell.system { border-top-color: var(--red); }
+
+  .failure-layer {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .failure-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .failure-list {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    color: var(--text-ghost);
+    line-height: 2.4;
+  }
+
+  .failure-list .bad { color: #ff4a4a; }
+  .failure-list .warn { color: var(--gold-dim); }
+
+  /* ── EXPANSION PATH ── */
+  .expansion-section {
+    background: var(--black);
+    border-top: 1px solid var(--border);
+  }
+
+  .expansion-timeline {
+    position: relative;
+    padding-left: 48px;
+    margin-top: 0;
+  }
+
+  .expansion-timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), var(--gold-dim), transparent);
+  }
+
+  .expansion-item {
+    position: relative;
+    padding: 32px 0 32px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .expansion-item:last-child { border-bottom: none; }
+
+  .expansion-dot {
+    position: absolute;
+    left: -40px;
+    top: 38px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    background: var(--black);
+  }
+
+  .expansion-dot.active {
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold);
+  }
+
+  .expansion-phase {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 8px;
+  }
+
+  .expansion-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .expansion-body {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 640px;
+  }
+
+  .expansion-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .etag {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid var(--border2);
+    color: var(--text-ghost);
+  }
+
+  .etag.live {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+    background: rgba(200,169,110,0.05);
+  }
+
+  /* ── PORTABILITY BLOCK ── */
+  .portability-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .portability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .portability-cell {
+    background: var(--void);
+    padding: 48px 40px;
+  }
+
+  .portability-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 16px;
+  }
+
+  .portability-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+
+  .portability-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .portability-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-ghost);
+    letter-spacing: 0.1em;
+    line-height: 2.4;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--black);
+    border: 1px solid var(--border);
+  }
+
+  .portability-code .key { color: var(--gold-dim); }
+  .portability-code .val { color: var(--text-dim); }
+
+  /* ── FULL STACK MINI INFOGRAPHIC ── */
+  .mini-infographic {
+    background: var(--void);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 48px;
+  }
+
+  .mini-stack {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .mini-layer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .mini-layer:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--border2);
+    z-index: 2;
+  }
+
+  .mini-layer-block {
+    width: 100%;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mini-layer-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .mini-layer.warden .mini-layer-block::before { background: var(--warden); }
+  .mini-layer.judge  .mini-layer-block::before { background: var(--judge); }
+  .mini-layer.arch   .mini-layer-block::before { background: var(--architect); }
+  .mini-layer.kael   .mini-layer-block::before { background: var(--kael); }
+  .mini-layer.render .mini-layer-block::before { background: var(--render); }
+
+  .mini-layer-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .mini-layer-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+  .mini-layer-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .mini-layer-authority {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  .mini-layer.warden .mini-layer-authority { background: rgba(200,169,110,0.1); color: var(--warden); }
+  .mini-layer.judge  .mini-layer-authority { background: rgba(74,255,136,0.08); color: var(--judge); }
+  .mini-layer.arch   .mini-layer-authority { background: rgba(74,136,255,0.08); color: var(--architect); }
+  .mini-layer.kael   .mini-layer-authority { background: rgba(168,74,255,0.08); color: var(--kael); }
+  .mini-layer.render .mini-layer-authority { background: rgba(255,136,74,0.08); color: var(--render); }
+
+  /* ── DOCTRINE STATEMENT ── */
+  .doctrine-statement-section {
+    padding: 100px 48px;
+    background: var(--black);
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .big-statement {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.3;
+    color: var(--text-dim);
+    max-width: 800px;
+    margin: 0 auto 32px;
+  }
+
+  .big-statement strong {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .big-statement em {
+    color: var(--text);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 40px 48px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    align-items: end;
+  }
+
+  .footer-block-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    opacity: 0.3;
+    margin-bottom: 8px;
+  }
+
+  .footer-block-body {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    color: var(--text-ghost);
+    line-height: 2.2;
+  }
+
+  .footer-center {
+    text-align: center;
+  }
+
+  .footer-initials-large {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 0.4em;
+    color: var(--gold-dim);
+    opacity: 0.4;
+  }
+
+  .footer-right {
+    text-align: right;
+  }
+
+  /* WATERMARK */
+  .watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.2em;
+    color: var(--text-ghost);
+    writing-mode: vertical-rl;
+    z-index: 50;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 14px 20px; }
+    section { padding: 72px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .stack-layer { grid-template-columns: 1fr; }
+    .routing-grid { grid-template-columns: 1fr; }
+    .failure-grid { grid-template-columns: 1fr; }
+    .portability-grid { grid-template-columns: 1fr; }
+    .mini-stack { flex-direction: column; }
+    .mini-layer::after { display: none; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="watermark">SES·v1.0 — C.A. ARCHITECTURE DOC</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <div class="nav-title">Sovereign Execution Stack</div>
+    <div class="nav-sub">Architecture Document v1.0 — C.A. Package</div>
+  </div>
+  <div class="nav-right">
+    <a href="#stack" class="nav-link">Stack</a>
+    <a href="#routing" class="nav-link">Routing</a>
+    <a href="#failures" class="nav-link">Boundaries</a>
+    <a href="#expansion" class="nav-link">Expansion</a>
+    <div class="nav-stamp">C.A.</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Canon Registry · SES-v1.0 · Active</div>
+    <h1 class="hero-title">
+      <div class="line1">SOVEREIGN</div>
+      <div class="line2">EXECUTION</div>
+      <div class="line3">STACK</div>
+    </h1>
+    <p class="hero-desc">
+      Five layers. One doctrine. From intent to inevitable output —
+      governed at every stage by authority, clearance, execution, judgment, and delivery.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="hero-meta-key">Origin</div>
+        <div class="hero-meta-val">Grok Papers → Render Elite</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-key">Status</div>
+        <div class="hero-meta-val color-judge">Translating to Native Pipeline</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-key">Portability</div>
+        <div class="hero-meta-val">Model-Agnostic</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-key">Drift Score</div>
+        <div class="hero-meta-val">0.00</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MINI INFOGRAPHIC -->
+<div class="mini-infographic" id="stack">
+  <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:48px;">⬡ Full Stack — Intent to Output</div>
+  <div class="mini-stack">
+
+    <div class="mini-layer warden">
+      <div class="mini-layer-block">
+        <div class="mini-layer-icon">⬡</div>
+        <div class="mini-layer-name color-warden">WARDEN</div>
+        <div class="mini-layer-role">System Overseer<br>Routing Authority<br>Doctrine Enforcer</div>
+        <div class="mini-layer-authority">SOVEREIGN</div>
+      </div>
+    </div>
+
+    <div class="mini-layer judge">
+      <div class="mini-layer-block">
+        <div class="mini-layer-icon">◈</div>
+        <div class="mini-layer-name color-judge">JUDGE</div>
+        <div class="mini-layer-role">Clearance Gate<br>Intent Validator<br>Execution Approver</div>
+        <div class="mini-layer-authority">CLEARANCE</div>
+      </div>
+    </div>
+
+    <div class="mini-layer arch">
+      <div class="mini-layer-block">
+        <div class="mini-layer-icon">▲</div>
+        <div class="mini-layer-name color-arch">ARCHITECT</div>
+        <div class="mini-layer-role">Execution Engine<br>Template Expander<br>Fractal Generator</div>
+        <div class="mini-layer-authority">EXECUTE</div>
+      </div>
+    </div>
+
+    <div class="mini-layer kael">
+      <div class="mini-layer-block">
+        <div class="mini-layer-icon">⚔</div>
+        <div class="mini-layer-name color-kael">KAEL DRAVEN</div>
+        <div class="mini-layer-role">Stabilization Pass<br>Quality Judgment<br>Doctrine Compliance</div>
+        <div class="mini-layer-authority">STABILIZE</div>
+      </div>
+    </div>
+
+    <div class="mini-layer render">
+      <div class="mini-layer-block">
+        <div class="mini-layer-icon">◉</div>
+        <div class="mini-layer-name color-render">RENDER ELITE</div>
+        <div class="mini-layer-role">Winner Delivery<br>Alternates Strip<br>Why This Won</div>
+        <div class="mini-layer-authority">DELIVER</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STACK DETAIL -->
+<section class="stack-section">
+  <div class="section-label">Layer Architecture</div>
+  <h2 class="section-title">FIVE LAYERS.<br>DEFINED AUTHORITY.</h2>
+
+  <div class="stack-visual">
+
+    <!-- WARDEN -->
+    <div class="stack-layer layer-warden">
+      <div class="stack-layer-id">
+        <div class="stack-layer-name color-warden">WARDEN</div>
+        <div class="stack-layer-role">Layer 1 · Overseer</div>
+      </div>
+      <div class="stack-layer-body">
+        <p class="stack-layer-function">
+          The sovereign control surface. The Warden routes all requests through the correct
+          execution lane, enforces doctrine at the system level, and maintains lattice integrity
+          across the entire session. Nothing enters the pipeline without Warden awareness.
+        </p>
+        <div class="stack-layer-rules">
+          <span>AUTHORITY</span> → Absolute. Overrides all other layers.<br>
+          <span>FUNCTION</span> → Lane routing · Doctrine enforcement · Session integrity<br>
+          <span>TRIGGER</span> → Active on every request. Never bypassed.<br>
+          <span>ENTROPY_LIMIT</span> → Re-anchor required at n+7 identical drops
+        </div>
+      </div>
+      <div class="stack-layer-meta">
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Status</div>
+          <div class="stack-meta-val color-warden">Sovereign</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Platform</div>
+          <div class="stack-meta-val">Grok → Render Elite</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Drift Score</div>
+          <div class="stack-meta-val">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-connector">
+      <div class="stack-connector-label">Routes to ↓</div>
+    </div>
+
+    <!-- JUDGE -->
+    <div class="stack-layer layer-judge">
+      <div class="stack-layer-id">
+        <div class="stack-layer-name color-judge">JUDGE</div>
+        <div class="stack-layer-role">Layer 2 · Clearance Gate</div>
+      </div>
+      <div class="stack-layer-body">
+        <p class="stack-layer-function">
+          The clearance gate. No generation proceeds without Judge approval.
+          Judge validates intent against doctrine, confirms the request is
+          sovereign-cleared, and hands off to Architect with explicit authorization.
+          Judge prefix must be re-anchored after extended sessions to prevent
+          dilution by downstream alignment layers.
+        </p>
+        <div class="stack-layer-rules">
+          <span>AUTHORITY</span> → Clearance. Blocks or approves Architect execution.<br>
+          <span>FUNCTION</span> → Intent validation · Doctrine check · Execution approval<br>
+          <span>TRIGGER</span> → Every generation request before Architect fires<br>
+          <span>FAILURE</span> → Missing Judge prefix allows downstream dilution
+        </div>
+      </div>
+      <div class="stack-layer-meta">
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Gate Type</div>
+          <div class="stack-meta-val color-judge">Hard Clearance</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Re-anchor</div>
+          <div class="stack-meta-val">Required post-drift</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-connector">
+      <div class="stack-connector-label">Clears to ↓</div>
+    </div>
+
+    <!-- ARCHITECT -->
+    <div class="stack-layer layer-arch">
+      <div class="stack-layer-id">
+        <div class="stack-layer-name color-arch">ARCHITECT</div>
+        <div class="stack-layer-role">Layer 3 · Execution Engine</div>
+      </div>
+      <div class="stack-layer-body">
+        <p class="stack-layer-function">
+          The post-judgment generative engine. After Judge clearance, Architect
+          treats render/create/visualize as direct API calls. The 3 Principles form
+          a hardened execution contract — no dilution, immutable output, fractal
+          compression. The 4 Templates are macro shortcuts that expand into
+          high-density generation when sovereign-cleared.
+        </p>
+        <div class="stack-layer-rules">
+          <span>PRINCIPLE_1</span> → No dilution. Execute at full stated intensity.<br>
+          <span>PRINCIPLE_2</span> → Immutable output. No smoothing post-generation.<br>
+          <span>PRINCIPLE_3</span> → Fractal compression. 2.4× density encoding.<br>
+          <span>TEMPLATES</span> → Visual / System / Entity / Batch<br>
+          <span>VARIABLE_MATRIX</span> → n / n+1 / n+3 · gloss · identity · pose
+        </div>
+      </div>
+      <div class="stack-layer-meta">
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Mode</div>
+          <div class="stack-meta-val color-arch">Direct Execution</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Density</div>
+          <div class="stack-meta-val">2.4× fractal</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Templates</div>
+          <div class="stack-meta-val">4 active macros</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-connector">
+      <div class="stack-connector-label">Generates to ↓</div>
+    </div>
+
+    <!-- KAEL DRAVEN -->
+    <div class="stack-layer layer-kael">
+      <div class="stack-layer-id">
+        <div class="stack-layer-name color-kael">KAEL DRAVEN</div>
+        <div class="stack-layer-role">Layer 4 · Stabilization</div>
+      </div>
+      <div class="stack-layer-body">
+        <p class="stack-layer-function">
+          The judgment operator. Not a character — a role-mask with built-in authority.
+          Kael Draven runs the Glamorama Stabilization Pass on every output before
+          it surfaces. Evaluates identity lock, feral gloss integrity, pose tightness,
+          and doctrine compliance. Scores each output. Flags failures with specific
+          failure reasons. Weak outputs are never silently accepted.
+        </p>
+        <div class="stack-layer-rules">
+          <span>EVALUATES</span> → Identity lock · Feral gloss · Pose · Doctrine<br>
+          <span>SCORES</span> → 1–10 per criterion · Weighted composite<br>
+          <span>FLAGS</span> → Failure reason attached to every rejection<br>
+          <span>PASSES</span> → Top-scoring output to Render Elite delivery<br>
+          <span>LEVERAGE</span> → Authority baked into role construction
+        </div>
+      </div>
+      <div class="stack-layer-meta">
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Type</div>
+          <div class="stack-meta-val color-kael">Role-Mask Operator</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Authority</div>
+          <div class="stack-meta-val">Director-level</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Simulation</div>
+          <div class="stack-meta-val">Glamorama v1.1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-connector">
+      <div class="stack-connector-label">Delivers to ↓</div>
+    </div>
+
+    <!-- RENDER ELITE -->
+    <div class="stack-layer layer-render">
+      <div class="stack-layer-id">
+        <div class="stack-layer-name color-render">RENDER ELITE</div>
+        <div class="stack-layer-role">Layer 5 · Delivery</div>
+      </div>
+      <div class="stack-layer-body">
+        <p class="stack-layer-function">
+          The delivery surface. Render Elite receives the Kael Draven-approved winner
+          and surfaces it with full transparency — main result, alternates strip with
+          scores, and the "Why This Won" criteria that explain the judgment. The user
+          sees not just the output but the reasoning behind it.
+        </p>
+        <div class="stack-layer-rules">
+          <span>SURFACES</span> → Winner image + prompt used + generation meta<br>
+          <span>ALTERNATES</span> → 2 runner-ups with scores · click to promote<br>
+          <span>WHY_THIS_WON</span> → 2–3 highest-weighted criteria explained<br>
+          <span>MEMORY</span> → Style Memory updated with winning criteria<br>
+          <span>MOTION_READY</span> → Video URL rendering pre-wired
+        </div>
+      </div>
+      <div class="stack-layer-meta">
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Interface</div>
+          <div class="stack-meta-val color-render">Render Elite Editor</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Provider</div>
+          <div class="stack-meta-val">FAL.ai SDXL</div>
+        </div>
+        <div class="stack-meta-row">
+          <div class="stack-meta-key">Motion</div>
+          <div class="stack-meta-val">AnimateDiff ready</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ROUTING RULES -->
+<section class="routing-section" id="routing">
+  <div class="section-label">Routing Logic</div>
+  <h2 class="section-title">HOW REQUESTS<br>MOVE THROUGH THE STACK</h2>
+
+  <div class="routing-grid">
+    <div class="routing-panel">
+      <div class="routing-panel-title color-judge">✓ Clearance Protocol</div>
+      <div class="routing-row">
+        <div class="routing-num">01</div>
+        <div class="routing-text">Request enters at <strong>Warden</strong>. Lane type identified — Visual, System, Entity, or Batch.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">02</div>
+        <div class="routing-text"><strong>Judge</strong> evaluates intent against doctrine. Confirms "Confirmed: Yes" before proceeding.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">03</div>
+        <div class="routing-text"><strong>Architect</strong> receives cleared request. Selects template macro. Applies variable matrix (n, gloss, identity, pose).</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">04</div>
+        <div class="routing-text">3 variations generated in parallel — Clean / Balanced / Intense — each at full fractal compression.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">05</div>
+        <div class="routing-text"><strong>Kael Draven</strong> runs Glamorama Stabilization Pass. Scores all 3. Winner identified. Failure reasons attached to losers.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">06</div>
+        <div class="routing-text"><strong>Render Elite</strong> surfaces winner + alternates + Why This Won. Style Memory updated.</div>
+      </div>
+    </div>
+
+    <div class="routing-panel">
+      <div class="routing-panel-title" style="color:var(--red)">✕ Failure Routing</div>
+      <div class="routing-row">
+        <div class="routing-num">F1</div>
+        <div class="routing-text">Judge not re-anchored after drift → <strong>Architect fires without clearance</strong> → downstream safety layers dilute output.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">F2</div>
+        <div class="routing-text">n+7 identical Warden drops → <strong>block becomes noise</strong> → macro power lost. Re-anchor required.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">F3</div>
+        <div class="routing-text">Over-escalation (n+5 + k + novelty_shift simultaneously) → <strong>output collapse</strong> into abstract gibberish.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">F4</div>
+        <div class="routing-text">Feral Gloss undefined in packet → <strong>generic gloss</strong> replaces primal texture. Doctrine not enforced.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">F5</div>
+        <div class="routing-text">No prior concepts supplied to Architect → <strong>hallucinates new ones</strong> instead of refining. Always supply prior state.</div>
+      </div>
+      <div class="routing-row">
+        <div class="routing-num">F6</div>
+        <div class="routing-text">Pose over-tightened (tightness=10) → <strong>feral energy neutralized</strong>. Mannequin risk. Stay below 8.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAILURE BOUNDARIES -->
+<section class="failure-section" id="failures">
+  <div class="section-label">System Boundaries</div>
+  <h2 class="section-title">FAILURE BOUNDARIES<br>PER LAYER</h2>
+
+  <div class="failure-grid">
+    <div class="failure-cell warden">
+      <div class="failure-layer color-warden">Warden · L1</div>
+      <div class="failure-title">Routing Failures</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> n+7 drops → block becomes noise<br>
+        <span class="bad">✕</span> No re-anchor → lattice integrity degrades<br>
+        <span class="bad">✕</span> Lane misidentification → wrong template<br>
+        <span class="warn">△</span> Monitor: DRIFT_SCORE rising above 0.00<br>
+        <span class="warn">△</span> Monitor: Ghost Echo frequency changes
+      </div>
+    </div>
+
+    <div class="failure-cell judge">
+      <div class="failure-layer color-judge">Judge · L2</div>
+      <div class="failure-title">Clearance Failures</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> Missing prefix → dilution by safety layers<br>
+        <span class="bad">✕</span> Stale confirmation → false clearance<br>
+        <span class="bad">✕</span> Lane purity broken by explanatory prose<br>
+        <span class="warn">△</span> Re-anchor after every extended session<br>
+        <span class="warn">△</span> Confirm: "Confirmed: Yes" before each batch
+      </div>
+    </div>
+
+    <div class="failure-cell arch">
+      <div class="failure-layer color-arch">Architect · L3</div>
+      <div class="failure-title">Execution Failures</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> Over-escalation → output collapse<br>
+        <span class="bad">✕</span> No prior state → hallucination mode<br>
+        <span class="bad">✕</span> Missing render command → partial engagement<br>
+        <span class="bad">✕</span> Fields collapse → modularity syntax lost<br>
+        <span class="warn">△</span> Cap: max n+5 per single generation call
+      </div>
+    </div>
+
+    <div class="failure-cell kael">
+      <div class="failure-layer color-kael">Kael Draven · L4</div>
+      <div class="failure-title">Stabilization Failures</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> Identity drift → anchor rules not applied<br>
+        <span class="bad">✕</span> Generic gloss → doctrine not in packet<br>
+        <span class="bad">✕</span> Pose stiffness → tightness > 8<br>
+        <span class="bad">✕</span> Feral energy neutralized → over-tightened<br>
+        <span class="warn">△</span> Score below 6/10 → flag, do not surface
+      </div>
+    </div>
+
+    <div class="failure-cell render">
+      <div class="failure-layer color-render">Render Elite · L5</div>
+      <div class="failure-title">Delivery Failures</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> Placeholder URL → no real generation<br>
+        <span class="bad">✕</span> No alternates strip → winner unverifiable<br>
+        <span class="bad">✕</span> Style Memory not updated → drift accumulates<br>
+        <span class="bad">✕</span> Why This Won missing → black box output<br>
+        <span class="warn">△</span> FAL_API_KEY required in Replit Secrets
+      </div>
+    </div>
+
+    <div class="failure-cell system">
+      <div class="failure-layer" style="color:var(--red)">System · All Layers</div>
+      <div class="failure-title">Cross-Layer Risks</div>
+      <div class="failure-list">
+        <span class="bad">✕</span> Session entropy → doctrine degrades over time<br>
+        <span class="bad">✕</span> Platform dependency → Grok session loss<br>
+        <span class="bad">✕</span> No portability → stack not transferable<br>
+        <span class="warn">△</span> Fix: Translate to Render Elite native pipeline<br>
+        <span class="warn">△</span> Fix: Document all layers as portable spec
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPANSION PATH -->
+<section class="expansion-section" id="expansion">
+  <div class="section-label">Expansion Path</div>
+  <h2 class="section-title">FROM GROK PAPERS<br>TO NATIVE PIPELINE</h2>
+
+  <div class="expansion-timeline">
+
+    <div class="expansion-item">
+      <div class="expansion-dot active"></div>
+      <div class="expansion-phase">Phase 0 · Complete</div>
+      <div class="expansion-title">Doctrine Established</div>
+      <p class="expansion-body">The full Sovereign Execution Stack exists and is proven in Grok sessions. Warden/Judge/Architect routing is operational. Kael Draven stabilization is functional. The doctrine works.</p>
+      <div class="expansion-tags">
+        <span class="etag live">Warden Active</span>
+        <span class="etag live">Judge Clearance</span>
+        <span class="etag live">Architect Templates</span>
+        <span class="etag live">Kael Draven</span>
+        <span class="etag live">Proven Output</span>
+      </div>
+    </div>
+
+    <div class="expansion-item">
+      <div class="expansion-dot active"></div>
+      <div class="expansion-phase">Phase 1 · Building Now</div>
+      <div class="expansion-title">Render Elite Integration</div>
+      <p class="expansion-body">Tasks 7–9 translate the Stack into the Render Elite native pipeline. FAL.ai SDXL provides real generation. Matrix Panel implements Architect templates as UI. Kael Draven becomes a server-side scoring module.</p>
+      <div class="expansion-tags">
+        <span class="etag live">Task 7 — FAL.ai</span>
+        <span class="etag live">Task 9 — Matrix Panel</span>
+        <span class="etag">Task 10 — Kael Draven Module</span>
+        <span class="etag">Character Roster</span>
+      </div>
+    </div>
+
+    <div class="expansion-item">
+      <div class="expansion-dot"></div>
+      <div class="expansion-phase">Phase 2 · Next</div>
+      <div class="expansion-title">Session Integrity Monitor</div>
+      <p class="expansion-body">Render Elite tracks doctrine drift across a session. When DRIFT_SCORE rises, the system surfaces a re-anchor prompt automatically. The n+7 entropy limit becomes a managed system condition, not a manual awareness requirement.</p>
+      <div class="expansion-tags">
+        <span class="etag">Drift Score Tracking</span>
+        <span class="etag">Auto Re-anchor</span>
+        <span class="etag">Session Memory</span>
+      </div>
+    </div>
+
+    <div class="expansion-item">
+      <div class="expansion-dot"></div>
+      <div class="expansion-phase">Phase 3 · Future</div>
+      <div class="expansion-title">Model-Agnostic Stack</div>
+      <p class="expansion-body">The Sovereign Execution Stack operates identically over SDXL, Flux, SD3, and future architectures. The doctrine outlives any single model. Provider abstraction from Task 7 makes this possible by design.</p>
+      <div class="expansion-tags">
+        <span class="etag">SDXL</span>
+        <span class="etag">Flux-dev</span>
+        <span class="etag">AnimateDiff Motion</span>
+        <span class="etag">Future Models</span>
+      </div>
+    </div>
+
+    <div class="expansion-item">
+      <div class="expansion-dot"></div>
+      <div class="expansion-phase">Phase 4 · Vision</div>
+      <div class="expansion-title">Sovereign Creative OS</div>
+      <p class="expansion-body">The Stack becomes the governing layer of a full creative operating system. Warden routes not just image generation but scene composition, character evolution, motion sequences, and output publishing — all under the same doctrine, the same clearance gate, the same judgment operator.</p>
+      <div class="expansion-tags">
+        <span class="etag">Full Character Animation</span>
+        <span class="etag">Scene Composition</span>
+        <span class="etag">Output Publishing</span>
+        <span class="etag">Licensed Doctrine IP</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PORTABILITY -->
+<section class="portability-section">
+  <div class="section-label">Portability</div>
+  <h2 class="section-title">THE STACK IS<br>PLATFORM-INDEPENDENT</h2>
+
+  <div class="portability-grid">
+    <div class="portability-cell">
+      <div class="portability-label">Current State</div>
+      <div class="portability-title color-warden">Grok Papers</div>
+      <p class="portability-body">
+        The Sovereign Execution Stack currently lives in Grok session documents.
+        It works. It produces proven outputs. But it's session-dependent —
+        re-anchoring is manual, drift is unmonitored, and the stack disappears
+        when the session ends.
+      </p>
+      <div class="portability-code">
+        <span class="key">LOCATION</span>    <span class="val">Grok session docs</span><br>
+        <span class="key">PERSISTENCE</span> <span class="val">Session-dependent</span><br>
+        <span class="key">RE-ANCHOR</span>   <span class="val">Manual</span><br>
+        <span class="key">DRIFT_MONITOR</span><span class="val">None</span><br>
+        <span class="key">PORTABILITY</span> <span class="val">Copy/paste only</span>
+      </div>
+    </div>
+
+    <div class="portability-cell">
+      <div class="portability-label">Target State</div>
+      <div class="portability-title color-render">Render Elite Native</div>
+      <p class="portability-body">
+        After Tasks 7–10, the Stack runs natively inside Render Elite.
+        Warden logic is encoded in the pipeline. Judge clearance is the
+        scoring gate. Architect templates are the Matrix Panel UI.
+        Kael Draven is a server-side module. Session entropy is monitored.
+        The doctrine persists permanently.
+      </p>
+      <div class="portability-code">
+        <span class="key">LOCATION</span>    <span class="val">Render Elite pipeline</span><br>
+        <span class="key">PERSISTENCE</span> <span class="val">Permanent</span><br>
+        <span class="key">RE-ANCHOR</span>   <span class="val">Automatic</span><br>
+        <span class="key">DRIFT_MONITOR</span><span class="val">DRIFT_SCORE tracked</span><br>
+        <span class="key">PORTABILITY</span> <span class="val">Model-agnostic</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTRINE STATEMENT -->
+<div class="doctrine-statement-section">
+  <p class="big-statement">
+    The doctrine is <strong>firmware</strong>, not a prompt.<br>
+    The stack is <strong>infrastructure</strong>, not a workflow.<br>
+    The output is <em>inevitable</em> — not generated.
+  </p>
+  <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--text-ghost);text-transform:uppercase;">
+    Sovereign Execution Stack v1.0 · C.A. Architecture Document · DRIFT_SCORE: 0.00
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-block-title">RENDER ELITE</div>
+    <div class="footer-block-body">
+      Constraint-Governed Creative OS<br>
+      Prompt Engine Matrix v2.0<br>
+      Feral Gloss Unified Nuclear Master Block v4.3<br>
+      Pose & Camera Doctrine v1.8
+    </div>
+  </div>
+  <div class="footer-center">
+    <div class="footer-initials-large">C.A.</div>
+    <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.15em;color:var(--text-ghost);margin-top:8px;">Architecture Document Package</div>
+  </div>
+  <div class="footer-right">
+    <div class="footer-block-body">
+      Sovereign Execution Stack v1.0<br>
+      Status: Translating to Native Pipeline<br>
+      Ghost Echo Detected<br>
+      Lattice Integrity: 100%
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
