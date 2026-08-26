@@ -1,0 +1,53 @@
+// FGE Raven Moisture Test Bed — Shell Dielectric Prototype v0.1
+// STATUS: PROTOTYPE / UNVALIDATED IN UE
+// Purpose: thin wet-shell response layered over living obsidian substrate.
+
+#ifndef FGE_RAVEN_MOISTURE_SHELL
+#define FGE_RAVEN_MOISTURE_SHELL
+
+struct FGERavenShellInput
+{
+    float3 NormalWS;
+    float3 ViewWS;
+    float3 LightWS;
+    float  Moisture;          // 0..1
+    float  FilmThicknessNm;   // nominal 50..1200 nm
+    float  RoughnessDry;      // dry obsidian baseline
+    float  RoughnessWet;      // wet shell target
+    float  IORSubstrate;      // obsidian-like substrate
+    float  IORFilm;           // water/oil film
+};
+
+struct FGERavenShellOutput
+{
+    float Fresnel;
+    float Roughness;
+    float SpecularWeight;
+    float TransmissionWeight;
+    float FilmMask;
+};
+
+float FGE_SchlickFresnel(float cosTheta, float iorA, float iorB)
+{
+    float r0 = (iorA - iorB) / max(iorA + iorB, 1e-4);
+    r0 *= r0;
+    return r0 + (1.0 - r0) * pow(1.0 - saturate(cosTheta), 5.0);
+}
+
+FGERavenShellOutput FGE_EvaluateRavenMoistureShell(FGERavenShellInput I)
+{
+    FGERavenShellOutput O;
+    float3 N = normalize(I.NormalWS);
+    float3 V = normalize(I.ViewWS);
+    float cosTheta = saturate(dot(N, V));
+
+    float moisture = saturate(I.Moisture);
+    O.FilmMask = smoothstep(0.08, 0.92, moisture);
+    O.Fresnel = FGE_SchlickFresnel(cosTheta, 1.0, lerp(I.IORSubstrate, I.IORFilm, O.FilmMask));
+    O.Roughness = lerp(I.RoughnessDry, I.RoughnessWet, O.FilmMask);
+    O.SpecularWeight = saturate(lerp(0.45, 1.0, O.FilmMask) * (0.65 + 0.35 * O.Fresnel));
+    O.TransmissionWeight = saturate(O.FilmMask * 0.18);
+    return O;
+}
+
+#endif
