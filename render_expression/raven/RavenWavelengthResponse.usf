@@ -1,0 +1,43 @@
+// FGE Raven Moisture Test Bed — Wavelength Response Prototype v0.1
+// STATUS: PROTOTYPE / UNVALIDATED IN UE
+// Thin-film interference approximation for RGB spectral bands.
+
+#ifndef FGE_RAVEN_WAVELENGTH_RESPONSE
+#define FGE_RAVEN_WAVELENGTH_RESPONSE
+
+float FGE_ThinFilmBand(float wavelengthNm, float thicknessNm, float filmIOR, float cosTheta)
+{
+    float opticalPathNm = 2.0 * filmIOR * thicknessNm * max(cosTheta, 0.05);
+    float phase = 6.28318530718 * opticalPathNm / max(wavelengthNm, 1.0);
+    return 0.5 + 0.5 * cos(phase);
+}
+
+float3 FGE_RavenThinFilmRGB(float thicknessNm, float filmIOR, float cosTheta, float moisture)
+{
+    // Representative display-band wavelengths: R 610nm, G 550nm, B 460nm.
+    float3 bands = float3(
+        FGE_ThinFilmBand(610.0, thicknessNm, filmIOR, cosTheta),
+        FGE_ThinFilmBand(550.0, thicknessNm, filmIOR, cosTheta),
+        FGE_ThinFilmBand(460.0, thicknessNm, filmIOR, cosTheta)
+    );
+
+    float wet = saturate(moisture);
+    float3 ravenBias = float3(0.46, 0.62, 1.0); // cool obsidian spectral bias
+    float3 spectral = lerp(1.0.xxx, bands * ravenBias * 1.35, wet);
+    return saturate(spectral);
+}
+
+float3 FGE_RavenMoistureEmission(
+    float3 baseEmission,
+    float thicknessNm,
+    float filmIOR,
+    float cosTheta,
+    float moisture,
+    float activation)
+{
+    float3 wavelengthResponse = FGE_RavenThinFilmRGB(thicknessNm, filmIOR, cosTheta, moisture);
+    float pulse = saturate(activation) * saturate(moisture);
+    return baseEmission * wavelengthResponse * pulse;
+}
+
+#endif
