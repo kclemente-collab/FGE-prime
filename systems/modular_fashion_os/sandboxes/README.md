@@ -26,7 +26,7 @@ Single-file runtime harness for fashion-asset evidence. It does **not** mutate C
 
 `fare_asset_identity` · `fare_mutation_attempt` · `fare_validation_event` · `fare_recovery_event` · `fare_validated_checkpoint` · `fare_provenance_event`
 
-These are evidence tables, not the product registry in `schema/layered_fashion_module.sql`. Product truth stays in Storage. FARE only records what the runtime *did*.
+These are evidence tables, not the product registry. DDL lives in [`../schema/layered_fashion_module.sql`](../schema/layered_fashion_module.sql) (section 8). Product truth stays in Storage. FARE only records what the runtime *did*. Soft-link via `sku_identifier` / `garment_runtime_id`. No cascade into `digital_assets_registry`. `fare_runtime_frame` is a serialization packet, not a table.
 
 ## Authority split
 
