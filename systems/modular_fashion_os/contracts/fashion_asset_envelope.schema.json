@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/contracts/fashion_asset_envelope.schema.json",
+  "title": "FGE Fashion Asset Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "object_id",
+    "version",
+    "status",
+    "canon_effect",
+    "identity",
+    "provenance",
+    "garment",
+    "representations",
+    "validation"
+  ],
+  "properties": {
+    "object_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "status": {"type": "string"},
+    "canon_effect": {"enum": ["NONE", "PROPOSED", "AUTHORIZED", "LOCKED"]},
+    "identity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["asset_id", "asset_class", "display_name"],
+      "properties": {
+        "asset_id": {"type": "string", "minLength": 1},
+        "asset_class": {"enum": ["GARMENT", "ACCESSORY", "FOOTWEAR", "JEWELRY", "ARMOR", "OTHER"]},
+        "display_name": {"type": "string", "minLength": 1},
+        "sku": {"type": ["string", "null"]},
+        "brand": {"type": ["string", "null"]},
+        "rarity": {"type": ["string", "null"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source_type"],
+      "properties": {
+        "source_type": {"enum": ["USER_SUPPLIED", "FGE_GENERATED", "IMPORTED", "LICENSED", "UNKNOWN"]},
+        "creator_id": {"type": ["string", "null"]},
+        "source_uri": {"type": ["string", "null"]},
+        "content_hash": {"type": ["string", "null"]},
+        "created_at": {"type": ["string", "null"]},
+        "authority_notes": {"type": ["string", "null"]}
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "commercial_use": {"type": ["boolean", "null"]},
+        "modification_allowed": {"type": ["boolean", "null"]},
+        "rental_allowed": {"type": ["boolean", "null"]},
+        "redistribution_allowed": {"type": ["boolean", "null"]},
+        "license_id": {"type": ["string", "null"]}
+      }
+    },
+    "garment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["geometry", "fit", "layering", "coverage", "material", "physics"],
+      "properties": {
+        "geometry": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "master_format": {"type": ["string", "null"]},
+            "master_uri": {"type": ["string", "null"]},
+            "bind_pose": {"type": ["string", "null"]},
+            "vertex_count": {"type": ["integer", "null"], "minimum": 0}
+          }
+        },
+        "fit": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "source_body_profile": {"type": ["string", "null"]},
+            "rig_compatibility": {"type": "array", "items": {"type": "string"}},
+            "anchor_points": {"type": "array", "items": {"type": "string"}},
+            "morph_strategy": {"type": ["string", "null"]},
+            "fit_tolerance_mm": {"type": ["number", "null"], "minimum": 0}
+          }
+        },
+        "layering": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "layer_class": {"type": ["string", "null"]},
+            "layer_priority": {"type": ["integer", "null"]},
+            "compatible_over_layers": {"type": "array", "items": {"type": "string"}},
+            "compatible_under_layers": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "description": "Body and garment coverage graph. Region values should describe COVER, PARTIAL, OPEN or UNKNOWN.",
+          "additionalProperties": {"type": "string"}
+        },
+        "material": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "material_chip_id": {"type": ["string", "null"]},
+            "fabric_id": {"type": ["string", "null"]},
+            "physical_intent": {"type": "object", "additionalProperties": true},
+            "optical_intent": {"type": "object", "additionalProperties": true},
+            "tactile_intent": {"type": "object", "additionalProperties": true},
+            "aging_intent": {"type": "object", "additionalProperties": true}
+          }
+        },
+        "physics": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "profile_id": {"type": ["string", "null"]},
+            "solver_neutral": {"type": "object", "additionalProperties": true},
+            "fallback_behavior": {"type": ["string", "null"]}
+          }
+        },
+        "customization": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "enabled": {"type": ["boolean", "null"]},
+            "channels": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
+            "patterns": {"type": "array", "items": {"type": "object", "additionalProperties": true}}
+          }
+        }
+      }
+    },
+    "representations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "runtime", "adapters"],
+      "properties": {
+        "source": {"type": "array", "items": {"$ref": "#/$defs/representation"}},
+        "runtime": {"type": "array", "items": {"$ref": "#/$defs/representation"}},
+        "adapters": {"type": "array", "items": {"$ref": "#/$defs/adapterRepresentation"}}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["UNKNOWN", "PENDING", "PARTIAL", "PASSED", "FAILED"]},
+        "gates": {"type": "object", "additionalProperties": {"type": "string"}},
+        "conflicts": {"type": "array", "items": {"type": "string"}},
+        "unknowns": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "representation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["representation_id", "format"],
+      "properties": {
+        "representation_id": {"type": "string"},
+        "format": {"type": "string"},
+        "uri": {"type": ["string", "null"]},
+        "lod": {"type": ["integer", "null"], "minimum": 0},
+        "hash": {"type": ["string", "null"]},
+        "status": {"type": ["string", "null"]}
+      }
+    },
+    "adapterRepresentation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["adapter_id", "target"],
+      "properties": {
+        "adapter_id": {"type": "string"},
+        "target": {"type": "string"},
+        "rig_profile": {"type": ["string", "null"]},
+        "material_profile": {"type": ["string", "null"]},
+        "physics_profile": {"type": ["string", "null"]},
+        "asset_uri": {"type": ["string", "null"]},
+        "capabilities": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
