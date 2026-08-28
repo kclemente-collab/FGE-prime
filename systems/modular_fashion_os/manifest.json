@@ -1,0 +1,39 @@
+{
+  "object_id": "FGE-SYS-MODULAR-FASHION-OS-001",
+  "version": "0.1.0",
+  "status": "IMPLEMENTED_BRANCH_NOT_CANON_PROMOTED",
+  "canon_effect": "NONE",
+  "authority": {
+    "storage": "GITHUB_PERSISTENCE",
+    "display": "LLM_EPHEMERAL_RUNTIME",
+    "character_binding": "CHARACTER_OS"
+  },
+  "modules": [
+    {
+      "object_id": "FGE-FASHION-STORAGE-GITHUB-001",
+      "role": "VERSIONED_PERSISTENCE_AND_PROVENANCE",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "object_id": "FGE-FASHION-LLM-DISPLAY-001",
+      "role": "LLM_RUNTIME_PRESENTATION_AND_DELTA_PROPOSAL",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "object_id": "FGE-FASHION-CHARACTER-OS-ADAPTER-001",
+      "role": "CHARACTER_SAFE_WARDROBE_BINDING",
+      "status": "IMPLEMENTED_GENERIC_HANDSHAKE"
+    }
+  ],
+  "laws": [
+    "UNKNOWN_OVER_INVENTED",
+    "GENERATED_OUTPUT_NOT_CANON",
+    "STORAGE_DISPLAY_ADAPTER_AUTHORITY_SEPARATION",
+    "GARMENT_REFERENCE_OVER_CHARACTER_DATA_DUPLICATION",
+    "ENGINE_SPECIFIC_PARAMETERS_DOWNSTREAM_OF_GARMENT_INTENT",
+    "CONFLICTS_PRESERVED_UNTIL_RESOLVED"
+  ],
+  "storage_layout": "storage/assets/<asset_id>/<version>.json",
+  "registry": "storage/index.json",
+  "primary_contract": "contracts/fashion_asset_envelope.schema.json"
+}
