@@ -1,0 +1,26 @@
+{
+  "object_id": "FGE-FARE-001",
+  "runtime_id": "FGE-FARE-VALIDATION-RECOVERY-001",
+  "ledger_id": "FGE-FARE-SERIALIZATION-LEDGER-001",
+  "milestone": "v0.6",
+  "status": "IMPLEMENTED_BRANCH",
+  "canon_effect": "NONE",
+  "source_authority": "GOOGLE_SANDBOX_SOURCE_CLAIMED",
+  "source_verification": "PENDING_EXTERNAL_AUDIT",
+  "entrypoint": "index.html",
+  "source_archive": "archive/fare_sandbox_v0.6.original.html",
+  "architecture_layer": "EXECUTION_BRIDGE_SIMULATOR",
+  "patches": [
+    "FARE-PATCH-001_ROW_IDENTITY_DOM_BINDING"
+  ],
+  "dependencies": {
+    "ui_rendering": "cdn.tailwindcss.com",
+    "typography": "fonts.googleapis.com"
+  },
+  "implementation_notes": {
+    "relational_ledger": "EMULATED_IN_MEMORY_JAVASCRIPT_COUNTERS",
+    "hash_chain": "MOCK_DETERMINISTIC_NON_CRYPTOGRAPHIC_HASH",
+    "live_sql_database": false,
+    "true_crash_restart_restore": false
+  }
+}
