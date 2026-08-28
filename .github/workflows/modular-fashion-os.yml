@@ -1,0 +1,32 @@
+name: Modular Fashion OS
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "systems/modular_fashion_os/**"
+      - ".github/workflows/modular-fashion-os.yml"
+  push:
+    branches:
+      - "fge/modular-fashion-os-v0.1"
+    paths:
+      - "systems/modular_fashion_os/**"
+      - ".github/workflows/modular-fashion-os.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-fashion-os:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install validation tools
+        run: python -m pip install --upgrade pytest flake8
+      - name: Syntax and undefined-name check
+        run: flake8 systems/modular_fashion_os --count --select=E9,F63,F7,F82 --show-source --statistics
+      - name: Fashion OS tests
+        run: pytest -q systems/modular_fashion_os/tests
