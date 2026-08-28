@@ -1,0 +1,12 @@
+{
+  "character_id": "FGE-CHAR-EXAMPLE-001",
+  "version": "0.1.0",
+  "authority": "NON_CANON_TEST_FIXTURE",
+  "rig_profile": "FGE-RIG-HUMANOID-001",
+  "body_profile": "FGE-BODY-EXAMPLE-001",
+  "wardrobe_policy": {
+    "allowed_asset_classes": ["GARMENT", "ACCESSORY", "FOOTWEAR", "JEWELRY"],
+    "forbidden_asset_ids": [],
+    "max_layer_priority": 100
+  }
+}
