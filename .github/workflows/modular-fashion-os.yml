@@ -4,12 +4,14 @@ on:
   pull_request:
     branches: ["main"]
     paths:
+      - "systems/__init__.py"
       - "systems/modular_fashion_os/**"
       - ".github/workflows/modular-fashion-os.yml"
   push:
     branches:
       - "fge/modular-fashion-os-v0.1"
     paths:
+      - "systems/__init__.py"
       - "systems/modular_fashion_os/**"
       - ".github/workflows/modular-fashion-os.yml"
 
