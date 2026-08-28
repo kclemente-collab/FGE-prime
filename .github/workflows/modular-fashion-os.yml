@@ -21,6 +21,8 @@ permissions:
 jobs:
   validate-fashion-os:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -31,4 +33,4 @@ jobs:
       - name: Syntax and undefined-name check
         run: flake8 systems/modular_fashion_os --count --select=E9,F63,F7,F82 --show-source --statistics
       - name: Fashion OS tests
-        run: pytest -q systems/modular_fashion_os/tests
+        run: python -m pytest -q systems/modular_fashion_os/tests
