@@ -292,6 +292,16 @@ class ModularFashionOSRuntimeTest(unittest.TestCase):
                 target_runtime="UNREAL_ENGINE_5",
             )
 
+    def test_missing_character_reference_is_rejected_at_input_boundary(self):
+        character = copy.deepcopy(self.character)
+        del character["character_ref"]["object_id"]
+        with self.assertRaises(ContractValidationError):
+            compile_wardrobe_binding_candidate(
+                character,
+                self.asset,
+                target_runtime="UNREAL_ENGINE_5",
+            )
+
     def test_adapter_cannot_authorize(self):
         with self.assertRaises(PermissionError):
             authorize_binding({})

@@ -52,6 +52,21 @@ class GitHubFashionStoreTest(unittest.TestCase):
         with self.assertRaises(StorageContractError):
             self.store.save_asset(invalid)
 
+    def test_every_load_validates_full_schema(self):
+        path = self.store.asset_path(
+            self.asset["identity"]["asset_id"], self.asset["version"]
+        )
+        invalid = copy.deepcopy(self.asset)
+        invalid["rights"]["valuation"]["currency"] = "DOLLARS"
+        self.store.files[path] = {
+            "sha": "sha-invalid",
+            "content": self.store.canonical_json(invalid),
+        }
+        with self.assertRaises(StorageContractError):
+            self.store.load_asset(
+                self.asset["identity"]["asset_id"], self.asset["version"]
+            )
+
     def test_asset_ids_use_collision_free_path_segments(self):
         slash = copy.deepcopy(self.asset)
         slash["identity"]["asset_id"] = "brand/coat"

@@ -222,7 +222,7 @@ FGE-SPEC-LAYERED-FASHION-DB-00X spec revisions
 ## 13. Validation
 
 ```bash
-python -m pytest systems/modular_fashion_os/tests/test_runtime_adapter.py
+python -m pytest systems/modular_fashion_os/tests
 ```
 
 *FGE-SPEC-LAYERED-FASHION-DB-001 v0.2.0 — candidate schema for Character OS wardrobe infrastructure. Not canon until operator promotion.*

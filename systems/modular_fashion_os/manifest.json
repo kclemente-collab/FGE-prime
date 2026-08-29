@@ -38,7 +38,7 @@
     "ENGINE_SPECIFIC_PARAMETERS_DOWNSTREAM_OF_GARMENT_INTENT",
     "CONFLICTS_PRESERVED_UNTIL_RESOLVED"
   ],
-  "storage_layout": "storage/assets/<asset_id>/<version>.json",
+  "storage_layout": "storage/assets/<percent-encoded-asset-id>/<version>.json",
   "registry": "storage/index.json",
   "primary_contract": "contracts/fashion_asset_envelope.schema.json",
   "character_projection_contract": "contracts/character_chip_fashion_projection.schema.json",
