@@ -28,6 +28,19 @@ class ContractAndBenchmarkTest(unittest.TestCase):
             schema = json.loads((payload_dir / name).read_text())
             Draft202012Validator.check_schema(schema)
 
+    def test_readme_references_all_six_payload_contracts(self):
+        names = {
+            "storage_module.json",
+            "display_module.json",
+            "adapter_module.json",
+            "clipping_occlusion_engine.json",
+            "fabric_description_index.json",
+            "runtime_customization_parameters.json",
+        }
+        readme = (ROOT / "README.md").read_text()
+        for name in names:
+            self.assertIn(f"schema/payloads/{name}", readme)
+
     def test_fixture_matches_envelope_contract(self):
         asset = json.loads(
             (ROOT / "examples" / "EXAMPLE_NONCANON_fashion_asset.json").read_text()

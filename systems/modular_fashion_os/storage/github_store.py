@@ -181,8 +181,11 @@ class GitHubFashionStore:
         return asset_id, version
 
     def asset_path(self, asset_id: str, version: str) -> str:
-        safe_asset = asset_id.replace("/", "_")
-        safe_version = version.replace("/", "_")
+        # Encode each value as one reversible repository path segment. Replacing
+        # separators (for example, "/" with "_") is lossy and can make two
+        # distinct governed IDs resolve to the same immutable record.
+        safe_asset = quote(asset_id, safe="")
+        safe_version = quote(version, safe="")
         return f"{self.config.root}/assets/{safe_asset}/{safe_version}.json"
 
     def load_asset(self, asset_id: str, version: str) -> Optional[Dict[str, Any]]:
@@ -304,8 +307,10 @@ class GitHubFashionStore:
         If the version exists with identical canonical content, the operation is idempotent.
         If it exists with different content, StorageConflict is raised.
         """
-        asset_id, version = self._validate_minimum(envelope)
+        # Detach the caller-owned object before validation so the exact snapshot
+        # that passes the contract is the snapshot written and indexed.
         payload = copy.deepcopy(envelope)
+        asset_id, version = self._validate_minimum(payload)
         text = self.canonical_json(payload)
         content_hash = self.digest(text)
         path = self.asset_path(asset_id, version)
@@ -337,7 +342,7 @@ class GitHubFashionStore:
                 asset_commit = None
 
         try:
-            registration = self._register_index(envelope, path, content_hash)
+            registration = self._register_index(payload, path, content_hash)
         except Exception as exc:
             raise StorageRecoveryRequired(asset_id, version, path) from exc
         index_result = registration["result"]

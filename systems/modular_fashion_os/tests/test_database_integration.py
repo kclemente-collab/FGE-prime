@@ -22,6 +22,14 @@ class PostgreSQLIntegrationTest(unittest.TestCase):
                 )
             }
             self.assertIn("display_ui_anchors", fde_columns)
+            self.assertNotIn("icon_thumbnail_uri", fde_columns)
+            self.assertNotIn("sound_profile_on_movement", fde_columns)
+            display_ui_type = connection.execute(
+                "SELECT data_type FROM information_schema.columns "
+                "WHERE table_name = 'fabric_description_index' "
+                "AND column_name = 'display_ui_anchors'"
+            ).fetchone()[0]
+            self.assertEqual(display_ui_type, "jsonb")
             asset_id = connection.execute(
                 "INSERT INTO digital_assets_registry "
                 "(sku_identifier, brand_name, rarity_tier, digital_rights_framework) "

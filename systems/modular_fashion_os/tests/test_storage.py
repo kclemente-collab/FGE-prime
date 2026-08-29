@@ -52,6 +52,30 @@ class GitHubFashionStoreTest(unittest.TestCase):
         with self.assertRaises(StorageContractError):
             self.store.save_asset(invalid)
 
+    def test_asset_ids_use_collision_free_path_segments(self):
+        slash = copy.deepcopy(self.asset)
+        slash["identity"]["asset_id"] = "brand/coat"
+        underscore = copy.deepcopy(self.asset)
+        underscore["identity"]["asset_id"] = "brand_coat"
+
+        slash_receipt = self.store.save_asset(slash)
+        underscore_receipt = self.store.save_asset(underscore)
+
+        self.assertNotEqual(slash_receipt["path"], underscore_receipt["path"])
+        self.assertIn("brand%2Fcoat", slash_receipt["path"])
+        self.assertEqual(
+            self.store.load_asset("brand/coat", slash["version"])["identity"][
+                "asset_id"
+            ],
+            "brand/coat",
+        )
+        self.assertEqual(
+            self.store.load_asset("brand_coat", underscore["version"])["identity"][
+                "asset_id"
+            ],
+            "brand_coat",
+        )
+
     def test_concurrent_index_conflict_recovers(self):
         self.store.index_conflicts = 1
         receipt = self.store.save_asset(self.asset)
@@ -71,6 +95,21 @@ class GitHubFashionStoreTest(unittest.TestCase):
             self.asset["identity"]["asset_id"], self.asset["version"]
         )
         self.assertEqual(receipt["index_state"], "RECOVERED")
+
+    def test_recovery_revalidates_the_stored_envelope(self):
+        path = self.store.asset_path(
+            self.asset["identity"]["asset_id"], self.asset["version"]
+        )
+        invalid = copy.deepcopy(self.asset)
+        invalid["rights"]["valuation"]["currency"] = "DOLLARS"
+        self.store.files[path] = {
+            "sha": "sha-invalid",
+            "content": self.store.canonical_json(invalid),
+        }
+        with self.assertRaises(StorageContractError):
+            self.store.reconcile_asset_index(
+                self.asset["identity"]["asset_id"], self.asset["version"]
+            )
 
     def test_latest_version_uses_semver_not_write_order(self):
         high = copy.deepcopy(self.asset)

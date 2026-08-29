@@ -70,6 +70,37 @@ class ModularFashionOSRuntimeTest(unittest.TestCase):
         )
         self.assertFalse(packet["governance"]["may_mutate_storage"])
 
+    def test_display_packet_detaches_all_mutable_source_data(self):
+        asset = copy.deepcopy(self.asset)
+        character = copy.deepcopy(self.character)
+        packet = compile_display_packet(
+            asset,
+            character_context=character,
+            fabric_index=self.fde,
+        )
+
+        packet["fit"]["rig_compatibility"].append("MUTATED")
+        packet["representations"]["adapters"][0]["target"] = "MUTATED"
+        packet["validation"]["gates"]["RIGHTS"] = "MUTATED"
+        packet["character_context"]["wardrobe_authority"]["status"] = "MUTATED"
+        packet["fabric_description"]["ui"]["display_ui_anchors"][
+            "icon_thumbnail_uri"
+        ] = "MUTATED"
+
+        self.assertNotIn("MUTATED", asset["garment"]["fit"]["rig_compatibility"])
+        self.assertEqual(
+            asset["representations"]["adapters"][0]["target"],
+            "UNREAL_ENGINE_5",
+        )
+        self.assertEqual(asset["validation"]["gates"]["RIGHTS"], "PASSED")
+        self.assertEqual(character["wardrobe_authority"]["status"], "AUTHORIZED")
+        self.assertEqual(
+            self.fde.lookup("fab_lthr_nappa_01")["display_ui_anchors"][
+                "icon_thumbnail_uri"
+            ],
+            "s3://ui/nappa.png",
+        )
+
     def test_delta_stays_proposed(self):
         packet = compile_display_packet(self.asset)
         propose_delta(packet, "garment.material.optical_intent.test", 1, "test")
@@ -165,6 +196,40 @@ class ModularFashionOSRuntimeTest(unittest.TestCase):
         self.assertEqual(candidate["status"], "BLOCKED")
         self.assertIn(
             "NO_EXACT_PLATFORM_ADAPTER", candidate["compatibility"]["blockers"]
+        )
+
+    def test_target_adapter_must_match_character_rig(self):
+        asset = self.ready_asset()
+        asset["representations"]["adapters"][0]["rig_profile"] = "OTHER_RIG"
+        candidate = compile_wardrobe_binding_candidate(
+            self.character,
+            asset,
+            target_runtime="UNREAL_ENGINE_5",
+            require_live_adapter=True,
+        )
+        self.assertEqual(candidate["status"], "BLOCKED")
+        self.assertIsNone(candidate["selected_adapter"])
+        self.assertIn(
+            "NO_RIG_COMPATIBLE_PLATFORM_ADAPTER",
+            candidate["compatibility"]["blockers"],
+        )
+
+    def test_live_compatible_adapter_wins_over_earlier_wrong_rig(self):
+        asset = self.ready_asset()
+        compatible = copy.deepcopy(asset["representations"]["adapters"][0])
+        compatible["adapter_id"] = "ADAPTER-COMPATIBLE-LIVE"
+        asset["representations"]["adapters"][0]["rig_profile"] = "OTHER_RIG"
+        asset["representations"]["adapters"].append(compatible)
+        candidate = compile_wardrobe_binding_candidate(
+            self.character,
+            asset,
+            target_runtime="UNREAL_ENGINE_5",
+            require_live_adapter=True,
+        )
+        self.assertEqual(candidate["status"], "READY_CANDIDATE")
+        self.assertEqual(
+            candidate["selected_adapter"]["adapter_id"],
+            "ADAPTER-COMPATIBLE-LIVE",
         )
 
     def test_ready_binding_uses_reference_and_compiles_execution_plan(self):

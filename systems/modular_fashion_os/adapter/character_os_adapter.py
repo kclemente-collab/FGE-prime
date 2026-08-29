@@ -27,13 +27,34 @@ def _list(value: Any) -> List[Any]:
 
 
 def _choose_target_adapter(
-    adapters: List[Dict[str, Any]], target_runtime: str
-) -> Optional[Dict[str, Any]]:
+    adapters: List[Dict[str, Any]],
+    target_runtime: str,
+    rig_profile_id: str,
+    require_live_adapter: bool,
+) -> Tuple[Optional[Dict[str, Any]], bool]:
     target_norm = target_runtime.strip().lower()
-    for adapter in adapters:
-        if str(adapter.get("target", "")).strip().lower() == target_norm:
-            return deepcopy(adapter)
-    return None
+    target_matches = [
+        adapter
+        for adapter in adapters
+        if str(adapter.get("target", "")).strip().lower() == target_norm
+    ]
+    rig_matches = [
+        adapter
+        for adapter in target_matches
+        if adapter.get("rig_profile") == rig_profile_id
+    ]
+    if not rig_matches:
+        return None, bool(target_matches)
+    if require_live_adapter:
+        for adapter in rig_matches:
+            capabilities = set(_list(adapter.get("capabilities")))
+            if (
+                adapter.get("live_runtime")
+                and adapter.get("runtime_status") == "LIVE"
+                and REQUIRED_LIVE_CAPABILITIES <= capabilities
+            ):
+                return deepcopy(adapter), True
+    return deepcopy(rig_matches[0]), True
 
 
 def _policy_check(
@@ -139,15 +160,22 @@ def _layer_stack_check(
 
 
 def _runtime_check(
-    selected_adapter: Optional[Dict[str, Any]], require_live_adapter: bool
+    selected_adapter: Optional[Dict[str, Any]],
+    require_live_adapter: bool,
+    target_adapter_exists: bool,
 ) -> Tuple[List[str], List[str]]:
     blockers: List[str] = []
     warnings: List[str] = []
     if selected_adapter is None:
+        reason = (
+            "NO_RIG_COMPATIBLE_PLATFORM_ADAPTER"
+            if target_adapter_exists
+            else "NO_EXACT_PLATFORM_ADAPTER"
+        )
         if require_live_adapter:
-            blockers.append("NO_EXACT_PLATFORM_ADAPTER")
+            blockers.append(reason)
         else:
-            warnings.append("NO_EXACT_PLATFORM_ADAPTER")
+            warnings.append(reason)
         return blockers, warnings
     if require_live_adapter and (
         not selected_adapter.get("live_runtime")
@@ -262,9 +290,14 @@ def compile_wardrobe_binding_candidate(
         for value in _list(representations.get("adapters"))
         if isinstance(value, dict)
     ]
-    selected_adapter = _choose_target_adapter(adapters, target_runtime)
+    selected_adapter, target_adapter_exists = _choose_target_adapter(
+        adapters,
+        target_runtime,
+        character_projection["embodiment"]["rig_profile_id"],
+        require_live_adapter,
+    )
     runtime_blockers, runtime_warnings = _runtime_check(
-        selected_adapter, require_live_adapter
+        selected_adapter, require_live_adapter, target_adapter_exists
     )
     blockers.extend(runtime_blockers)
     warnings.extend(runtime_warnings)

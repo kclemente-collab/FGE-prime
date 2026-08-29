@@ -57,13 +57,14 @@ CREATE TABLE IF NOT EXISTS fabric_description_index (
     global_fabric_id VARCHAR(64) PRIMARY KEY,
     display_name_en VARCHAR(160) NOT NULL,
     tactile_description TEXT NOT NULL,
-    icon_thumbnail_uri TEXT,
-    sound_profile_on_movement VARCHAR(128),
     use_raytracing_anisotropy BOOLEAN NOT NULL DEFAULT FALSE,
     parallax_occlusion_mapping_depth FLOAT,
     clear_coat_present BOOLEAN NOT NULL DEFAULT FALSE,
     localization_manifest JSONB NOT NULL DEFAULT '{}'::jsonb,
-    display_ui_anchors JSONB NOT NULL DEFAULT '{}'::jsonb,
+    -- Governing representation: extensible UI metadata stays one JSON object.
+    -- Do not duplicate individual anchor keys as independently writable columns.
+    display_ui_anchors JSONB NOT NULL DEFAULT '{}'::jsonb
+        CHECK (jsonb_typeof(display_ui_anchors) = 'object'),
     viewport_rendering_overrides JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -179,8 +180,6 @@ INSERT INTO fabric_description_index (
     global_fabric_id,
     display_name_en,
     tactile_description,
-    icon_thumbnail_uri,
-    sound_profile_on_movement,
     use_raytracing_anisotropy,
     parallax_occlusion_mapping_depth,
     clear_coat_present,
@@ -191,8 +190,6 @@ INSERT INTO fabric_description_index (
     'fab_lthr_nappa_01',
     'Premium Heavy Nappa Leather',
     'Thick, full-grain milled leather with a semi-matte sheen and pronounced structure.',
-    's3://ui/fabric-swatches/nappa_leather_thumb.png',
-    'sfx_leather_rustle_low_freq',
     TRUE,
     0.02,
     FALSE,

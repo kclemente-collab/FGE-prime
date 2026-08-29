@@ -118,7 +118,7 @@ raw physical constants   ->     UE5 Substrate graph        ->   Chaos clothing c
 USD / 8K EXR source      ->     LOD0/1/2 runtime meshes    ->   rig + solver bridge
 ```
 
-See `schema/payloads/storage_module.json`, `display_module.json`, and `adapter_module.json`.
+See `schema/payloads/storage_module.json`, `schema/payloads/display_module.json`, and `schema/payloads/adapter_module.json`.
 
 ---
 
@@ -137,6 +137,8 @@ See `schema/payloads/clipping_occlusion_engine.json`.
 ## 7. Fabric Description Engine (FDE)
 
 FDE translates physics numbers into UI copy, swatches, movement SFX, and viewport overrides. Lookup key: `global_fabric_id` (example `fab_lthr_nappa_01`).
+
+**Representation decision:** `display_ui_anchors` is an extensible JSON object in the payload contract and PostgreSQL `JSONB` in the FDE registry. It is the single persisted source for UI anchor keys such as `icon_thumbnail_uri` and `sound_profile_on_movement`; those keys are not duplicated as independently writable SQL columns. This keeps optional and future anchors sparse while the JSON Schema governs their known types.
 
 See `schema/payloads/fabric_description_index.json`.
 
@@ -167,7 +169,7 @@ Equip join query is documented in this file on GitHub after schema push. Full SQ
 
 ```text
 DESIGN OR INGEST
-   -> validate Fashion Asset Envelope
+   -> deep-copy and validate the exact Fashion Asset Envelope snapshot
    -> persist version to GitHub Storage
    -> register storage/index.json entry
    -> compile LLM Display packet
@@ -176,6 +178,8 @@ DESIGN OR INGEST
         READY_CANDIDATE | NEEDS_VALIDATION | BLOCKED
    -> explicit authority promotes or rejects
 ```
+
+GitHub Storage retries concurrent index compare-and-swap conflicts, preserves the highest semantic version as `latest_version`, and raises `StorageRecoveryRequired` when an immutable asset write succeeds but registration cannot be completed. Replaying the same save or calling `reconcile_asset_index()` revalidates the stored envelope before completing registration. Asset IDs use reversible path-segment encoding, so distinct IDs cannot collapse onto one repository path.
 
 Adapter stores a reference such as `FGE-FASH-EXAMPLE-COAT-001@0.1.0`. `authorize_binding()` raises `PermissionError` on purpose.
 

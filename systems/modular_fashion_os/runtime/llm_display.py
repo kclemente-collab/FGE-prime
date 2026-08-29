@@ -6,6 +6,7 @@ PROPOSED deltas but never marks them authorized, locked or canonical.
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -64,23 +65,23 @@ def compile_display_packet(
             "brand": _value(identity.get("brand")),
             "rarity": _value(identity.get("rarity")),
         },
-        "fit": garment.get("fit", {}),
-        "layering": garment.get("layering", {}),
-        "coverage": garment.get("coverage", {}),
-        "material": garment.get("material", {}),
-        "physics": garment.get("physics", {}),
-        "customization": garment.get("customization", {}),
-        "rights": envelope.get("rights", {}),
+        "fit": deepcopy(garment.get("fit", {})),
+        "layering": deepcopy(garment.get("layering", {})),
+        "coverage": deepcopy(garment.get("coverage", {})),
+        "material": deepcopy(garment.get("material", {})),
+        "physics": deepcopy(garment.get("physics", {})),
+        "customization": deepcopy(garment.get("customization", {})),
+        "rights": deepcopy(envelope.get("rights", {})),
         "representations": {
-            "source": _as_list(representations.get("source")),
-            "runtime": _as_list(representations.get("runtime")),
-            "adapters": _as_list(representations.get("adapters")),
+            "source": deepcopy(_as_list(representations.get("source"))),
+            "runtime": deepcopy(_as_list(representations.get("runtime"))),
+            "adapters": deepcopy(_as_list(representations.get("adapters"))),
         },
         "validation": {
             "state": _value(validation.get("state")),
-            "gates": validation.get("gates", {}),
-            "conflicts": _as_list(validation.get("conflicts")),
-            "unknowns": _unknown_paths(envelope),
+            "gates": deepcopy(validation.get("gates", {})),
+            "conflicts": deepcopy(_as_list(validation.get("conflicts"))),
+            "unknowns": deepcopy(_unknown_paths(envelope)),
         },
         "runtime_request": {
             "target": target_runtime,
@@ -109,12 +110,32 @@ def compile_display_packet(
         packet["fabric_description"] = compile_fde_output(envelope, fabric_index)
 
     if character_context is not None:
+        character_ref = character_context.get("character_ref") or {}
+        embodiment = character_context.get("embodiment") or {}
+        wardrobe_authority = character_context.get(
+            "wardrobe_authority",
+            character_context.get("wardrobe_policy", {}),
+        )
         packet["character_context"] = {
-            "character_id": _value(character_context.get("character_id")),
-            "character_version": _value(character_context.get("version")),
-            "rig_profile": _value(character_context.get("rig_profile")),
-            "body_profile": _value(character_context.get("body_profile")),
-            "wardrobe_policy": character_context.get("wardrobe_policy", {}),
+            "character_id": _value(
+                character_ref.get("object_id", character_context.get("character_id"))
+            ),
+            "character_version": _value(
+                character_ref.get("version", character_context.get("version"))
+            ),
+            "rig_profile": _value(
+                embodiment.get(
+                    "rig_profile_id",
+                    character_context.get("rig_profile"),
+                )
+            ),
+            "body_profile": _value(
+                embodiment.get(
+                    "body_profile_id",
+                    character_context.get("body_profile"),
+                )
+            ),
+            "wardrobe_authority": deepcopy(wardrobe_authority),
             "authority": "REFERENCE_ONLY",
         }
 
