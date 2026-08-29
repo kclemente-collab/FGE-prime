@@ -20,11 +20,30 @@
     "authority_notes": "Synthetic fixture only. Not a character wardrobe canon object."
   },
   "rights": {
-    "commercial_use": null,
-    "modification_allowed": null,
-    "rental_allowed": null,
-    "redistribution_allowed": null,
-    "license_id": null
+    "commercial_use": false,
+    "rental_allowed": false,
+    "redistribution_allowed": false,
+    "license_id": "FGE-LICENSE-TEST-ONLY-001",
+    "modification_operations": {
+      "color_tint": true,
+      "pattern_overlay": true,
+      "material_substitution": false,
+      "fit_morph": true
+    },
+    "platform_authorizations": [
+      {
+        "target": "UNREAL_ENGINE_5",
+        "status": "AUTHORIZED",
+        "license_id": "FGE-LICENSE-TEST-ONLY-001",
+        "expires_at": null
+      }
+    ],
+    "valuation": {
+      "currency": "USD",
+      "base_value_minor": 0,
+      "royalty_bps": 0,
+      "recipients": []
+    }
   },
   "garment": {
     "geometry": {
@@ -44,7 +63,13 @@
       "layer_class": "OVERWEAR",
       "layer_priority": 60,
       "compatible_over_layers": [],
-      "compatible_under_layers": ["BASE", "INNER", "OUTER"]
+      "compatible_under_layers": ["BASE", "INNER", "OUTER"],
+      "occlusion": {
+        "deactivation_zones_skin": ["torso_front", "torso_back", "upper_arm_left", "upper_arm_right"],
+        "push_out_distance_mm": 2.5,
+        "collision_channel": "ECC_GameTraceChannel_ClothingInteraction",
+        "normal_offset_falloff_power": 1.2
+      }
     },
     "coverage": {
       "torso_front": "COVER",
@@ -58,7 +83,8 @@
     },
     "material": {
       "material_chip_id": "FGE-MAT-EXAMPLE-NAPPA-001",
-      "fabric_id": "FGE-FAB-EXAMPLE-NAPPA-001",
+      "fabric_id": "fab_lthr_nappa_01",
+      "substrate_shading_topology": "Substrate_Slab_Blended",
       "physical_intent": {
         "mass_class": "HEAVY",
         "bend_response": "STRUCTURED",
@@ -88,8 +114,10 @@
     },
     "customization": {
       "enabled": false,
-      "channels": [],
-      "patterns": []
+      "rgba_control_texture_uri": null,
+      "max_pattern_tiling_scale": 8.0,
+      "color_tints": [],
+      "pattern_overlays": []
     }
   },
   "representations": {
@@ -120,8 +148,11 @@
         "rig_profile": "FGE-RIG-HUMANOID-001",
         "material_profile": "UE5_SUBSTRATE_CANDIDATE",
         "physics_profile": "CHAOS_CLOTH_CANDIDATE",
+        "physics_solver": "UE5_CHAOS_CLOTHING",
         "asset_uri": null,
-        "capabilities": ["RIG_BIND", "MATERIAL_TRANSLATION", "PHYSICS_TRANSLATION"]
+        "runtime_status": "CANDIDATE",
+        "live_runtime": false,
+        "capabilities": ["RIG_BIND", "MATERIAL_TRANSLATION", "PHYSICS_TRANSLATION", "CLIPPING_OCCLUSION"]
       }
     ]
   },
@@ -133,12 +164,11 @@
       "FIT": "PENDING",
       "MATERIAL": "PARTIAL",
       "PHYSICS": "PARTIAL",
-      "RIGHTS": "UNKNOWN"
+      "RIGHTS": "PASSED"
     },
     "conflicts": [],
     "unknowns": [
       "garment.geometry.master_uri",
-      "rights",
       "representations.source[0].uri",
       "representations.runtime[0].uri"
     ]

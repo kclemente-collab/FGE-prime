@@ -1,6 +1,6 @@
 {
   "object_id": "FGE-SYS-MODULAR-FASHION-OS-001",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "IMPLEMENTED_BRANCH_NOT_CANON_PROMOTED",
   "canon_effect": "NONE",
   "authority": {
@@ -12,17 +12,22 @@
     {
       "object_id": "FGE-FASHION-STORAGE-GITHUB-001",
       "role": "VERSIONED_PERSISTENCE_AND_PROVENANCE",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED_SCHEMA_VALIDATED_RECOVERABLE"
     },
     {
       "object_id": "FGE-FASHION-LLM-DISPLAY-001",
       "role": "LLM_RUNTIME_PRESENTATION_AND_DELTA_PROPOSAL",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED_WITH_STATIC_FDE_COMPILER"
     },
     {
       "object_id": "FGE-FASHION-CHARACTER-OS-ADAPTER-001",
       "role": "CHARACTER_SAFE_WARDROBE_BINDING",
-      "status": "IMPLEMENTED_GENERIC_HANDSHAKE"
+      "status": "IMPLEMENTED_EXACT_PROJECTION_AND_EXECUTION_PLAN"
+    },
+    {
+      "object_id": "FGE-BENCH-UE5-OCCLUSION-001",
+      "role": "EXTERNAL_UE5_PERFORMANCE_EVIDENCE_GATE",
+      "status": "SUPPRESSED_PENDING_MEASUREMENT"
     }
   ],
   "laws": [
@@ -35,5 +40,8 @@
   ],
   "storage_layout": "storage/assets/<asset_id>/<version>.json",
   "registry": "storage/index.json",
-  "primary_contract": "contracts/fashion_asset_envelope.schema.json"
+  "primary_contract": "contracts/fashion_asset_envelope.schema.json",
+  "character_projection_contract": "contracts/character_chip_fashion_projection.schema.json",
+  "payload_contracts": "schema/payloads/*.json",
+  "external_ci_work_order": "work_orders/FGE-WO-REPO-CI-REPAIR-001.md"
 }

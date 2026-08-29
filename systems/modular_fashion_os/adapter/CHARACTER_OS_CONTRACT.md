@@ -1,7 +1,8 @@
 # FGE Character OS Fashion Adapter Contract
 
 **Object:** `FGE-FASHION-CHARACTER-OS-ADAPTER-001`  
-**Status:** `IMPLEMENTED_GENERIC_HANDSHAKE`  
+**Version:** `0.2.0`  
+**Status:** `IMPLEMENTED_EXACT_PROJECTION_AND_EXECUTION_PLAN`  
 **Canon effect:** `NONE`
 
 ## Purpose
@@ -10,24 +11,32 @@ Attach a fashion asset to a character through references and compatibility check
 
 ## Character-facing input contract
 
-The generic adapter reads only these compatibility-facing fields when present:
+The adapter requires the exact `FGE-CHARACTER-CHIP-FASHION-PROJECTION-001@1.0.0` contract. It is a read-only projection from the Character Chip, not a replacement for the full Character Chip:
 
 ```json
 {
-  "character_id": "FGE-CHAR-...",
-  "version": "1.0.0",
-  "authority": "LOCKED",
-  "rig_profile": "FGE_RIG_PROFILE_ID",
-  "body_profile": "FGE_BODY_PROFILE_ID",
-  "wardrobe_policy": {
+  "object_id": "FGE-CHARACTER-CHIP-FASHION-PROJECTION-001",
+  "schema_version": "1.0.0",
+  "character_ref": {
+    "object_id": "FGE-CHAR-...",
+    "version": "1.0.0",
+    "authority": "LOCKED"
+  },
+  "embodiment": {
+    "rig_profile_id": "FGE_RIG_PROFILE_ID",
+    "body_profile_id": "FGE_BODY_PROFILE_ID"
+  },
+  "wardrobe_authority": {
+    "status": "AUTHORIZED",
     "allowed_asset_classes": ["GARMENT", "ACCESSORY"],
     "forbidden_asset_ids": [],
     "max_layer_priority": 100
-  }
+  },
+  "active_wardrobe": []
 }
 ```
 
-Missing fields are preserved as UNKNOWN and lower compatibility confidence. They are never fabricated.
+Missing or malformed fields fail schema validation. They are never fabricated.
 
 ## Fashion-facing input
 
@@ -49,6 +58,8 @@ FGE-FASH-EXAMPLE-COAT-001@0.1.0
 
 rather than copying garment physics/material data into the character object.
 
+It also emits `FGE_FASHION_EXECUTABLE_ADAPTER_PAYLOAD`, containing rig binding, solver-neutral physics, clipping/occlusion, vertex push and rights receipts. This is an execution plan; a live UE5 or other platform adapter remains separately required.
+
 ## Authority boundary
 
 ```text
@@ -64,6 +75,10 @@ ADAPTER
 
 Calling `authorize_binding()` inside the adapter intentionally raises `PermissionError`. Authorization must occur in Character OS governance.
 
-## Future exact handshake
+## Fail-closed gates
 
-The current implementation accepts a generic Character Chip projection. When the authoritative Character Chip schema is available in-repository, add a projection layer that maps its exact locked field names into this narrow interface. Do not mutate the Character Chip schema to fit this adapter.
+- Character wardrobe authority must be active.
+- Rights validation must be `PASSED`.
+- Target platform rights must be `AUTHORIZED`.
+- Rig, body profile and active layer stack must be compatible.
+- When a live runtime is required, an exact adapter must report `runtime_status=LIVE`, `live_runtime=true`, and all mandatory capabilities.

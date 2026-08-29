@@ -1,4 +1,4 @@
--- FGE-SPEC-LAYERED-FASHION-DB-001 v0.1.0
+-- FGE-SPEC-LAYERED-FASHION-DB-001 v0.2.0
 -- Layered Fashion Module — PostgreSQL 15+ DDL
 -- Status: SPEC_CANDIDATE / NOT_CANON_PROMOTED
 -- Canon effect: NONE
@@ -10,6 +10,7 @@
 --   fabric_description_index    = FDE lookup (UI + viewport)
 --   clipping_occlusion_rules    = layer stack + hollow-out
 --   asset_customization_hub     = tint / pattern overlays (Display)
+--   asset_valuation_event       = append-only valuation / royalty evidence
 --   fare_*                      = runtime evidence only (not product truth)
 --
 -- Engine-specific Chaos / Substrate / AmmoJS payloads are NOT stored as
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS fabric_description_index (
     parallax_occlusion_mapping_depth FLOAT,
     clear_coat_present BOOLEAN NOT NULL DEFAULT FALSE,
     localization_manifest JSONB NOT NULL DEFAULT '{}'::jsonb,
+    display_ui_anchors JSONB NOT NULL DEFAULT '{}'::jsonb,
     viewport_rendering_overrides JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -150,7 +152,28 @@ CREATE INDEX IF NOT EXISTS idx_adapter_asset
     ON asset_adapter_payloads (asset_id);
 
 -- ---------------------------------------------------------------------------
--- 7. Seed FDE row used by the non-canon example coat
+-- 7. Append-only commercial valuation evidence
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS asset_valuation_event (
+    valuation_event_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    asset_id UUID NOT NULL
+        REFERENCES digital_assets_registry(asset_id) ON DELETE CASCADE,
+    event_type VARCHAR(32) NOT NULL
+        CHECK (event_type IN ('LIST', 'TRANSFER', 'RENTAL', 'CUSTOMIZATION', 'ROYALTY_ACCRUAL')),
+    currency CHAR(3) NOT NULL,
+    gross_value_minor BIGINT NOT NULL CHECK (gross_value_minor >= 0),
+    royalty_bps INTEGER NOT NULL CHECK (royalty_bps BETWEEN 0 AND 10000),
+    royalty_distribution JSONB NOT NULL DEFAULT '[]'::jsonb,
+    platform VARCHAR(64) NOT NULL,
+    license_id VARCHAR(128) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_asset_valuation_asset
+    ON asset_valuation_event (asset_id, created_at);
+
+-- ---------------------------------------------------------------------------
+-- 8. Seed FDE row used by the non-canon example coat
 -- ---------------------------------------------------------------------------
 INSERT INTO fabric_description_index (
     global_fabric_id,
@@ -162,6 +185,7 @@ INSERT INTO fabric_description_index (
     parallax_occlusion_mapping_depth,
     clear_coat_present,
     localization_manifest,
+    display_ui_anchors,
     viewport_rendering_overrides
 ) VALUES (
     'fab_lthr_nappa_01',
@@ -177,6 +201,10 @@ INSERT INTO fabric_description_index (
         'tactile_description', 'Thick, full-grain milled leather with a semi-matte sheen and pronounced structure.'
     ),
     jsonb_build_object(
+        'icon_thumbnail_uri', 's3://ui/fabric-swatches/nappa_leather_thumb.png',
+        'sound_profile_on_movement', 'sfx_leather_rustle_low_freq'
+    ),
+    jsonb_build_object(
         'use_raytracing_anisotropy', TRUE,
         'parallax_occlusion_mapping_depth', 0.02,
         'clear_coat_present', FALSE
@@ -185,7 +213,7 @@ INSERT INTO fabric_description_index (
 ON CONFLICT (global_fabric_id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
--- 8. FARE evidence ledger
+-- 9. FARE evidence ledger
 --     Object: FGE-FARE-SERIALIZATION-LEDGER-001
 --     Version: 0.6.1
 --     Status: REVIEWED_CANDIDATE_ARCHITECTURE

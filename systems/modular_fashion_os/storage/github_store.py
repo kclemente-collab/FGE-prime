@@ -22,8 +22,16 @@ from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
+from systems.modular_fashion_os.validation import (
+    PACKAGE_ROOT,
+    ContractValidationError,
+    validate_envelope,
+    validate_json_contract,
+)
+
 
 DEFAULT_ROOT = "systems/modular_fashion_os/storage"
+MAX_INDEX_RETRIES = 4
 
 
 class StorageConflict(RuntimeError):
@@ -32,6 +40,27 @@ class StorageConflict(RuntimeError):
 
 class StorageContractError(ValueError):
     """Raised when an envelope lacks the minimum persistence contract."""
+
+
+class GitHubAPIError(RuntimeError):
+    """GitHub API failure retaining its HTTP status for recovery decisions."""
+
+    def __init__(self, status_code: int, detail: str):
+        self.status_code = status_code
+        super().__init__(f"GitHub API {status_code}: {detail}")
+
+
+class StorageRecoveryRequired(RuntimeError):
+    """Asset bytes exist but index recovery could not be completed automatically."""
+
+    def __init__(self, asset_id: str, version: str, path: str):
+        self.asset_id = asset_id
+        self.version = version
+        self.path = path
+        super().__init__(
+            f"Stored {asset_id}@{version} at {path}, but index registration failed; "
+            "call reconcile_asset_index()"
+        )
 
 
 @dataclass(frozen=True)
@@ -90,7 +119,7 @@ class GitHubFashionStore:
             if allow_404 and exc.code == 404:
                 return None
             detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"GitHub API {exc.code}: {detail}") from exc
+            raise GitHubAPIError(exc.code, detail) from exc
 
     def _contents_endpoint(self, path: str) -> str:
         encoded = "/".join(quote(part, safe="") for part in path.split("/"))
@@ -129,10 +158,19 @@ class GitHubFashionStore:
         return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
     @staticmethod
+    def _validated_receipt(receipt: Dict[str, Any]) -> Dict[str, Any]:
+        validate_json_contract(
+            receipt,
+            PACKAGE_ROOT / "schema" / "payloads" / "storage_module.json",
+        )
+        return receipt
+
+    @staticmethod
     def _validate_minimum(envelope: Dict[str, Any]) -> tuple[str, str]:
-        for field in ("object_id", "version", "identity", "provenance", "garment", "representations", "validation"):
-            if field not in envelope:
-                raise StorageContractError(f"Missing required field: {field}")
+        try:
+            validate_envelope(envelope)
+        except ContractValidationError as exc:
+            raise StorageContractError(str(exc)) from exc
         identity = envelope.get("identity") or {}
         asset_id = identity.get("asset_id")
         version = envelope.get("version")
@@ -149,7 +187,11 @@ class GitHubFashionStore:
 
     def load_asset(self, asset_id: str, version: str) -> Optional[Dict[str, Any]]:
         record = self._read_file(self.asset_path(asset_id, version))
-        return None if record is None else json.loads(record["content"])
+        if record is None:
+            return None
+        envelope = json.loads(record["content"])
+        self._validate_minimum(envelope)
+        return envelope
 
     def load_index(self) -> Dict[str, Any]:
         path = f"{self.config.root}/index.json"
@@ -157,12 +199,104 @@ class GitHubFashionStore:
         if record is None:
             return {
                 "object_id": "FGE-FASHION-STORAGE-INDEX-001",
-                "version": "0.1.0",
+                "version": "0.2.0",
                 "status": "ACTIVE_STORAGE_INDEX",
                 "authority": "GITHUB_PERSISTENCE",
                 "assets": {},
             }
         return json.loads(record["content"])
+
+    @staticmethod
+    def _semver_key(version: str) -> tuple[int, int, int]:
+        return tuple(int(part) for part in version.split("."))
+
+    def _index_entry(
+        self,
+        envelope: Dict[str, Any],
+        path: str,
+        content_hash: str,
+    ) -> Dict[str, Any]:
+        return {
+            "path": path,
+            "content_hash": content_hash,
+            "object_id": envelope["object_id"],
+            "status": envelope.get("status", "UNKNOWN"),
+            "canon_effect": envelope.get("canon_effect", "NONE"),
+        }
+
+    def _register_index(
+        self,
+        envelope: Dict[str, Any],
+        path: str,
+        content_hash: str,
+        *,
+        max_attempts: int = MAX_INDEX_RETRIES,
+    ) -> Dict[str, Any]:
+        """Optimistically update the index, retrying concurrent SHA conflicts."""
+        asset_id = envelope["identity"]["asset_id"]
+        version = envelope["version"]
+        index_path = f"{self.config.root}/index.json"
+        last_error: Exception | None = None
+        for attempt in range(1, max_attempts + 1):
+            index_record = self._read_file(index_path)
+            if index_record is None:
+                index = {
+                    "object_id": "FGE-FASHION-STORAGE-INDEX-001",
+                    "version": "0.2.0",
+                    "status": "ACTIVE_STORAGE_INDEX",
+                    "authority": "GITHUB_PERSISTENCE",
+                    "assets": {},
+                }
+            else:
+                index = json.loads(index_record["content"])
+            assets = index.setdefault("assets", {})
+            asset_record = assets.setdefault(asset_id, {"versions": {}})
+            versions = asset_record.setdefault("versions", {})
+            versions[version] = self._index_entry(envelope, path, content_hash)
+            asset_record["latest_version"] = max(versions, key=self._semver_key)
+            try:
+                result = self._put_file(
+                    index_path,
+                    self.canonical_json(index),
+                    f"Register fashion asset {asset_id}@{version}",
+                    sha=None if index_record is None else index_record["sha"],
+                )
+                return {
+                    "result": result,
+                    "attempts": attempt,
+                    "recovered": attempt > 1,
+                }
+            except GitHubAPIError as exc:
+                last_error = exc
+                if exc.status_code not in (409, 422):
+                    raise
+        assert last_error is not None
+        raise last_error
+
+    def reconcile_asset_index(self, asset_id: str, version: str) -> Dict[str, Any]:
+        """Recover an orphaned immutable asset into the registry index."""
+        path = self.asset_path(asset_id, version)
+        stored = self._read_file(path)
+        if stored is None:
+            raise FileNotFoundError(path)
+        envelope = json.loads(stored["content"])
+        stored_asset_id, stored_version = self._validate_minimum(envelope)
+        if (stored_asset_id, stored_version) != (asset_id, version):
+            raise StorageConflict("Stored path and envelope identity disagree")
+        content_hash = self.digest(self.canonical_json(envelope))
+        registration = self._register_index(envelope, path, content_hash)
+        return self._validated_receipt({
+            "receipt_type": "FGE_FASHION_STORAGE_RECEIPT",
+            "asset_id": asset_id,
+            "version": version,
+            "path": path,
+            "content_hash": content_hash,
+            "asset_commit": None,
+            "index_commit": registration["result"].get("commit", {}).get("sha"),
+            "authority": "GITHUB_PERSISTENCE",
+            "index_state": "RECOVERED",
+            "recovery_attempts": registration["attempts"],
+        })
 
     def save_asset(self, envelope: Dict[str, Any]) -> Dict[str, Any]:
         """Persist one immutable asset version and register it.
@@ -185,35 +319,30 @@ class GitHubFashionStore:
                 )
             asset_commit = None
         else:
-            result = self._put_file(
-                path,
-                text,
-                f"Store fashion asset {asset_id}@{version}",
-            )
-            asset_commit = result.get("commit", {}).get("sha")
+            try:
+                result = self._put_file(
+                    path,
+                    text,
+                    f"Store fashion asset {asset_id}@{version}",
+                )
+                asset_commit = result.get("commit", {}).get("sha")
+            except GitHubAPIError as exc:
+                if exc.status_code not in (409, 422):
+                    raise
+                raced = self._read_file(path)
+                if raced is None or self.digest(raced["content"]) != content_hash:
+                    raise StorageConflict(
+                        f"Concurrent writer stored different content for {asset_id}@{version}"
+                    ) from exc
+                asset_commit = None
 
-        index_path = f"{self.config.root}/index.json"
-        index_record = self._read_file(index_path)
-        index = self.load_index()
-        assets = index.setdefault("assets", {})
-        record = assets.setdefault(asset_id, {"versions": {}})
-        record["versions"][version] = {
-            "path": path,
-            "content_hash": content_hash,
-            "object_id": envelope["object_id"],
-            "status": envelope.get("status", "UNKNOWN"),
-            "canon_effect": envelope.get("canon_effect", "NONE"),
-        }
-        record["latest_version"] = version
+        try:
+            registration = self._register_index(envelope, path, content_hash)
+        except Exception as exc:
+            raise StorageRecoveryRequired(asset_id, version, path) from exc
+        index_result = registration["result"]
 
-        index_result = self._put_file(
-            index_path,
-            self.canonical_json(index),
-            f"Register fashion asset {asset_id}@{version}",
-            sha=None if index_record is None else index_record["sha"],
-        )
-
-        return {
+        return self._validated_receipt({
             "receipt_type": "FGE_FASHION_STORAGE_RECEIPT",
             "asset_id": asset_id,
             "version": version,
@@ -222,7 +351,9 @@ class GitHubFashionStore:
             "asset_commit": asset_commit,
             "index_commit": index_result.get("commit", {}).get("sha"),
             "authority": "GITHUB_PERSISTENCE",
-        }
+            "index_state": "RECOVERED" if registration["recovered"] else "REGISTERED",
+            "recovery_attempts": registration["attempts"] - 1,
+        })
 
 
 if __name__ == "__main__":

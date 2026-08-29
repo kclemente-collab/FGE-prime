@@ -9,6 +9,11 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, Iterable, List, Optional
 
+from systems.modular_fashion_os.runtime.fde import (
+    FabricDescriptionIndex,
+    compile_fde_output,
+)
+
 
 UNKNOWN = "UNKNOWN"
 
@@ -33,6 +38,7 @@ def compile_display_packet(
     *,
     target_runtime: str = "LLM_GENERIC",
     character_context: Optional[Dict[str, Any]] = None,
+    fabric_index: Optional[FabricDescriptionIndex] = None,
 ) -> Dict[str, Any]:
     """Return an authority-safe packet optimized for LLM reasoning/presentation."""
     identity = envelope.get("identity", {})
@@ -90,6 +96,17 @@ def compile_display_packet(
         },
         "proposed_deltas": [],
     }
+
+    if fabric_index is None:
+        packet["fabric_description"] = {
+            "status": "INDEX_NOT_SUPPLIED",
+            "fabric_id": (garment.get("material") or {}).get("fabric_id", UNKNOWN),
+            "ui": {},
+            "viewport": {},
+            "runtime_customization": {},
+        }
+    else:
+        packet["fabric_description"] = compile_fde_output(envelope, fabric_index)
 
     if character_context is not None:
         packet["character_context"] = {

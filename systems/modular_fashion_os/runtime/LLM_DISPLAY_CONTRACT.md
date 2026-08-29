@@ -1,7 +1,8 @@
 # FGE LLM Display Contract
 
 **Object:** `FGE-FASHION-LLM-DISPLAY-001`  
-**Status:** `IMPLEMENTED / EPHEMERAL_RUNTIME`  
+**Version:** `0.2.0`  
+**Status:** `IMPLEMENTED_WITH_STATIC_FDE_COMPILER / EPHEMERAL_RUNTIME`  
 **Canon effect:** `NONE`
 
 ## Purpose
@@ -13,6 +14,7 @@ Turn a persisted Fashion Asset Envelope into a compact reasoning/presentation pa
 1. `Fashion Asset Envelope` from GitHub storage.
 2. Optional Character OS context containing only compatibility-facing fields.
 3. Optional target runtime name.
+4. Optional validated `FabricDescriptionIndex` for FDE compilation.
 
 ## Output
 
@@ -29,6 +31,7 @@ The packet contains:
 - validation state
 - preserved conflicts + unknowns
 - empty or explicitly PROPOSED deltas
+- FDE localization, UI anchors, viewport overrides and governed RGBA/pattern shader inputs
 
 ## Runtime law
 

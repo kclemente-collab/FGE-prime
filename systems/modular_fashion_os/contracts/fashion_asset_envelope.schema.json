@@ -11,6 +11,7 @@
     "canon_effect",
     "identity",
     "provenance",
+    "rights",
     "garment",
     "representations",
     "validation"
@@ -48,13 +49,60 @@
     },
     "rights": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
+      "required": ["commercial_use", "rental_allowed", "redistribution_allowed", "license_id", "modification_operations", "platform_authorizations", "valuation"],
       "properties": {
-        "commercial_use": {"type": ["boolean", "null"]},
-        "modification_allowed": {"type": ["boolean", "null"]},
-        "rental_allowed": {"type": ["boolean", "null"]},
-        "redistribution_allowed": {"type": ["boolean", "null"]},
-        "license_id": {"type": ["string", "null"]}
+        "commercial_use": {"type": "boolean"},
+        "rental_allowed": {"type": "boolean"},
+        "redistribution_allowed": {"type": "boolean"},
+        "license_id": {"type": "string", "minLength": 1},
+        "modification_operations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["color_tint", "pattern_overlay", "material_substitution", "fit_morph"],
+          "properties": {
+            "color_tint": {"type": "boolean"},
+            "pattern_overlay": {"type": "boolean"},
+            "material_substitution": {"type": "boolean"},
+            "fit_morph": {"type": "boolean"}
+          }
+        },
+        "platform_authorizations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["target", "status", "license_id"],
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "status": {"enum": ["AUTHORIZED", "DENIED", "EXPIRED", "UNKNOWN"]},
+              "license_id": {"type": "string", "minLength": 1},
+              "expires_at": {"type": ["string", "null"], "format": "date-time"}
+            }
+          }
+        },
+        "valuation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["currency", "base_value_minor", "royalty_bps", "recipients"],
+          "properties": {
+            "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+            "base_value_minor": {"type": "integer", "minimum": 0},
+            "royalty_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+            "recipients": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["recipient_id", "share_bps"],
+                "properties": {
+                  "recipient_id": {"type": "string", "minLength": 1},
+                  "share_bps": {"type": "integer", "minimum": 0, "maximum": 10000}
+                }
+              }
+            }
+          }
+        }
       }
     },
     "garment": {
@@ -85,18 +133,30 @@
         },
         "layering": {
           "type": "object",
-          "additionalProperties": true,
+          "additionalProperties": false,
+          "required": ["layer_class", "layer_priority", "compatible_over_layers", "compatible_under_layers", "occlusion"],
           "properties": {
-            "layer_class": {"type": ["string", "null"]},
-            "layer_priority": {"type": ["integer", "null"]},
+            "layer_class": {"type": "string", "minLength": 1},
+            "layer_priority": {"type": "integer", "minimum": 0, "maximum": 100},
             "compatible_over_layers": {"type": "array", "items": {"type": "string"}},
-            "compatible_under_layers": {"type": "array", "items": {"type": "string"}}
+            "compatible_under_layers": {"type": "array", "items": {"type": "string"}},
+            "occlusion": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["deactivation_zones_skin", "push_out_distance_mm", "collision_channel", "normal_offset_falloff_power"],
+              "properties": {
+                "deactivation_zones_skin": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+                "push_out_distance_mm": {"type": "number", "minimum": 0, "maximum": 25},
+                "collision_channel": {"type": "string", "minLength": 1},
+                "normal_offset_falloff_power": {"type": "number", "exclusiveMinimum": 0}
+              }
+            }
           }
         },
         "coverage": {
           "type": "object",
           "description": "Body and garment coverage graph. Region values should describe COVER, PARTIAL, OPEN or UNKNOWN.",
-          "additionalProperties": {"type": "string"}
+          "additionalProperties": {"enum": ["COVER", "PARTIAL", "OPEN", "UNKNOWN"]}
         },
         "material": {
           "type": "object",
@@ -121,11 +181,41 @@
         },
         "customization": {
           "type": "object",
-          "additionalProperties": true,
+          "additionalProperties": false,
+          "required": ["enabled", "rgba_control_texture_uri", "max_pattern_tiling_scale", "color_tints", "pattern_overlays"],
           "properties": {
-            "enabled": {"type": ["boolean", "null"]},
-            "channels": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
-            "patterns": {"type": "array", "items": {"type": "object", "additionalProperties": true}}
+            "enabled": {"type": "boolean"},
+            "rgba_control_texture_uri": {"type": ["string", "null"]},
+            "max_pattern_tiling_scale": {"type": "number", "exclusiveMinimum": 0},
+            "color_tints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["channel", "semantic", "default_hex", "runtime_override_allowed"],
+                "properties": {
+                  "channel": {"enum": ["R", "G", "B", "A"]},
+                  "semantic": {"enum": ["PRIMARY_TEXTILE", "SECONDARY_ACCENT", "RIGID_HARDWARE", "ROUGHNESS_WEAR"]},
+                  "default_hex": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+                  "runtime_override_allowed": {"type": "boolean"}
+                }
+              }
+            },
+            "pattern_overlays": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["pattern_id", "tiling_frequency", "uv_channel_index", "offset_speed", "blend_mode"],
+                "properties": {
+                  "pattern_id": {"type": "string", "minLength": 1},
+                  "tiling_frequency": {"type": "array", "prefixItems": [{"type": "number", "exclusiveMinimum": 0}, {"type": "number", "exclusiveMinimum": 0}], "items": false},
+                  "uv_channel_index": {"type": "integer", "minimum": 0, "maximum": 7},
+                  "offset_speed": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "items": false},
+                  "blend_mode": {"enum": ["LERP_BASE_COLOR", "LERP_SUBSTRATE_SLAB_ROUGHNESS", "MULTIPLY", "OVERLAY"]}
+                }
+              }
+            }
           }
         }
       }
@@ -176,7 +266,10 @@
         "rig_profile": {"type": ["string", "null"]},
         "material_profile": {"type": ["string", "null"]},
         "physics_profile": {"type": ["string", "null"]},
+        "physics_solver": {"type": ["string", "null"]},
         "asset_uri": {"type": ["string", "null"]},
+        "runtime_status": {"enum": ["LIVE", "CANDIDATE", "UNAVAILABLE"]},
+        "live_runtime": {"type": "boolean"},
         "capabilities": {"type": "array", "items": {"type": "string"}}
       }
     }

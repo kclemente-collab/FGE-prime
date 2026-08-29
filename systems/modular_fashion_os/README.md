@@ -2,7 +2,7 @@
 
 **Object:** `FGE-SYS-MODULAR-FASHION-OS-001`  
 **Spec:** `FGE-SPEC-LAYERED-FASHION-DB-001`  
-**Version:** `0.1.0`  
+**Version:** `0.2.0`  
 **Status:** `IMPLEMENTED_BRANCH / SPEC_CANDIDATE / NOT_CANON_PROMOTED`  
 **Owner:** Keith Clemente / Feral Gloss Empire  
 **Created:** 2026-08-28  
@@ -127,7 +127,7 @@ See `schema/payloads/storage_module.json`, `display_module.json`, and `adapter_m
 Three coordinated systems:
 
 - Rigid Z-index. Higher `z_layer_index` occludes lower.
-- Pre-baked alpha clipping masks. Equipping a Layer 60 trench deactivates torso / upper-arm patches on Layer 10 and Layer 20. Expected savings up to ~40%.
+- Pre-baked alpha clipping masks. Equipping a Layer 60 trench deactivates torso / upper-arm patches on Layer 10 and Layer 20. The performance claim remains suppressed until the governed UE5 benchmark records measured evidence.
 - Dynamic runtime collision buffer. Collar / cuff / hem borders use a 2.5 mm push-out along normals.
 
 See `schema/payloads/clipping_occlusion_engine.json`.
@@ -152,7 +152,7 @@ See `schema/payloads/runtime_customization_parameters.json`.
 
 ## 9. Database Setup
 
-Prerequisites: PostgreSQL 15+, optional Docker, S3 or Cloudflare R2 for source/runtime files.
+Prerequisites: Python 3.10+, dependencies in `requirements.txt`, PostgreSQL 15+, optional Docker, S3 or Cloudflare R2 for source/runtime files.
 
 ```bash
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
@@ -187,11 +187,12 @@ Adapter stores a reference such as `FGE-FASH-EXAMPLE-COAT-001@0.1.0`. `authorize
 |-----------|-----------|--------|
 | Package | `FGE-SYS-MODULAR-FASHION-OS-001` | `IMPLEMENTED_BRANCH / NOT_CANON_PROMOTED` |
 | Layered DB spec | `FGE-SPEC-LAYERED-FASHION-DB-001` | `SPEC_CANDIDATE` |
-| GitHub persistence | `FGE-FASHION-STORAGE-GITHUB-001` | `IMPLEMENTED` |
-| LLM display compiler | `FGE-FASHION-LLM-DISPLAY-001` | `IMPLEMENTED` |
-| Character OS adapter | `FGE-FASHION-CHARACTER-OS-ADAPTER-001` | `IMPLEMENTED_GENERIC_HANDSHAKE` |
-| PostgreSQL DDL | `schema/layered_fashion_module.sql` | `SPEC_CANDIDATE` |
+| GitHub persistence | `FGE-FASHION-STORAGE-GITHUB-001` | `IMPLEMENTED_SCHEMA_VALIDATED_RECOVERABLE` |
+| LLM display compiler | `FGE-FASHION-LLM-DISPLAY-001` | `IMPLEMENTED_WITH_STATIC_FDE_COMPILER` |
+| Character OS adapter | `FGE-FASHION-CHARACTER-OS-ADAPTER-001` | `IMPLEMENTED_EXACT_PROJECTION_AND_EXECUTION_PLAN` |
+| PostgreSQL DDL | `schema/layered_fashion_module.sql` | `SPEC_CANDIDATE / INTEGRATION_TESTED` |
 | UE5 Substrate / Chaos live adapters | — | `CANDIDATE / NOT_IMPLEMENTED` |
+| UE5 performance claim | `FGE-BENCH-UE5-OCCLUSION-001` | `SUPPRESSED_PENDING_MEASUREMENT` |
 | Example asset | `FGE-FASH-EXAMPLE-COAT-001` | `NON_CANON_TEST_FIXTURE` |
 
 ---
@@ -220,4 +221,4 @@ FGE-SPEC-LAYERED-FASHION-DB-00X spec revisions
 python -m pytest systems/modular_fashion_os/tests/test_runtime_adapter.py
 ```
 
-*FGE-SPEC-LAYERED-FASHION-DB-001 v0.1.0 — candidate schema for Character OS wardrobe infrastructure. Not canon until operator promotion.*
+*FGE-SPEC-LAYERED-FASHION-DB-001 v0.2.0 — candidate schema for Character OS wardrobe infrastructure. Not canon until operator promotion.*

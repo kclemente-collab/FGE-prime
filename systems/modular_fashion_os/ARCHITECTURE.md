@@ -2,7 +2,7 @@
 
 **Object:** `FGE-SPEC-LAYERED-FASHION-DB-001`  
 **Package:** `FGE-SYS-MODULAR-FASHION-OS-001`  
-**Version:** `0.1.0`  
+**Version:** `0.2.0`  
 **Status:** `SPEC_CANDIDATE / NOT_CANON_PROMOTED`  
 **Date:** 2026-08-28  
 **Canon effect:** `NONE`
@@ -14,7 +14,7 @@ FGE Character OS needs clothes that behave like luxury inventory, not costume de
 Commercial outcomes:
 
 1. Asset preservation — engines cannot overwrite source.
-2. Performance — hollow-out occlusion can drop inner-mesh cost by up to ~40%.
+2. Performance — hollow-out occlusion is benchmarkable; no percentage claim is publishable until `FGE-BENCH-UE5-OCCLUSION-001` contains a verified UE5 run.
 3. Interoperability — one Nappa trench identity across UE5 Chaos and WebXR.
 
 Rights stay unknown until granted. Customization is tint and pattern overlay, not a new master albedo. Promotion to canon is operator-only.

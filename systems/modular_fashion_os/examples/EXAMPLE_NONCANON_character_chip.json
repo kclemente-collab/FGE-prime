@@ -1,12 +1,30 @@
 {
-  "character_id": "FGE-CHAR-EXAMPLE-001",
-  "version": "0.1.0",
-  "authority": "NON_CANON_TEST_FIXTURE",
-  "rig_profile": "FGE-RIG-HUMANOID-001",
-  "body_profile": "FGE-BODY-EXAMPLE-001",
-  "wardrobe_policy": {
+  "object_id": "FGE-CHARACTER-CHIP-FASHION-PROJECTION-001",
+  "schema_version": "1.0.0",
+  "character_ref": {
+    "object_id": "FGE-CHAR-EXAMPLE-001",
+    "version": "0.1.0",
+    "authority": "NON_CANON_TEST_FIXTURE"
+  },
+  "embodiment": {
+    "rig_profile_id": "FGE-RIG-HUMANOID-001",
+    "body_profile_id": "FGE-BODY-EXAMPLE-001"
+  },
+  "wardrobe_authority": {
+    "status": "AUTHORIZED",
     "allowed_asset_classes": ["GARMENT", "ACCESSORY", "FOOTWEAR", "JEWELRY"],
     "forbidden_asset_ids": [],
     "max_layer_priority": 100
-  }
+  },
+  "active_wardrobe": [
+    {
+      "asset_ref": "FGE-FASH-EXAMPLE-BASE-001@0.1.0",
+      "layer_class": "BASE",
+      "layer_priority": 10,
+      "coverage": {
+        "torso_front": "COVER",
+        "torso_back": "COVER"
+      }
+    }
+  ]
 }

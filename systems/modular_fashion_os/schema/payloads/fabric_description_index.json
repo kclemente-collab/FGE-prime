@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/schema/payloads/fabric_description_index.json",
+  "title": "FGE Fabric Description Index Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["global_fabric_id", "localization_manifest", "display_ui_anchors", "viewport_rendering_overrides"],
+  "properties": {
+    "global_fabric_id": {"type": "string", "minLength": 1},
+    "localization_manifest": {
+      "type": "object",
+      "required": ["display_name_en", "tactile_description"],
+      "additionalProperties": {"type": "string"},
+      "properties": {
+        "display_name_en": {"type": "string", "minLength": 1},
+        "tactile_description": {"type": "string", "minLength": 1}
+      }
+    },
+    "display_ui_anchors": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "icon_thumbnail_uri": {"type": ["string", "null"]},
+        "sound_profile_on_movement": {"type": ["string", "null"]}
+      }
+    },
+    "viewport_rendering_overrides": {"type": "object", "additionalProperties": true}
+  }
+}
