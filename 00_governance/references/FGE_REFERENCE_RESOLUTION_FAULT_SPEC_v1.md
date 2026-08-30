@@ -1,7 +1,7 @@
 # FGE Reference Resolution Fault & Circuit Breaker Specification
 
 OBJECT_ID: FGE-REFERENCE-RESOLUTION-FAULT-SPEC-001
-VERSION: 1.0.0
+VERSION: 1.1.0
 CLASS: FAILURE / CIRCUIT_BREAKER / GOVERNANCE_UI
 STATUS: PROPOSED / READY_FOR_TEST
 AUTHORITY: DIRECTOR
@@ -10,7 +10,7 @@ PARENT_PROTOCOL: FGE-REFERENCE-POINTER-PROTOCOL-001
 
 ## 1. Purpose
 
-Prevent unresolved references, broken GitHub targets, transient transport faults, version mismatches, blob mismatches, and missing anchors from being silently replaced with model memory or semantic guessing.
+Prevent unresolved references, registered-but-uninstalled sources, broken GitHub targets, transient transport faults, version mismatches, blob mismatches, and missing anchors from being silently replaced with model memory or semantic guessing.
 
 Core law:
 
@@ -31,8 +31,13 @@ REFERENCE
    ↓
 REGISTRY LOOKUP
    ↓
-TARGET RESOLUTION
-   ↓
+RESOLUTION_STATE
+   ├── SOURCE_MISSING → HARD LOCK
+   ├── DEPRECATED_TARGET → HARD LOCK
+   └── RESOLVABLE
+            ↓
+      TARGET RESOLUTION
+            ↓
 ┌───────────────────────┬─────────────────────┐
 │ deterministic failure │ transient failure   │
 │                       │                     │
@@ -52,63 +57,77 @@ TARGET RESOLUTION
 
 ### FGE-FAULT-REFERENCE-UNREGISTERED
 
-Meaning: The FGE OBJECT_ID does not exist in the pointer registry.
+The FGE OBJECT_ID does not exist in the pointer registry.
 
 This is not HTTP 404 because no physical target was resolved.
 
 Action: hard lock.
 
+### FGE-FAULT-REFERENCE-SOURCE-MISSING
+
+The reference ID is registered as a valid schema/catalog identity, but no physical source document has been installed yet.
+
+This preserves `UNKNOWN > INVENTED` while allowing future objects to be reserved without fake Git paths.
+
+Action: hard lock dependent execution. Do not guess or synthesize the missing source.
+
+### FGE-FAULT-REFERENCE-DEPRECATED-TARGET
+
+The reference is known, but its registered physical target is deprecated for new execution.
+
+Action: hard lock unless an explicit governed replacement is resolved.
+
 ### FGE-FAULT-RESOLUTION-404
 
-Meaning: A registered physical GitHub target was requested and GitHub definitively reports that it does not exist.
+A registered physical GitHub target was requested and GitHub definitively reports that it does not exist.
 
 Action: hard lock immediately. Do not retry deterministic 404 failures.
 
 ### FGE-FAULT-RESOLUTION-403
 
-Meaning: The target could not be accessed under current authority.
+The target could not be accessed under current authority.
 
 Action: hard lock. Preserve access/authority distinction.
 
 ### FGE-FAULT-RESOLUTION-TIMEOUT
 
-Meaning: Transport failed before resolution could be determined.
+Transport failed before resolution could be determined.
 
 Action: retry according to runtime policy. If exhausted, lock.
 
 ### FGE-FAULT-RESOLUTION-5XX
 
-Meaning: GitHub/server returned a transient server-side failure.
+GitHub/server returned a transient server-side failure.
 
 Action: retry according to runtime policy. If exhausted, lock.
 
 ### FGE-FAULT-VERSION-MISMATCH
 
-Meaning: Caller requested an explicit @VERSION that differs from the registered version.
+Caller requested an explicit @VERSION that differs from the registered version.
 
 Action: hard lock.
 
 ### FGE-FAULT-BLOB-MISMATCH
 
-Meaning: Retrieved content does not produce the registered Git blob SHA.
+Retrieved content does not produce the registered Git blob SHA.
 
 Action: hard lock. Treat as provenance/integrity failure.
 
 ### FGE-FAULT-ANCHOR-MISSING
 
-Meaning: The document exists but the requested Markdown section/field target does not.
+The document exists but the requested Markdown section/field target does not.
 
 Action: hard lock for requests dependent on that anchor.
 
 ### FGE-FAULT-SCHEMA-INVALID
 
-Meaning: The registry itself does not satisfy the typed registry contract.
+The registry itself does not satisfy the typed registry contract.
 
 Action: reject registry intake and lock dependent execution.
 
 ### FGE-FAULT-REGISTRY-COMPAT-DIVERGENCE
 
-Meaning: Legacy `pointers` compatibility view differs from authoritative `records` view.
+Legacy `pointers` compatibility view differs from authoritative `records` view.
 
 Action: reject registry intake.
 
@@ -123,6 +142,8 @@ RETRYABLE:
   - HTTP_5XX
 NON_RETRYABLE:
   - UNREGISTERED
+  - SOURCE_MISSING
+  - DEPRECATED_TARGET
   - 404
   - 403
   - VERSION_MISMATCH
@@ -258,6 +279,7 @@ Generation is permitted only when all required references satisfy:
 
 ```text
 REGISTERED
+AND RESOLUTION_STATE == RESOLVABLE
 AND TARGET_RESOLVED
 AND VERSION_VALID
 AND BLOB_VALID_IF_BOUND
@@ -273,4 +295,4 @@ NO VALID REFERENCE
 → NO GENERATION
 ```
 
-REF: FGE-REF-20260830-FAULT1
+REF: FGE-REF-20260830-FAULT2
