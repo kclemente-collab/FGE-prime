@@ -29,42 +29,32 @@
       "status": "PROPOSED / UNLOCKED",
       "authority": "DIRECTOR",
       "provenance": "USER_SUPPLIED_ARCHITECTURE_COMPILED_TO_REPOSITORY",
-      "aliases": [
-        "MVT.FGE.BRAIN.HEART",
-        "FGE.CHAR.SKELETON.PAIR"
-      ],
-      "tags": [
-        "FGE.CHAR",
-        "FGE.CHAR.SKELETON",
-        "FGE.CHAR.HEART",
-        "FGE.CHAR.BRAIN",
-        "FGE.REFERENCE"
-      ]
+      "aliases": ["MVT.FGE.BRAIN.HEART", "FGE.CHAR.SKELETON.PAIR"],
+      "tags": ["FGE.CHAR", "FGE.CHAR.SKELETON", "FGE.CHAR.HEART", "FGE.CHAR.BRAIN", "FGE.REFERENCE"]
     },
     {
       "reference_id": "FGE-REF-CHAR-SKELETON-INDEX-001",
-      "title": "FGE Character Skeleton · Reference Index System",
+      "title": "FGE Character Skeleton · Pointer-First Reference Index",
       "repository": "kclemente-collab/FGE-prime",
-      "path": "00_governance/references/FGE-CHAR-SKELETON-PAIR-001.md",
+      "path": "00_governance/references/FGE-REF-CHAR-SKELETON-INDEX-001.md",
       "git_ref": "main",
-      "commit_sha": "db127ffbd661ed6a931ea3b6e3351465292976bf",
-      "blob_sha": "f59a4e936c8839a0668792e06afb1f78f6b8f419",
-      "anchor": "fge-character-skeleton--reference-index-system",
-      "version": "1.0.0",
-      "status": "PROPOSED / READY_FOR_REGISTRATION",
+      "commit_sha": "5d2b7cf9d29d79ef753ee2f2ec498fa66a32f47e",
+      "blob_sha": "7953bb9f8776a693527f42ae5049445fd22dac4c",
+      "anchor": null,
+      "version": "1.1.0",
+      "status": "PROPOSED / SUPERSEDES_V1_IF_PROMOTED",
       "authority": "DIRECTOR",
-      "provenance": "USER_SUPPLIED_REFERENCE_INDEX_APPENDED_TO_ROOT_DOCUMENT",
-      "aliases": [
-        "MVT.FGE.BRAIN.HEART",
-        "FGE.CHAR.SKELETON.INDEX"
-      ],
-      "tags": [
-        "FGE.REFERENCE",
-        "FGE.CHAR",
-        "FGE.CHAR.SKELETON",
-        "FGE.CHAR.REGISTRY",
-        "FGE.CHAR.CONTINUITY"
-      ]
+      "provenance": "DIRECTOR_SUPPLIED_V1.1 · compiler-installed",
+      "aliases": ["FGE.CHAR.SKELETON.INDEX"],
+      "tags": ["FGE.REFERENCE", "FGE.CHAR", "FGE.CHAR.SKELETON", "FGE.CHAR.REGISTRY", "FGE.CHAR.CONTINUITY"],
+      "supersedes": "FGE-REF-CHAR-SKELETON-INDEX-001@1.0.0",
+      "prior": {
+        "path": "00_governance/references/FGE-CHAR-SKELETON-PAIR-001.md",
+        "version": "1.0.0",
+        "anchor": "fge-character-skeleton--reference-index-system",
+        "commit_sha": "db127ffbd661ed6a931ea3b6e3351465292976bf",
+        "blob_sha": "f59a4e936c8839a0668792e06afb1f78f6b8f419"
+      }
     },
     {
       "reference_id": "FGE-REFERENCE-POINTER-PROTOCOL-001",
@@ -79,14 +69,75 @@
       "status": "ACTIVE",
       "authority": "FGE GOVERNANCE",
       "provenance": "CREATED_IN_REPOSITORY",
-      "aliases": [
-        "FGE.GITHUB.REFERENCE.PROTOCOL"
-      ],
-      "tags": [
-        "FGE.REFERENCE",
-        "FGE.GITHUB",
-        "FGE.GOVERNANCE"
-      ]
+      "aliases": ["FGE.GITHUB.REFERENCE.PROTOCOL"],
+      "tags": ["FGE.REFERENCE", "FGE.GITHUB", "FGE.GOVERNANCE"]
+    },
+    {
+      "reference_id": "FGE-CHAR-CONTRADICTION-001",
+      "title": "Preserved Heart/Brain mapping conflict",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": "00_governance/references/FGE-REF-CHAR-SKELETON-INDEX-001.md",
+      "git_ref": "main",
+      "commit_sha": "5d2b7cf9d29d79ef753ee2f2ec498fa66a32f47e",
+      "blob_sha": "7953bb9f8776a693527f42ae5049445fd22dac4c",
+      "anchor": "preserved-semantic-conflict",
+      "version": "1.1.0",
+      "status": "UNRESOLVED_CONCEPT_MAPPING",
+      "authority": "DIRECTOR",
+      "provenance": "INDEX_V1.1",
+      "aliases": [],
+      "tags": ["FGE.CHAR.CONTRADICTION"]
+    },
+    {
+      "reference_id": "FGE-CHAR-HEART-NIKKI-001",
+      "title": "Nikki Heart instance (schema only)",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": null,
+      "git_ref": "main",
+      "commit_sha": null,
+      "blob_sha": null,
+      "anchor": null,
+      "version": "1.1.0",
+      "status": "REGISTERED_SCHEMA / SOURCE_MISSING",
+      "authority": "DIRECTOR",
+      "provenance": "INDEX_CATALOG",
+      "aliases": [],
+      "tags": ["FGE.CHAR.HEART"],
+      "relations": [{ "relation": "INSTANCE_OF", "target": "FGE-CHAR-HEART-001" }]
+    },
+    {
+      "reference_id": "FGE-CHAR-BRAIN-NIKKI-001",
+      "title": "Nikki Brain instance (schema only)",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": null,
+      "git_ref": "main",
+      "commit_sha": null,
+      "blob_sha": null,
+      "anchor": null,
+      "version": "1.1.0",
+      "status": "REGISTERED_SCHEMA / SOURCE_MISSING",
+      "authority": "DIRECTOR",
+      "provenance": "INDEX_CATALOG",
+      "aliases": [],
+      "tags": ["FGE.CHAR.BRAIN"],
+      "relations": [{ "relation": "INSTANCE_OF", "target": "FGE-CHAR-BRAIN-001" }]
+    },
+    {
+      "reference_id": "FGE-CHAR-FINGERPRINT-NIKKI-001",
+      "title": "Nikki fingerprint instance (schema only)",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": null,
+      "git_ref": "main",
+      "commit_sha": null,
+      "blob_sha": null,
+      "anchor": null,
+      "version": "1.1.0",
+      "status": "REGISTERED_SCHEMA / SOURCE_MISSING",
+      "authority": "DIRECTOR",
+      "provenance": "INDEX_CATALOG",
+      "aliases": [],
+      "tags": ["FGE.CHAR.FINGERPRINT"],
+      "relations": [{ "relation": "INSTANCE_OF", "target": "FGE-CHAR-FINGERPRINT-001" }]
     },
     {
       "reference_id": "FGE-REPO-HOME-001",
@@ -101,13 +152,8 @@
       "status": "ACTIVE",
       "authority": "REPOSITORY",
       "provenance": "EXISTING_REPOSITORY_DOCUMENT",
-      "aliases": [
-        "FGE.HOME"
-      ],
-      "tags": [
-        "FGE.REFERENCE",
-        "FGE.REPOSITORY.HOME"
-      ]
+      "aliases": ["FGE.HOME"],
+      "tags": ["FGE.REFERENCE", "FGE.REPOSITORY.HOME"]
     }
   ],
   "pointer_template": {
