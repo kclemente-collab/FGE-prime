@@ -3,141 +3,67 @@
   "$id": "https://github.com/kclemente-collab/FGE-prime/blob/main/00_governance/references/FGE_REFERENCE_POINTER_REGISTRY.schema.json",
   "title": "FGE Pointer Registry Schema",
   "type": "object",
-  "required": [
-    "registry_id",
-    "version",
-    "records"
-  ],
+  "required": ["registry_id", "version", "records"],
   "properties": {
-    "registry_id": {
-      "type": "string",
-      "pattern": "^FGE-REFERENCE-POINTER-REGISTRY-[0-9]+$"
-    },
-    "object_id": {
-      "type": "string",
-      "description": "Backward-compatible alias for registry_id.",
-      "pattern": "^FGE-REFERENCE-POINTER-REGISTRY-[0-9]+$"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
-    },
-    "class": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string"
-    },
-    "authority": {
-      "type": "string"
-    },
-    "canon_effect": {
-      "type": "string"
-    },
-    "repository": {
-      "type": "string",
-      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
-    },
-    "resolution_protocol": {
-      "type": "string",
-      "pattern": "^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$"
-    },
-    "schema_ref": {
-      "type": "string"
-    },
-    "validator_ref": {
-      "type": "string"
-    },
-    "fault_spec_ref": {
-      "type": "string"
-    },
-    "rules": {
-      "type": "object"
-    },
-    "records": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/pointerRecord"
-      }
-    },
-    "pointers": {
-      "type": "array",
-      "description": "Backward-compatible mirror of records. Runtime validator requires exact semantic parity.",
-      "items": {
-        "$ref": "#/$defs/pointerRecord"
-      }
-    },
-    "pointer_template": {
-      "type": "object"
-    },
-    "reference_syntax": {
-      "type": "object"
-    }
+    "registry_id": {"type": "string", "pattern": "^FGE-REFERENCE-POINTER-REGISTRY-[0-9]+$"},
+    "object_id": {"type": "string", "description": "Backward-compatible alias for registry_id.", "pattern": "^FGE-REFERENCE-POINTER-REGISTRY-[0-9]+$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "class": {"type": "string"},
+    "status": {"type": "string"},
+    "authority": {"type": "string"},
+    "canon_effect": {"type": "string"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "resolution_protocol": {"type": "string", "pattern": "^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$"},
+    "schema_ref": {"type": "string"},
+    "validator_ref": {"type": "string"},
+    "fault_spec_ref": {"type": "string"},
+    "rules": {"type": "object"},
+    "records": {"type": "array", "items": {"$ref": "#/$defs/pointerRecord"}},
+    "pointers": {"type": "array", "description": "Backward-compatible mirror of records. Runtime validator requires exact semantic parity.", "items": {"$ref": "#/$defs/pointerRecord"}},
+    "pointer_template": {"type": "object"},
+    "reference_syntax": {"type": "object"}
   },
   "$defs": {
-    "sha1OrNull": {
-      "type": ["string", "null"],
-      "pattern": "^[0-9a-f]{40}$"
+    "sha1OrNull": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "anchorOrNull": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9._/-]+$"},
+    "relation": {
+      "type": "object",
+      "required": ["relation", "target"],
+      "properties": {
+        "relation": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "pattern": "^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$"}
+      },
+      "additionalProperties": false
     },
-    "anchorOrNull": {
-      "type": ["string", "null"],
-      "pattern": "^[A-Za-z0-9._/-]+$"
+    "priorPointer": {
+      "type": "object",
+      "properties": {
+        "path": {"type": ["string", "null"]},
+        "version": {"type": "string"},
+        "anchor": {"$ref": "#/$defs/anchorOrNull"},
+        "commit_sha": {"$ref": "#/$defs/sha1OrNull"},
+        "blob_sha": {"$ref": "#/$defs/sha1OrNull"}
+      },
+      "additionalProperties": false
     },
     "pointerRecord": {
       "type": "object",
       "required": [
-        "reference_id",
-        "title",
-        "repository",
-        "path",
-        "git_ref",
-        "pointer_mode",
-        "version",
-        "lifecycle_status",
-        "lock_state",
-        "authority",
-        "provenance",
-        "aliases",
-        "tags"
+        "reference_id", "title", "repository", "path", "git_ref", "pointer_mode",
+        "resolution_state", "version", "lifecycle_status", "lock_state", "authority",
+        "provenance", "aliases", "tags"
       ],
       "properties": {
-        "reference_id": {
-          "type": "string",
-          "pattern": "^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "repository": {
-          "type": "string",
-          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
-        },
-        "path": {
-          "type": "string",
-          "minLength": 1,
-          "not": {
-            "pattern": "^(?:/|.*\\.\\./)"
-          }
-        },
-        "git_ref": {
-          "type": "string",
-          "minLength": 1,
-          "default": "main"
-        },
-        "pointer_mode": {
-          "type": "string",
-          "enum": ["LIVE", "FROZEN"]
-        },
-        "commit_sha": {
-          "$ref": "#/$defs/sha1OrNull"
-        },
-        "blob_sha": {
-          "$ref": "#/$defs/sha1OrNull"
-        },
-        "anchor": {
-          "$ref": "#/$defs/anchorOrNull"
-        },
+        "reference_id": {"type": "string", "pattern": "^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$"},
+        "title": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "path": {"type": ["string", "null"]},
+        "git_ref": {"type": "string", "minLength": 1, "default": "main"},
+        "pointer_mode": {"type": "string", "enum": ["LIVE", "FROZEN"]},
+        "resolution_state": {"type": "string", "enum": ["RESOLVABLE", "SOURCE_MISSING", "DEPRECATED_TARGET"]},
+        "commit_sha": {"$ref": "#/$defs/sha1OrNull"},
+        "blob_sha": {"$ref": "#/$defs/sha1OrNull"},
+        "anchor": {"$ref": "#/$defs/anchorOrNull"},
         "version": {
           "type": "string",
           "anyOf": [
@@ -145,49 +71,28 @@
             {"const": "CURRENT"}
           ]
         },
-        "status": {
-          "type": "string",
-          "description": "Compatibility display status. Typed governance lives in lifecycle_status + lock_state."
-        },
-        "lifecycle_status": {
-          "type": "string",
-          "enum": ["PROPOSED", "REVIEW", "ACTIVE", "PROMOTED", "DEPRECATED"]
-        },
-        "lock_state": {
-          "type": "string",
-          "enum": ["LOCKED", "UNLOCKED", "NONE"]
-        },
-        "authority": {
-          "type": "string",
-          "enum": [
-            "DIRECTOR",
-            "CORE_RUNTIME",
-            "SYSTEM_DEFAULT",
-            "FGE_GOVERNANCE",
-            "REPOSITORY"
-          ]
-        },
-        "provenance": {
-          "type": "string",
-          "minLength": 1
-        },
-        "aliases": {
-          "type": "array",
-          "items": {"type": "string"},
-          "uniqueItems": true
-        },
-        "tags": {
-          "type": "array",
-          "items": {"type": "string"},
-          "uniqueItems": true
-        }
+        "status": {"type": "string", "description": "Compatibility display status. Typed governance lives in lifecycle_status + lock_state + resolution_state."},
+        "lifecycle_status": {"type": "string", "enum": ["PROPOSED", "REVIEW", "ACTIVE", "PROMOTED", "DEPRECATED"]},
+        "lock_state": {"type": "string", "enum": ["LOCKED", "UNLOCKED", "NONE"]},
+        "authority": {"type": "string", "enum": ["DIRECTOR", "CORE_RUNTIME", "SYSTEM_DEFAULT", "FGE_GOVERNANCE", "REPOSITORY"]},
+        "provenance": {"type": "string", "minLength": 1},
+        "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "relations": {"type": "array", "items": {"$ref": "#/$defs/relation"}},
+        "supersedes": {"type": ["string", "null"]},
+        "prior": {"$ref": "#/$defs/priorPointer"}
       },
       "allOf": [
         {
-          "if": {
-            "properties": {"pointer_mode": {"const": "FROZEN"}},
-            "required": ["pointer_mode"]
-          },
+          "if": {"properties": {"resolution_state": {"const": "RESOLVABLE"}}, "required": ["resolution_state"]},
+          "then": {"properties": {"path": {"type": "string", "minLength": 1, "not": {"pattern": "^(?:/|.*\\.\\./)"}}}}
+        },
+        {
+          "if": {"properties": {"resolution_state": {"const": "SOURCE_MISSING"}}, "required": ["resolution_state"]},
+          "then": {"properties": {"path": {"type": "null"}, "commit_sha": {"type": "null"}, "blob_sha": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"pointer_mode": {"const": "FROZEN"}}, "required": ["pointer_mode"]},
           "then": {
             "required": ["commit_sha", "blob_sha"],
             "properties": {
