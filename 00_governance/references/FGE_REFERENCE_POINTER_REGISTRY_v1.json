@@ -22,8 +22,8 @@
       "repository": "kclemente-collab/FGE-prime",
       "path": "00_governance/references/FGE-CHAR-SKELETON-PAIR-001.md",
       "git_ref": "main",
-      "commit_sha": "242e7d1e881a14908aecf8755d4e28a970b255ec",
-      "blob_sha": "a30e025fc337a1c3938c19a2aaf224bb5eea718b",
+      "commit_sha": "db127ffbd661ed6a931ea3b6e3351465292976bf",
+      "blob_sha": "f59a4e936c8839a0668792e06afb1f78f6b8f419",
       "anchor": null,
       "version": "1.0.0",
       "status": "PROPOSED / UNLOCKED",
@@ -39,6 +39,31 @@
         "FGE.CHAR.HEART",
         "FGE.CHAR.BRAIN",
         "FGE.REFERENCE"
+      ]
+    },
+    {
+      "reference_id": "FGE-REF-CHAR-SKELETON-INDEX-001",
+      "title": "FGE Character Skeleton · Reference Index System",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": "00_governance/references/FGE-CHAR-SKELETON-PAIR-001.md",
+      "git_ref": "main",
+      "commit_sha": "db127ffbd661ed6a931ea3b6e3351465292976bf",
+      "blob_sha": "f59a4e936c8839a0668792e06afb1f78f6b8f419",
+      "anchor": "fge-character-skeleton--reference-index-system",
+      "version": "1.0.0",
+      "status": "PROPOSED / READY_FOR_REGISTRATION",
+      "authority": "DIRECTOR",
+      "provenance": "USER_SUPPLIED_REFERENCE_INDEX_APPENDED_TO_ROOT_DOCUMENT",
+      "aliases": [
+        "MVT.FGE.BRAIN.HEART",
+        "FGE.CHAR.SKELETON.INDEX"
+      ],
+      "tags": [
+        "FGE.REFERENCE",
+        "FGE.CHAR",
+        "FGE.CHAR.SKELETON",
+        "FGE.CHAR.REGISTRY",
+        "FGE.CHAR.CONTINUITY"
       ]
     },
     {
