@@ -1,109 +1,280 @@
-# FGE Reference Pointer Protocol v1.0
+# FGE Reference Pointer Protocol v1.1
 
 OBJECT_ID: FGE-REFERENCE-POINTER-PROTOCOL-001
-VERSION: 1.0.0
-CLASS: REFERENCE / RESOLUTION INFRASTRUCTURE
+VERSION: 1.1.0
+CLASS: REFERENCE / RESOLUTION / CIRCUIT_BREAKER INFRASTRUCTURE
 STATUS: ACTIVE_SPEC / UNLOCKED
 AUTHORITY: FGE GOVERNANCE
 CANON_EFFECT: NONE
 
-## Purpose
+## 1. Purpose
 
-Provide one stable FGE reference tag that can resolve to a document stored in GitHub without requiring the caller to know the repository path.
+Provide one stable FGE reference address that resolves to a governed GitHub document without requiring callers to know repository paths, while preventing unresolved pointers from falling back to model memory or semantic guessing.
 
-## Human syntax
+Core law:
+
+```text
+REFERENCE > MEMORY
+RESOLVE > INTERPRET
+SOURCE > SEMANTIC GUESS
+UNKNOWN > INVENTED
+```
+
+## 2. Human syntax
 
 ```text
 [REFERENCE: FGE-CHAR-SKELETON-PAIR-001]
-```
-
-Optional precision:
-
-```text
 [REFERENCE: FGE-CHAR-SKELETON-PAIR-001@1.0.0]
-[REFERENCE: FGE-CHAR-SKELETON-PAIR-001#section-or-field]
+[REFERENCE: FGE-CHAR-SKELETON-PAIR-001#core-law]
+[REFERENCE: FGE-CHAR-SKELETON-PAIR-001@1.0.0#core-law]
 ```
 
-## Resolution law
+`@VERSION` pins the governed version. `#ANCHOR` targets an internal document section/field.
 
-A reference ID is an FGE identity pointer, not a filename.
+## 3. Resolution order
 
-Resolution order:
+1. Extract exact FGE reference ID.
+2. Look up `reference_id` in `FGE_REFERENCE_POINTER_REGISTRY_v1.json`.
+3. Verify registry schema before accepting the record.
+4. Verify repository and repository-relative path.
+5. Resolve live or frozen Git target.
+6. Verify explicit `@VERSION` when present.
+7. Verify bound Git blob when `blob_sha` is present.
+8. Verify requested or registered anchor when present.
+9. Preserve record authority, lifecycle state, lock state, and provenance.
+10. Classify unresolved conflicts.
+11. Only then permit downstream execution.
 
-1. Find `reference_id` in `FGE_REFERENCE_POINTER_REGISTRY_v1.json`.
-2. Verify `repository`.
-3. Resolve `path`.
-4. Use `git_ref` for the live/current document view.
-5. If `commit_sha` or `blob_sha` is present, use it when an immutable historical source is required.
-6. Apply `anchor` or the caller's `#path` when supplied.
-7. Return `UNKNOWN_REFERENCE` if no registered pointer exists.
-8. Never infer or invent a missing target.
+No step may silently substitute internal model memory for a failed source resolution.
 
-## Pointer record
-
-```json
-{
-  "reference_id": "FGE-EXAMPLE-001",
-  "title": "Example document",
-  "repository": "kclemente-collab/FGE-prime",
-  "path": "path/to/document.md",
-  "git_ref": "main",
-  "commit_sha": null,
-  "blob_sha": null,
-  "anchor": null,
-  "version": "1.0.0",
-  "status": "ACTIVE",
-  "authority": "FGE GOVERNANCE",
-  "provenance": "REGISTERED",
-  "aliases": [],
-  "tags": []
-}
-```
-
-## Live vs frozen pointers
+## 4. Pointer modes
 
 ### LIVE
 
-`git_ref: main` resolves the current governed file at its registered path.
+`pointer_mode: LIVE`
 
-Use for operational documents expected to evolve.
+- `git_ref` is the current source branch/tag.
+- `commit_sha` and `blob_sha` may be present as provenance snapshots.
+- A changed document does not change reference identity unless the governed object identity changes.
 
 ### FROZEN
 
-`commit_sha` and/or `blob_sha` binds the reference to exact Git content.
+`pointer_mode: FROZEN`
 
-Use for evidence, locked specifications, releases, audits, tests, and historical provenance.
+- `commit_sha` is required.
+- `blob_sha` is required.
+- Resolution must verify immutable Git evidence.
+- Use for locked specifications, releases, audits, evidence, and historical provenance.
 
-A live pointer may also carry a frozen revision so current state and historical evidence remain distinguishable.
+## 5. Pointer authority law
 
-## Governance laws
+A pointer transports access, not authority.
 
-- REFERENCE != DOCUMENT.
-- REFERENCE != CANON.
-- PATH != IDENTITY.
-- MOVING A FILE MUST UPDATE THE REGISTRY.
-- CHANGING A DOCUMENT DOES NOT REQUIRE CHANGING ITS REFERENCE ID unless its identity changes.
-- VERSION CHANGES MUST BE EXPLICIT.
-- LOCKED/FROZEN references SHOULD carry immutable Git evidence.
-- UNKNOWN > INVENTED.
-- CONFLICT > SILENT RECONCILIATION.
+```text
+REFERENCE != DOCUMENT
+REFERENCE != CANON
+REFERENCE != AUTHORIZATION
+REFERENCE != MUTATION PERMISSION
+PATH != IDENTITY
+```
 
-## Registry
+The resolved object retains its own:
 
-Canonical registry file for this protocol:
+```text
+STATUS
+AUTHORITY
+VERSION
+PROVENANCE
+CANON_EFFECT
+LOCKS
+CONFLICTS
+```
+
+## 6. Registry contract
+
+Registry:
 
 ```text
 00_governance/references/FGE_REFERENCE_POINTER_REGISTRY_v1.json
 ```
 
-## Runtime behavior
-
-When an FGE runtime sees:
+Typed schema:
 
 ```text
-REFERENCE: <FGE-ID>
+00_governance/references/FGE_REFERENCE_POINTER_REGISTRY.schema.json
 ```
 
-it should treat `<FGE-ID>` as a lookup key into the reference registry, retrieve the GitHub target, and preserve the target's own authority/status/provenance rather than promoting it merely because it was referenced.
+Validator/resolver:
 
-REF: FGE-GITHUB-REF-20260830-PTR1
+```text
+00_governance/references/validate_reference_registry.py
+```
+
+The v1.1 registry uses authoritative `records` while preserving legacy `pointers` as a compatibility mirror. The validator must reject intake if the two views diverge.
+
+Typed governance is represented by:
+
+```text
+lifecycle_status
+lock_state
+authority
+pointer_mode
+```
+
+Legacy display `status` may remain for compatibility but is not the typed execution authority.
+
+## 7. Failure and circuit breaker law
+
+Fault specification:
+
+```text
+[REFERENCE: FGE-REFERENCE-RESOLUTION-FAULT-SPEC-001]
+```
+
+Failure classes include:
+
+```text
+FGE-FAULT-REFERENCE-UNREGISTERED
+FGE-FAULT-RESOLUTION-404
+FGE-FAULT-RESOLUTION-403
+FGE-FAULT-RESOLUTION-TIMEOUT
+FGE-FAULT-RESOLUTION-5XX
+FGE-FAULT-VERSION-MISMATCH
+FGE-FAULT-BLOB-MISMATCH
+FGE-FAULT-ANCHOR-MISSING
+FGE-FAULT-SCHEMA-INVALID
+FGE-FAULT-REGISTRY-COMPAT-DIVERGENCE
+```
+
+Distinction:
+
+```text
+UNREGISTERED != 404
+TIMEOUT != 404
+404 = REGISTERED PHYSICAL TARGET ABSENT
+```
+
+Execution:
+
+```text
+DETERMINISTIC FAILURE
+→ HARD LOCK
+→ FAULT RECORD
+→ NO GENERATION
+
+TRANSIENT FAILURE
+→ RETRY
+→ IF EXHAUSTED: LOCK
+→ FAULT RECORD
+→ NO GENERATION
+```
+
+Default retryable classes:
+
+```text
+TIMEOUT
+HTTP 5XX
+```
+
+404, 403, version mismatch, blob mismatch, anchor missing, unregistered IDs, and invalid registry schema are non-retryable by default.
+
+## 8. Visual fault boundary
+
+A diagnostic fault surface is a deterministic host-runtime/UI artifact.
+
+```text
+RESOLUTION FAILURE
+→ DO NOT CALL GROK IMAGINE / IMAGE MODEL
+→ RENDER DETERMINISTIC FAULT SURFACE
+```
+
+Exact fault IDs, reference strings, and governance labels must not depend on generative image text rendering.
+
+## 9. HEART / BRAIN conflict law
+
+Do not implement `HEART ALWAYS WINS` as an unconditional historical override.
+
+Use:
+
+```text
+HEART INVARIANT > UNPROMOTED BRAIN DELTA
+```
+
+If developmental evidence produces a possible identity breakpoint:
+
+```text
+HEART_N
+→ BRAIN EVIDENCE
+→ DELTA / CONFLICT
+→ BREAKPOINT REVIEW
+   ├─ REJECT → HEART_N preserved
+   └─ PROMOTE → HEART_N+1 → LINEAGE
+```
+
+Laws:
+
+- Unpromoted BRAIN evidence cannot override HEART invariants.
+- Promoted breakpoint evidence may authorize a new HEART state.
+- Previous HEART states remain preserved in lineage.
+- Neither object silently rewrites the other.
+
+## 10. Candidate contradiction presentation
+
+An intentionally rendered unresolved contradiction must be classified as:
+
+```text
+FGE-CHAR-STATE-UNCONFIRMED-CONTRADICTION
+```
+
+Governance uncertainty belongs in a telemetry wrapper, badge, frame, or metadata layer. It must not automatically mutate scene lighting, color, contrast, character body, or world aesthetics.
+
+```text
+FAULT_TELEMETRY != CHARACTER_EXPRESSION
+GOVERNANCE_UNCERTAINTY != WORLD_AESTHETIC
+```
+
+## 11. Reference ID grammar
+
+Canonical object-ID parser:
+
+```regex
+^FGE-(?:[A-Z0-9]+-)+[0-9]{3,}$
+```
+
+This replaces the defective `[A-Z0-T]` range and permits the complete A-Z namespace plus numeric segments.
+
+## 12. Runtime gate
+
+Generation or downstream execution is permitted only after required references are:
+
+```text
+REGISTERED
+AND TARGET_RESOLVED
+AND VERSION_VALID
+AND BLOB_VALID_IF_BOUND
+AND ANCHOR_VALID_IF_REQUIRED
+AND AUTHORITY_RESOLVED
+AND REQUIRED_CONFLICTS_CLASSIFIED
+```
+
+Otherwise:
+
+```text
+NO VALID REFERENCE
+→ NO GENERATION
+```
+
+## 13. Governance laws
+
+- MOVING A FILE MUST UPDATE THE REGISTRY.
+- CHANGING A DOCUMENT DOES NOT REQUIRE A NEW REFERENCE ID unless identity changes.
+- VERSION CHANGES MUST BE EXPLICIT.
+- FROZEN references require immutable Git evidence.
+- UNKNOWN > INVENTED.
+- CONFLICT > SILENT RECONCILIATION.
+- EVIDENCE != CANON.
+- DELTA != MUTATION.
+- MUTATION REQUIRES PROMOTION.
+- LOCK = EXPLICIT.
+
+REF: FGE-GITHUB-REF-20260830-PTR2
