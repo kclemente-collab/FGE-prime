@@ -1,0 +1,75 @@
+name: Validate FGE Reference Registry
+
+on:
+  push:
+    paths:
+      - "00_governance/references/**"
+      - ".github/workflows/validate-reference-registry.yml"
+  pull_request:
+    paths:
+      - "00_governance/references/**"
+      - ".github/workflows/validate-reference-registry.yml"
+
+jobs:
+  validate-reference-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install schema validator
+        run: python -m pip install --disable-pip-version-check jsonschema
+
+      - name: Compile resolver
+        run: python -m py_compile 00_governance/references/validate_reference_registry.py
+
+      - name: Validate typed registry
+        run: python 00_governance/references/validate_reference_registry.py
+
+      - name: Smoke test resolution and circuit breaker
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, str(Path("00_governance/references").resolve()))
+          import validate_reference_registry as fge
+
+          registry = json.loads(
+              Path("00_governance/references/FGE_REFERENCE_POINTER_REGISTRY_v1.json")
+              .read_text(encoding="utf-8")
+          )
+          resolver = fge.FGEReferenceResolver(registry)
+
+          good = resolver.resolve_text(
+              "[REFERENCE: FGE-CHAR-SKELETON-PAIR-001]"
+          )
+          assert good["valid"] is True, good
+          assert good["generation_locked"] is False, good
+          assert good["resolved"][0]["resolution_state"] == "RESOLVABLE", good
+
+          missing = resolver.resolve_text(
+              "[REFERENCE: FGE-CHAR-HEART-NIKKI-001]"
+          )
+          assert missing["valid"] is False, missing
+          assert missing["generation_locked"] is True, missing
+          assert (
+              missing["faults"][0]["fault_id"]
+              == "FGE-FAULT-REFERENCE-SOURCE-MISSING"
+          ), missing
+
+          bad_version = resolver.resolve_text(
+              "[REFERENCE: FGE-CHAR-SKELETON-PAIR-001@9.9.9]"
+          )
+          assert bad_version["generation_locked"] is True, bad_version
+          assert (
+              bad_version["faults"][0]["fault_id"]
+              == "FGE-FAULT-VERSION-MISMATCH"
+          ), bad_version
+          PY
