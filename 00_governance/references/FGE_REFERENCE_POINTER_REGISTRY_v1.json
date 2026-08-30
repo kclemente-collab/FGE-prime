@@ -17,6 +17,31 @@
   },
   "pointers": [
     {
+      "reference_id": "FGE-CHAR-SKELETON-PAIR-001",
+      "title": "FGE Character Skeleton · Template Pair",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": "00_governance/references/FGE-CHAR-SKELETON-PAIR-001.md",
+      "git_ref": "main",
+      "commit_sha": "242e7d1e881a14908aecf8755d4e28a970b255ec",
+      "blob_sha": "a30e025fc337a1c3938c19a2aaf224bb5eea718b",
+      "anchor": null,
+      "version": "1.0.0",
+      "status": "PROPOSED / UNLOCKED",
+      "authority": "DIRECTOR",
+      "provenance": "USER_SUPPLIED_ARCHITECTURE_COMPILED_TO_REPOSITORY",
+      "aliases": [
+        "MVT.FGE.BRAIN.HEART",
+        "FGE.CHAR.SKELETON.PAIR"
+      ],
+      "tags": [
+        "FGE.CHAR",
+        "FGE.CHAR.SKELETON",
+        "FGE.CHAR.HEART",
+        "FGE.CHAR.BRAIN",
+        "FGE.REFERENCE"
+      ]
+    },
+    {
       "reference_id": "FGE-REFERENCE-POINTER-PROTOCOL-001",
       "title": "FGE Reference Pointer Protocol v1.0",
       "repository": "kclemente-collab/FGE-prime",
