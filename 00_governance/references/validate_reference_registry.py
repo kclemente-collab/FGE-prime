@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""FGE reference pointer registry validator/resolver.
+"""FGE reference pointer registry validator/resolver v1.1.
 
 Execution law:
 REFERENCE > MEMORY
@@ -8,10 +8,10 @@ UNKNOWN > INVENTED
 TRANSIENT_FAILURE -> RETRY
 DETERMINISTIC_FAILURE -> LOCK
 
-This module validates the registry, extracts FGE references from raw text,
-resolves registered GitHub targets, distinguishes deterministic from transient
-resolution failures, and emits machine-readable fault records. It never falls
-back to semantic guessing or model memory.
+The resolver never substitutes semantic guessing or model memory for a failed
+reference. Registry records may intentionally exist before a physical source
+is installed; those records are classified SOURCE_MISSING and hard-lock any
+execution that depends on them.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -37,12 +37,13 @@ REF_PATTERN = re.compile(
     r"(?:#(?P<anchor>[A-Za-z0-9._/-]+))?"
     r"\s*\]"
 )
-
 FGE_ID_PATTERN = re.compile(r"^FGE-(?:[A-Z0-9]+-)+\d{3,}$")
 SHA1_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
 
 FAULT_UNREGISTERED = "FGE-FAULT-REFERENCE-UNREGISTERED"
+FAULT_SOURCE_MISSING = "FGE-FAULT-REFERENCE-SOURCE-MISSING"
+FAULT_DEPRECATED_TARGET = "FGE-FAULT-REFERENCE-DEPRECATED-TARGET"
 FAULT_404 = "FGE-FAULT-RESOLUTION-404"
 FAULT_403 = "FGE-FAULT-RESOLUTION-403"
 FAULT_TIMEOUT = "FGE-FAULT-RESOLUTION-TIMEOUT"
@@ -92,11 +93,9 @@ def git_blob_sha(content: bytes) -> str:
 
 
 def github_heading_anchor(heading: str) -> str:
-    """Approximate GitHub Markdown heading slugging for deterministic checks."""
     value = heading.strip().lower()
     value = re.sub(r"[^\w\- ]", "", value, flags=re.UNICODE)
-    value = value.replace(" ", "-")
-    return value
+    return value.replace(" ", "-")
 
 
 def markdown_anchors(text: str) -> set[str]:
@@ -114,17 +113,15 @@ def markdown_anchors(text: str) -> set[str]:
 
 
 def extract_references(text: str) -> List[ReferenceToken]:
-    found: List[ReferenceToken] = []
-    for match in REF_PATTERN.finditer(text):
-        found.append(
-            ReferenceToken(
-                raw=match.group(0),
-                reference_id=match.group("id"),
-                version_constraint=match.group("ver"),
-                anchor=match.group("anchor"),
-            )
+    return [
+        ReferenceToken(
+            raw=match.group(0),
+            reference_id=match.group("id"),
+            version_constraint=match.group("ver"),
+            anchor=match.group("anchor"),
         )
-    return found
+        for match in REF_PATTERN.finditer(text)
+    ]
 
 
 def _require(condition: bool, message: str) -> None:
@@ -134,19 +131,9 @@ def _require(condition: bool, message: str) -> None:
 
 def validate_record(record: Dict[str, Any], index: int) -> None:
     required = {
-        "reference_id",
-        "title",
-        "repository",
-        "path",
-        "git_ref",
-        "pointer_mode",
-        "version",
-        "lifecycle_status",
-        "lock_state",
-        "authority",
-        "provenance",
-        "aliases",
-        "tags",
+        "reference_id", "title", "repository", "path", "git_ref",
+        "pointer_mode", "resolution_state", "version", "lifecycle_status",
+        "lock_state", "authority", "provenance", "aliases", "tags",
     }
     missing = sorted(required - record.keys())
     _require(not missing, f"records[{index}] missing required fields: {missing}")
@@ -159,13 +146,22 @@ def validate_record(record: Dict[str, Any], index: int) -> None:
     _require(isinstance(repository, str) and repository.count("/") == 1,
              f"records[{index}].repository must be owner/repo")
 
-    path = record["path"]
-    _require(isinstance(path, str) and path and not path.startswith("/") and "../" not in path,
-             f"records[{index}].path must be repository-relative")
-
     pointer_mode = record["pointer_mode"]
     _require(pointer_mode in {"LIVE", "FROZEN"},
              f"records[{index}].pointer_mode invalid: {pointer_mode!r}")
+
+    resolution_state = record["resolution_state"]
+    _require(resolution_state in {"RESOLVABLE", "SOURCE_MISSING", "DEPRECATED_TARGET"},
+             f"records[{index}].resolution_state invalid: {resolution_state!r}")
+
+    path = record["path"]
+    if resolution_state == "RESOLVABLE":
+        _require(isinstance(path, str) and path and not path.startswith("/") and "../" not in path,
+                 f"records[{index}].path must be repository-relative when RESOLVABLE")
+    elif resolution_state == "SOURCE_MISSING":
+        _require(path is None, f"records[{index}].path must be null when SOURCE_MISSING")
+        _require(record.get("commit_sha") is None and record.get("blob_sha") is None,
+                 f"records[{index}] SOURCE_MISSING cannot claim Git evidence")
 
     version = record["version"]
     _require(version == "CURRENT" or (isinstance(version, str) and SEMVER_PATTERN.fullmatch(version)),
@@ -184,6 +180,8 @@ def validate_record(record: Dict[str, Any], index: int) -> None:
                  f"records[{index}].{sha_field} invalid")
 
     if pointer_mode == "FROZEN":
+        _require(resolution_state == "RESOLVABLE",
+                 f"records[{index}] FROZEN pointer must be RESOLVABLE")
         _require(bool(record.get("commit_sha")) and bool(record.get("blob_sha")),
                  f"records[{index}] FROZEN pointer requires commit_sha and blob_sha")
 
@@ -192,7 +190,6 @@ def validate_record(record: Dict[str, Any], index: int) -> None:
 
 
 def canonical_record(record: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalize a record for compatibility-view parity comparison."""
     return json.loads(json.dumps(record, sort_keys=True))
 
 
@@ -224,11 +221,11 @@ def validate_registry(registry: Dict[str, Any], schema: Optional[Dict[str, Any]]
         _require(isinstance(registry["pointers"], list), "pointers must be an array")
         records_map = {r["reference_id"]: canonical_record(r) for r in registry["records"]}
         pointers_map = {r["reference_id"]: canonical_record(r) for r in registry["pointers"]}
-        _require(records_map == pointers_map,
-                 "pointers compatibility mirror diverges from records")
+        if records_map != pointers_map:
+            raise RegistryValidationError(
+                f"{FAULT_REGISTRY_DIVERGENCE}: pointers compatibility mirror diverges from records"
+            )
 
-    # Use jsonschema when available, but retain the stdlib validator above so CI
-    # does not silently skip validation if the dependency is absent.
     if schema is not None:
         try:
             import jsonschema  # type: ignore
@@ -241,9 +238,7 @@ class FGEReferenceResolver:
     def __init__(self, registry_data: Dict[str, Any]):
         validate_registry(registry_data)
         self.registry = registry_data
-        self.records_map = {
-            record["reference_id"]: record for record in registry_data["records"]
-        }
+        self.records_map = {record["reference_id"]: record for record in registry_data["records"]}
 
     def resolve_token(self, token: ReferenceToken) -> Tuple[Optional[Dict[str, Any]], Optional[Fault]]:
         record = self.records_map.get(token.reference_id)
@@ -258,19 +253,29 @@ class FGEReferenceResolver:
             return None, Fault(
                 fault_id=FAULT_VERSION,
                 failed_reference=token.raw,
-                reason=(
-                    f"Required version {token.version_constraint}; "
-                    f"registry holds {record['version']}."
-                ),
+                reason=f"Required version {token.version_constraint}; registry holds {record['version']}.",
             )
 
+        resolution_state = record["resolution_state"]
+        if resolution_state == "SOURCE_MISSING":
+            return None, Fault(
+                fault_id=FAULT_SOURCE_MISSING,
+                failed_reference=token.raw,
+                reason="Reference is registered as a schema/catalog object but no physical source is installed.",
+            )
+        if resolution_state == "DEPRECATED_TARGET":
+            return None, Fault(
+                fault_id=FAULT_DEPRECATED_TARGET,
+                failed_reference=token.raw,
+                reason="Reference target is deprecated and cannot be used for new execution.",
+            )
+
+        path = record["path"]
+        assert isinstance(path, str)
         effective_anchor = token.anchor or record.get("anchor")
-        encoded_path = urllib.parse.quote(record["path"], safe="/")
+        encoded_path = urllib.parse.quote(path, safe="/")
         encoded_ref = urllib.parse.quote(record["git_ref"], safe="")
-        browser_url = (
-            f"https://github.com/{record['repository']}"
-            f"/blob/{encoded_ref}/{encoded_path}"
-        )
+        browser_url = f"https://github.com/{record['repository']}/blob/{encoded_ref}/{encoded_path}"
         if effective_anchor:
             browser_url += f"#{effective_anchor}"
 
@@ -285,9 +290,10 @@ class FGEReferenceResolver:
             "version": record["version"],
             "anchor": effective_anchor,
             "repository": record["repository"],
-            "path": record["path"],
+            "path": path,
             "git_ref": record["git_ref"],
             "pointer_mode": record["pointer_mode"],
+            "resolution_state": resolution_state,
             "commit_sha": record.get("commit_sha"),
             "blob_sha": record.get("blob_sha"),
             "browser_url": browser_url,
@@ -317,11 +323,7 @@ class FGEReferenceResolver:
         }
 
 
-def fetch_with_retry(
-    url: str,
-    retries: int = DEFAULT_RETRIES,
-    timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
-) -> Tuple[Optional[bytes], Optional[Fault]]:
+def fetch_with_retry(url: str, retries: int = DEFAULT_RETRIES, timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS) -> Tuple[Optional[bytes], Optional[Fault]]:
     last_fault: Optional[Fault] = None
     attempts = max(1, retries)
 
@@ -332,49 +334,15 @@ def fetch_with_retry(
                 return response.read(), None
         except urllib.error.HTTPError as exc:
             if exc.code == 404:
-                return None, Fault(
-                    fault_id=FAULT_404,
-                    failed_reference=None,
-                    reason="Registered physical target does not exist.",
-                    http_status=404,
-                    target_url=url,
-                    retryable=False,
-                )
+                return None, Fault(FAULT_404, None, "Registered physical target does not exist.", http_status=404, target_url=url)
             if exc.code == 403:
-                return None, Fault(
-                    fault_id=FAULT_403,
-                    failed_reference=None,
-                    reason="Registered target exists but access was denied.",
-                    http_status=403,
-                    target_url=url,
-                    retryable=False,
-                )
+                return None, Fault(FAULT_403, None, "Registered target exists but access was denied.", http_status=403, target_url=url)
             if 500 <= exc.code <= 599:
-                last_fault = Fault(
-                    fault_id=FAULT_5XX,
-                    failed_reference=None,
-                    reason=f"GitHub/server returned HTTP {exc.code}.",
-                    http_status=exc.code,
-                    target_url=url,
-                    retryable=True,
-                )
+                last_fault = Fault(FAULT_5XX, None, f"GitHub/server returned HTTP {exc.code}.", http_status=exc.code, target_url=url, retryable=True)
             else:
-                return None, Fault(
-                    fault_id=f"FGE-FAULT-RESOLUTION-{exc.code}",
-                    failed_reference=None,
-                    reason=f"Unexpected HTTP {exc.code}.",
-                    http_status=exc.code,
-                    target_url=url,
-                    retryable=False,
-                )
+                return None, Fault(f"FGE-FAULT-RESOLUTION-{exc.code}", None, f"Unexpected HTTP {exc.code}.", http_status=exc.code, target_url=url)
         except (TimeoutError, urllib.error.URLError) as exc:
-            last_fault = Fault(
-                fault_id=FAULT_TIMEOUT,
-                failed_reference=None,
-                reason=f"Transient transport failure: {exc}",
-                target_url=url,
-                retryable=True,
-            )
+            last_fault = Fault(FAULT_TIMEOUT, None, f"Transient transport failure: {exc}", target_url=url, retryable=True)
 
         if attempt < attempts:
             time.sleep(min(2 ** (attempt - 1), 4))
@@ -390,9 +358,9 @@ def verify_resolved_target(resolved: Dict[str, Any], content: bytes) -> Optional
         actual_blob = git_blob_sha(content)
         if actual_blob != expected_blob:
             return Fault(
-                fault_id=FAULT_BLOB,
-                failed_reference=resolved["reference_id"],
-                reason=f"Expected blob {expected_blob}; fetched {actual_blob}.",
+                FAULT_BLOB,
+                resolved["reference_id"],
+                f"Expected blob {expected_blob}; fetched {actual_blob}.",
                 target_url=resolved["raw_url"],
             )
 
@@ -401,22 +369,16 @@ def verify_resolved_target(resolved: Dict[str, Any], content: bytes) -> Optional
         text = content.decode("utf-8", errors="replace")
         if anchor not in markdown_anchors(text):
             return Fault(
-                fault_id=FAULT_ANCHOR,
-                failed_reference=resolved["reference_id"],
-                reason=f"Markdown anchor #{anchor} was not found in the resolved document.",
+                FAULT_ANCHOR,
+                resolved["reference_id"],
+                f"Markdown anchor #{anchor} was not found in the resolved document.",
                 target_url=resolved["browser_url"],
             )
     return None
 
 
-def verify_remote_resolution(
-    resolution: Dict[str, Any],
-    retries: int,
-    timeout_seconds: float,
-) -> Optional[Fault]:
-    content, fault = fetch_with_retry(
-        resolution["raw_url"], retries=retries, timeout_seconds=timeout_seconds
-    )
+def verify_remote_resolution(resolution: Dict[str, Any], retries: int, timeout_seconds: float) -> Optional[Fault]:
+    content, fault = fetch_with_retry(resolution["raw_url"], retries=retries, timeout_seconds=timeout_seconds)
     if fault:
         fault.failed_reference = resolution["reference_id"]
         return fault
@@ -434,23 +396,10 @@ def scan_text_files(paths: Iterable[Path]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate and resolve FGE reference pointers.")
-    parser.add_argument(
-        "--registry",
-        default="00_governance/references/FGE_REFERENCE_POINTER_REGISTRY_v1.json",
-        help="Path to registry JSON.",
-    )
-    parser.add_argument(
-        "--schema",
-        default="00_governance/references/FGE_REFERENCE_POINTER_REGISTRY.schema.json",
-        help="Path to registry JSON Schema.",
-    )
-    parser.add_argument(
-        "--scan",
-        action="append",
-        default=[],
-        help="Text/Markdown file to scan for [REFERENCE: ...] tokens. May be repeated.",
-    )
-    parser.add_argument("--check-remote", action="store_true", help="Fetch and verify registered GitHub targets.")
+    parser.add_argument("--registry", default="00_governance/references/FGE_REFERENCE_POINTER_REGISTRY_v1.json")
+    parser.add_argument("--schema", default="00_governance/references/FGE_REFERENCE_POINTER_REGISTRY.schema.json")
+    parser.add_argument("--scan", action="append", default=[], help="Text/Markdown file containing [REFERENCE: ...] tokens. Repeatable.")
+    parser.add_argument("--check-remote", action="store_true")
     parser.add_argument("--retries", type=int, default=DEFAULT_RETRIES)
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT_SECONDS)
     args = parser.parse_args()
@@ -460,8 +409,7 @@ def main() -> int:
         schema_path = Path(args.schema)
         schema = load_json(schema_path) if schema_path.exists() else None
         validate_registry(registry, schema)
-    except (OSError, json.JSONDecodeError, RegistryValidationError, Exception) as exc:
-        # Avoid hiding jsonschema errors if the optional validator is installed.
+    except Exception as exc:
         fault = Fault(
             fault_id=FAULT_SCHEMA,
             failed_reference=None,
@@ -489,18 +437,25 @@ def main() -> int:
         output["faults"].extend(result["faults"])
 
     if args.check_remote:
-        targets = output["resolved"] if args.scan else [
-            resolver.resolve_token(
-                ReferenceToken(
-                    raw=f"[REFERENCE: {record['reference_id']}]",
-                    reference_id=record["reference_id"],
-                    version_constraint=None,
-                    anchor=None,
+        if args.scan:
+            targets = output["resolved"]
+        else:
+            targets = []
+            for record in registry["records"]:
+                result, fault = resolver.resolve_token(
+                    ReferenceToken(
+                        raw=f"[REFERENCE: {record['reference_id']}]",
+                        reference_id=record["reference_id"],
+                        version_constraint=None,
+                        anchor=None,
+                    )
                 )
-            )[0]
-            for record in registry["records"]
-        ]
-        for target in [item for item in targets if item is not None]:
+                if fault:
+                    output["faults"].append(asdict(fault))
+                elif result:
+                    targets.append(result)
+
+        for target in targets:
             fault = verify_remote_resolution(target, args.retries, args.timeout)
             if fault:
                 output["faults"].append(asdict(fault))
