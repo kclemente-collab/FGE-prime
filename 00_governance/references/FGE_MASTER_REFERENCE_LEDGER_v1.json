@@ -1,0 +1,20 @@
+{
+  "ledger_id": "FGE-MASTER-REFERENCE-LEDGER-001",
+  "object_id": "FGE-MASTER-REFERENCE-LEDGER-001",
+  "version": "0.1.0",
+  "class": "DISCOVERY / RECONCILIATION / ADDRESS COVERAGE",
+  "status": "PROPOSED / UNLOCKED",
+  "authority": "DIRECTOR",
+  "canon_effect": "NONE",
+  "rules": {
+    "ledger_stores_addresses_not_bodies": true,
+    "ledger_gt_memory": true,
+    "discover_neq_register": true,
+    "discover_neq_canon": true,
+    "source_missing_neq_object_missing": true,
+    "reuse_gt_create": true,
+    "no_silent_canon_promotion": true,
+    "no_speculative_population": true
+  },
+  "entries": []
+}

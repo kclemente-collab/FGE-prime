@@ -1,0 +1,49 @@
+# FGE Universal Reference Resolution Bootstrap
+
+OBJECT_ID: FGE-RUNTIME-REFERENCE-BOOTSTRAP-001
+ALIAS: FGE-XRT-REFERENCE-BOOTSTRAP-001
+VERSION: 1.0.0
+CLASS: CROSS-RUNTIME / REFERENCE RESOLUTION
+TARGET_RUNTIME: GROK / GROK IMAGINE
+STATUS: PROPOSED / UNLOCKED
+AUTHORITY: DIRECTOR
+CANON_EFFECT: NONE
+PROVENANCE: FGE-XRT-20260830-GROK-BOOT-PASS1 · Director packet installed as source body
+
+## Prime law
+
+```text
+REFERENCE > MEMORY
+SOURCE > RECOLLECTION
+RESOLVE > INTERPRET
+UNKNOWN > INVENTED
+CONFLICT > SILENT_RECONCILIATION
+```
+
+## Alias law
+
+```text
+canonical_id = FGE-RUNTIME-REFERENCE-BOOTSTRAP-001
+alias        = FGE-XRT-REFERENCE-BOOTSTRAP-001
+alias != independent identity
+```
+
+## Scan discipline
+
+```text
+FACT != RECOMMENDATION
+RECOMMENDATION != STATE
+FUTURE_WRITE != CURRENT_RUNTIME_CONDITION
+```
+
+## Execution contract
+
+```text
+KNOWN + RESOLVABLE     → USE SOURCE
+KNOWN + SOURCE_MISSING → STOP
+UNKNOWN ID             → STOP
+CONFLICT               → PRESERVE
+VALID SOURCE           → EXECUTE
+```
+
+Grok Imagine is a downstream consumer. Required identity failure blocks generation.

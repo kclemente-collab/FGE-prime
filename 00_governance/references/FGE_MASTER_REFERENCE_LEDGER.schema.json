@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kclemente-collab/FGE-prime/blob/main/00_governance/references/FGE_MASTER_REFERENCE_LEDGER.schema.json",
+  "title": "FGE Master Reference Ledger Schema",
+  "type": "object",
+  "required": ["ledger_id", "version", "entries"],
+  "properties": {
+    "ledger_id": {"type": "string", "const": "FGE-MASTER-REFERENCE-LEDGER-001"},
+    "object_id": {"type": "string", "const": "FGE-MASTER-REFERENCE-LEDGER-001"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "class": {"type": "string"},
+    "status": {"type": "string"},
+    "authority": {"type": "string"},
+    "canon_effect": {"type": "string"},
+    "rules": {"type": "object"},
+    "entries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/ledgerEntry"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "ledgerEntry": {
+      "type": "object",
+      "required": [
+        "reference_id", "object_id", "title", "object_class",
+        "source_type", "resolution_state", "status", "authority", "provenance"
+      ],
+      "properties": {
+        "reference_id": {"type": ["string", "null"]},
+        "object_id": {"type": ["string", "null"]},
+        "title": {"type": "string"},
+        "object_class": {"type": "string"},
+        "owner_or_domain": {"type": ["string", "null"]},
+        "source_type": {"type": "string"},
+        "source_location": {"type": ["string", "null"]},
+        "repository": {"type": ["string", "null"]},
+        "path": {"type": ["string", "null"]},
+        "version": {"type": ["string", "null"]},
+        "status": {"type": "string"},
+        "authority": {"type": ["string", "null"]},
+        "provenance": {"type": "string"},
+        "hash_or_evidence": {"type": ["string", "null"]},
+        "relations": {"type": "array"},
+        "aliases": {"type": "array", "items": {"type": "string"}},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "resolution_state": {
+          "type": "string",
+          "enum": ["RESOLVABLE", "SOURCE_MISSING", "UNREGISTERED", "BROKEN_TARGET", "CONFLICT", "DEPRECATED", "UNKNOWN"]
+        },
+        "last_verified": {"type": ["string", "null"]},
+        "notes": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    }
+  }
+}
