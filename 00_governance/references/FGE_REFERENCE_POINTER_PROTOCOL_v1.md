@@ -1,7 +1,7 @@
 # FGE Reference Pointer Protocol v1.1
 
 OBJECT_ID: FGE-REFERENCE-POINTER-PROTOCOL-001
-VERSION: 1.1.0
+VERSION: 1.1.1
 CLASS: REFERENCE / RESOLUTION / CIRCUIT_BREAKER INFRASTRUCTURE
 STATUS: ACTIVE_SPEC / UNLOCKED
 AUTHORITY: FGE GOVERNANCE
@@ -36,18 +36,44 @@ UNKNOWN > INVENTED
 1. Extract exact FGE reference ID.
 2. Look up `reference_id` in `FGE_REFERENCE_POINTER_REGISTRY_v1.json`.
 3. Verify registry schema before accepting the record.
-4. Verify repository and repository-relative path.
-5. Resolve live or frozen Git target.
-6. Verify explicit `@VERSION` when present.
-7. Verify bound Git blob when `blob_sha` is present.
-8. Verify requested or registered anchor when present.
-9. Preserve record authority, lifecycle state, lock state, and provenance.
-10. Classify unresolved conflicts.
-11. Only then permit downstream execution.
+4. Inspect `resolution_state`.
+5. If `SOURCE_MISSING`, hard-lock dependent execution without inventing a target.
+6. If `DEPRECATED_TARGET`, hard-lock new execution unless an authorized replacement is resolved.
+7. If `RESOLVABLE`, verify repository and repository-relative path.
+8. Resolve live or frozen Git target.
+9. Verify explicit `@VERSION` when present.
+10. Verify bound Git blob when `blob_sha` is present.
+11. Verify requested or registered anchor when present.
+12. Preserve record authority, lifecycle state, lock state, and provenance.
+13. Classify unresolved conflicts.
+14. Only then permit downstream execution.
 
 No step may silently substitute internal model memory for a failed source resolution.
 
-## 4. Pointer modes
+## 4. Resolution states
+
+### RESOLVABLE
+
+A physical source path is installed and may be fetched subject to normal validation.
+
+### SOURCE_MISSING
+
+The identity is registered, but no source document is installed.
+
+This is an intentional continuity state, not a 404.
+
+```text
+REGISTERED_ID + SOURCE_MISSING
+→ KNOWN IDENTITY
+→ UNKNOWN CONTENT
+→ HARD LOCK DEPENDENT EXECUTION
+```
+
+### DEPRECATED_TARGET
+
+The identity remains known for continuity/history, but the current target cannot be used for new execution without governed redirection.
+
+## 5. Pointer modes
 
 ### LIVE
 
@@ -66,7 +92,7 @@ No step may silently substitute internal model memory for a failed source resolu
 - Resolution must verify immutable Git evidence.
 - Use for locked specifications, releases, audits, evidence, and historical provenance.
 
-## 5. Pointer authority law
+## 6. Pointer authority law
 
 A pointer transports access, not authority.
 
@@ -78,19 +104,9 @@ REFERENCE != MUTATION PERMISSION
 PATH != IDENTITY
 ```
 
-The resolved object retains its own:
+The resolved object retains its own STATUS, AUTHORITY, VERSION, PROVENANCE, CANON_EFFECT, LOCKS, and CONFLICTS.
 
-```text
-STATUS
-AUTHORITY
-VERSION
-PROVENANCE
-CANON_EFFECT
-LOCKS
-CONFLICTS
-```
-
-## 6. Registry contract
+## 7. Registry contract
 
 Registry:
 
@@ -112,18 +128,19 @@ Validator/resolver:
 
 The v1.1 registry uses authoritative `records` while preserving legacy `pointers` as a compatibility mirror. The validator must reject intake if the two views diverge.
 
-Typed governance is represented by:
+Typed execution fields:
 
 ```text
+resolution_state
+pointer_mode
 lifecycle_status
 lock_state
 authority
-pointer_mode
 ```
 
 Legacy display `status` may remain for compatibility but is not the typed execution authority.
 
-## 7. Failure and circuit breaker law
+## 8. Failure and circuit breaker law
 
 Fault specification:
 
@@ -135,6 +152,8 @@ Failure classes include:
 
 ```text
 FGE-FAULT-REFERENCE-UNREGISTERED
+FGE-FAULT-REFERENCE-SOURCE-MISSING
+FGE-FAULT-REFERENCE-DEPRECATED-TARGET
 FGE-FAULT-RESOLUTION-404
 FGE-FAULT-RESOLUTION-403
 FGE-FAULT-RESOLUTION-TIMEOUT
@@ -149,7 +168,8 @@ FGE-FAULT-REGISTRY-COMPAT-DIVERGENCE
 Distinction:
 
 ```text
-UNREGISTERED != 404
+UNREGISTERED != SOURCE_MISSING
+SOURCE_MISSING != 404
 TIMEOUT != 404
 404 = REGISTERED PHYSICAL TARGET ABSENT
 ```
@@ -169,16 +189,9 @@ TRANSIENT FAILURE
 → NO GENERATION
 ```
 
-Default retryable classes:
+Default retryable classes are TIMEOUT and HTTP 5XX. Source-missing, deprecated target, 404, 403, version mismatch, blob mismatch, anchor missing, unregistered IDs, and invalid schema are non-retryable by default.
 
-```text
-TIMEOUT
-HTTP 5XX
-```
-
-404, 403, version mismatch, blob mismatch, anchor missing, unregistered IDs, and invalid registry schema are non-retryable by default.
-
-## 8. Visual fault boundary
+## 9. Visual fault boundary
 
 A diagnostic fault surface is a deterministic host-runtime/UI artifact.
 
@@ -190,7 +203,7 @@ RESOLUTION FAILURE
 
 Exact fault IDs, reference strings, and governance labels must not depend on generative image text rendering.
 
-## 9. HEART / BRAIN conflict law
+## 10. HEART / BRAIN conflict law
 
 Do not implement `HEART ALWAYS WINS` as an unconditional historical override.
 
@@ -218,7 +231,7 @@ Laws:
 - Previous HEART states remain preserved in lineage.
 - Neither object silently rewrites the other.
 
-## 10. Candidate contradiction presentation
+## 11. Candidate contradiction presentation
 
 An intentionally rendered unresolved contradiction must be classified as:
 
@@ -233,7 +246,7 @@ FAULT_TELEMETRY != CHARACTER_EXPRESSION
 GOVERNANCE_UNCERTAINTY != WORLD_AESTHETIC
 ```
 
-## 11. Reference ID grammar
+## 12. Reference ID grammar
 
 Canonical object-ID parser:
 
@@ -243,12 +256,13 @@ Canonical object-ID parser:
 
 This replaces the defective `[A-Z0-T]` range and permits the complete A-Z namespace plus numeric segments.
 
-## 12. Runtime gate
+## 13. Runtime gate
 
 Generation or downstream execution is permitted only after required references are:
 
 ```text
 REGISTERED
+AND RESOLUTION_STATE == RESOLVABLE
 AND TARGET_RESOLVED
 AND VERSION_VALID
 AND BLOB_VALID_IF_BOUND
@@ -264,7 +278,7 @@ NO VALID REFERENCE
 → NO GENERATION
 ```
 
-## 13. Governance laws
+## 14. Governance laws
 
 - MOVING A FILE MUST UPDATE THE REGISTRY.
 - CHANGING A DOCUMENT DOES NOT REQUIRE A NEW REFERENCE ID unless identity changes.
@@ -277,4 +291,4 @@ NO VALID REFERENCE
 - MUTATION REQUIRES PROMOTION.
 - LOCK = EXPLICIT.
 
-REF: FGE-GITHUB-REF-20260830-PTR2
+REF: FGE-GITHUB-REF-20260830-PTR3
