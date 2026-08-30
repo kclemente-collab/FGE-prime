@@ -1,0 +1,84 @@
+{
+  "object_id": "FGE-REFERENCE-POINTER-REGISTRY-001",
+  "version": "1.0.0",
+  "class": "REFERENCE_REGISTRY",
+  "status": "ACTIVE / UNLOCKED",
+  "authority": "FGE GOVERNANCE",
+  "canon_effect": "NONE",
+  "repository": "kclemente-collab/FGE-prime",
+  "resolution_protocol": "FGE-REFERENCE-POINTER-PROTOCOL-001",
+  "rules": {
+    "reference_is_identity_pointer": true,
+    "path_is_not_identity": true,
+    "unknown_over_invented": true,
+    "conflict_preserved": true,
+    "live_pointer_default_ref": "main",
+    "frozen_pointer_requires_git_evidence": true
+  },
+  "pointers": [
+    {
+      "reference_id": "FGE-REFERENCE-POINTER-PROTOCOL-001",
+      "title": "FGE Reference Pointer Protocol v1.0",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": "00_governance/references/FGE_REFERENCE_POINTER_PROTOCOL_v1.md",
+      "git_ref": "main",
+      "commit_sha": "32355fc610945ade2d8bbe9b222a1621690ded0d",
+      "blob_sha": "710b16a8e07d154d5a4df53a7a3300779b935136",
+      "anchor": null,
+      "version": "1.0.0",
+      "status": "ACTIVE",
+      "authority": "FGE GOVERNANCE",
+      "provenance": "CREATED_IN_REPOSITORY",
+      "aliases": [
+        "FGE.GITHUB.REFERENCE.PROTOCOL"
+      ],
+      "tags": [
+        "FGE.REFERENCE",
+        "FGE.GITHUB",
+        "FGE.GOVERNANCE"
+      ]
+    },
+    {
+      "reference_id": "FGE-REPO-HOME-001",
+      "title": "FGE Prime Repository Home",
+      "repository": "kclemente-collab/FGE-prime",
+      "path": "00_Home.md",
+      "git_ref": "main",
+      "commit_sha": null,
+      "blob_sha": "6c595d878ba528a7e6ae69f12b9c75a8e0bca101",
+      "anchor": null,
+      "version": "CURRENT",
+      "status": "ACTIVE",
+      "authority": "REPOSITORY",
+      "provenance": "EXISTING_REPOSITORY_DOCUMENT",
+      "aliases": [
+        "FGE.HOME"
+      ],
+      "tags": [
+        "FGE.REFERENCE",
+        "FGE.REPOSITORY.HOME"
+      ]
+    }
+  ],
+  "pointer_template": {
+    "reference_id": "FGE-<DOMAIN>-<OBJECT>-###",
+    "title": "<human title>",
+    "repository": "kclemente-collab/FGE-prime",
+    "path": "<repository-relative-path>",
+    "git_ref": "main",
+    "commit_sha": null,
+    "blob_sha": null,
+    "anchor": null,
+    "version": "<version>",
+    "status": "ACTIVE",
+    "authority": "<authority>",
+    "provenance": "REGISTERED",
+    "aliases": [],
+    "tags": []
+  },
+  "reference_syntax": {
+    "object": "[REFERENCE: FGE-ID]",
+    "version": "[REFERENCE: FGE-ID@VERSION]",
+    "anchor": "[REFERENCE: FGE-ID#ANCHOR]"
+  }
+}
