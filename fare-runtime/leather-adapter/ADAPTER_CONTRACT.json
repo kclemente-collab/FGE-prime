@@ -1,0 +1,17 @@
+{
+  "Object_ID": "FGE-ADP-LEATHER-FARE-001",
+  "Version": "1.0.0",
+  "Status": "IMPLEMENTED",
+  "Canon_Effect": "NONE",
+  "Matrix_ID": "FGE-MAT-LEATHER-FARE-001",
+  "Loop": "TOKEN > HEART_FINGERPRINT > BRAIN_DELTA > FARE_ARE > DMI_PACKET",
+  "Invariants": {
+    "PoreFrequency": 4.0,
+    "MaxStretch": 1.45,
+    "Heart_Hex": "#4A2C11",
+    "Color_Shift_Cap_Pct": 25.0,
+    "UV2_Gutter": 0.05,
+    "Horizontal_Blend": "REQUIRED",
+    "Heart_Rewrite": false
+  }
+}
