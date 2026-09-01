@@ -1,0 +1,12 @@
+{
+  "Object_ID": "FGE-WIRING-LEATHER-SUBSTRATE-BP-001",
+  "Version": "1.0.0",
+  "Status": "IMPLEMENTED",
+  "Binds": {
+    "Substrate": "FGE-UE5-SUBSTRATE-LEATHER-001",
+    "Blueprint": "FGE-BP-LEATHER-PARSE-001",
+    "Adapter": "FGE-ADP-LEATHER-FARE-001"
+  },
+  "Locked_On_Every_Apply": {"PoreFrequency": 4.0, "MaxStretch": 1.45},
+  "Graph_Stack": ["SLAB_HIDE", "SLAB_WEAR", "Horizontal Blend", "SLAB_OVERLAY", "Vertical Layer", "Substrate Output"]
+}
