@@ -1,0 +1,22 @@
+{
+  "object_id": "FGE-BENCH-UE5-OCCLUSION-001",
+  "version": "1.0.0",
+  "status": "PENDING_EXTERNAL_UE5_RUN",
+  "canon_effect": "NONE",
+  "evidence_status": "PENDING",
+  "claim_publishable": false,
+  "run_id": null,
+  "ue5_version": null,
+  "hardware_profile": null,
+  "sample_count": null,
+  "baseline_gpu_frame_ms": null,
+  "occlusion_gpu_frame_ms": null,
+  "controls": {
+    "same_character": true,
+    "same_animation": true,
+    "same_camera": true,
+    "same_quality_settings": true,
+    "warmup_frames": 300,
+    "minimum_sample_frames": 600
+  }
+}

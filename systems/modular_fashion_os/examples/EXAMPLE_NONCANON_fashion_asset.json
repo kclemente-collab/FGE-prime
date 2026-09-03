@@ -1,0 +1,176 @@
+{
+  "object_id": "FGE-FASH-EXAMPLE-COAT-001",
+  "version": "0.1.0",
+  "status": "NON_CANON_TEST_FIXTURE",
+  "canon_effect": "NONE",
+  "identity": {
+    "asset_id": "FGE-FASH-EXAMPLE-COAT-001",
+    "asset_class": "GARMENT",
+    "display_name": "Example Heavy Nappa Coat",
+    "sku": null,
+    "brand": "FGE_TEST_FIXTURE",
+    "rarity": null
+  },
+  "provenance": {
+    "source_type": "FGE_GENERATED",
+    "creator_id": "FGE-MODULAR-FASHION-OS-TEST",
+    "source_uri": null,
+    "content_hash": null,
+    "created_at": "2026-08-28T00:00:00Z",
+    "authority_notes": "Synthetic fixture only. Not a character wardrobe canon object."
+  },
+  "rights": {
+    "commercial_use": false,
+    "rental_allowed": false,
+    "redistribution_allowed": false,
+    "license_id": "FGE-LICENSE-TEST-ONLY-001",
+    "modification_operations": {
+      "color_tint": true,
+      "pattern_overlay": true,
+      "material_substitution": false,
+      "fit_morph": true
+    },
+    "platform_authorizations": [
+      {
+        "target": "UNREAL_ENGINE_5",
+        "status": "AUTHORIZED",
+        "license_id": "FGE-LICENSE-TEST-ONLY-001",
+        "expires_at": null
+      }
+    ],
+    "valuation": {
+      "currency": "USD",
+      "base_value_minor": 0,
+      "royalty_bps": 0,
+      "recipients": []
+    }
+  },
+  "garment": {
+    "geometry": {
+      "master_format": "USD",
+      "master_uri": null,
+      "bind_pose": "A_POSE",
+      "vertex_count": null
+    },
+    "fit": {
+      "source_body_profile": "FGE-BODY-EXAMPLE-001",
+      "rig_compatibility": ["FGE-RIG-HUMANOID-001"],
+      "anchor_points": ["SPINE_03", "CLAVICLE_L", "CLAVICLE_R"],
+      "morph_strategy": "PROFILE_GUIDED_WARP",
+      "fit_tolerance_mm": 3.0
+    },
+    "layering": {
+      "layer_class": "OVERWEAR",
+      "layer_priority": 60,
+      "compatible_over_layers": [],
+      "compatible_under_layers": ["BASE", "INNER", "OUTER"],
+      "occlusion": {
+        "deactivation_zones_skin": ["torso_front", "torso_back", "upper_arm_left", "upper_arm_right"],
+        "push_out_distance_mm": 2.5,
+        "collision_channel": "ECC_GameTraceChannel_ClothingInteraction",
+        "normal_offset_falloff_power": 1.2
+      }
+    },
+    "coverage": {
+      "torso_front": "COVER",
+      "torso_back": "COVER",
+      "upper_arm_left": "COVER",
+      "upper_arm_right": "COVER",
+      "forearm_left": "COVER",
+      "forearm_right": "COVER",
+      "neck": "PARTIAL",
+      "hands": "OPEN"
+    },
+    "material": {
+      "material_chip_id": "FGE-MAT-EXAMPLE-NAPPA-001",
+      "fabric_id": "fab_lthr_nappa_01",
+      "substrate_shading_topology": "Substrate_Slab_Blended",
+      "physical_intent": {
+        "mass_class": "HEAVY",
+        "bend_response": "STRUCTURED",
+        "stretch_response": "LOW"
+      },
+      "optical_intent": {
+        "surface": "SEMI_MATTE",
+        "anisotropy": "LOW_TO_MODERATE"
+      },
+      "tactile_intent": {
+        "hand": "SUPPLE_DENSE"
+      },
+      "aging_intent": {
+        "crease_memory": "VISIBLE",
+        "abrasion": "UNKNOWN"
+      }
+    },
+    "physics": {
+      "profile_id": "FGE-PHYS-EXAMPLE-HEAVY-LEATHER-001",
+      "solver_neutral": {
+        "drape": "LOW",
+        "bend": "STIFF",
+        "damping": "MODERATE",
+        "self_collision": "RECOMMENDED"
+      },
+      "fallback_behavior": "SKINNED_APPROXIMATION"
+    },
+    "customization": {
+      "enabled": false,
+      "rgba_control_texture_uri": null,
+      "max_pattern_tiling_scale": 8.0,
+      "color_tints": [],
+      "pattern_overlays": []
+    }
+  },
+  "representations": {
+    "source": [
+      {
+        "representation_id": "REP-SOURCE-USD-001",
+        "format": "USD",
+        "uri": null,
+        "lod": null,
+        "hash": null,
+        "status": "PLACEHOLDER"
+      }
+    ],
+    "runtime": [
+      {
+        "representation_id": "REP-RUNTIME-GLB-001",
+        "format": "GLB",
+        "uri": null,
+        "lod": 0,
+        "hash": null,
+        "status": "PLACEHOLDER"
+      }
+    ],
+    "adapters": [
+      {
+        "adapter_id": "ADAPTER-UE5-EXAMPLE-001",
+        "target": "UNREAL_ENGINE_5",
+        "rig_profile": "FGE-RIG-HUMANOID-001",
+        "material_profile": "UE5_SUBSTRATE_CANDIDATE",
+        "physics_profile": "CHAOS_CLOTH_CANDIDATE",
+        "physics_solver": "UE5_CHAOS_CLOTHING",
+        "asset_uri": null,
+        "runtime_status": "CANDIDATE",
+        "live_runtime": false,
+        "capabilities": ["RIG_BIND", "MATERIAL_TRANSLATION", "PHYSICS_TRANSLATION", "CLIPPING_OCCLUSION"]
+      }
+    ]
+  },
+  "validation": {
+    "state": "PARTIAL",
+    "gates": {
+      "IDENTITY": "PASSED",
+      "GEOMETRY": "PENDING",
+      "FIT": "PENDING",
+      "MATERIAL": "PARTIAL",
+      "PHYSICS": "PARTIAL",
+      "RIGHTS": "PASSED"
+    },
+    "conflicts": [],
+    "unknowns": [
+      "garment.geometry.master_uri",
+      "representations.source[0].uri",
+      "representations.runtime[0].uri"
+    ]
+  }
+}
