@@ -1,0 +1,32 @@
+{
+  "Object_ID": "FGE-ADP-SKIN-PRESET-001",
+  "Family_ID": "FGE-SKN-FAM-CARMEL-001",
+  "Parent_Preset": "SKN-PST-CARMEL-001",
+  "Version": "0.1.0",
+  "Status": "INSTALLED_RUNTIME",
+  "Lock": "NOT_LOCKED",
+  "Canon_Effect": "NONE",
+  "Summon_Priority": "BEFORE_GROK_DEFAULT_SKIN",
+  "Loop": "TOKEN > SKIN_GENOME > MIRROR > FARE_ARE > SUMMON_PACKET",
+  "Invariants": {
+    "SSS_Foundation": "REQUIRED",
+    "Finish_Architecture": "ADDITIVE_ONLY",
+    "Tone_Class": "CARMEL",
+    "Tone_Alias": ["CARAMEL"],
+    "Parent_Sheen": "DRY_SATIN",
+    "Parent_Porosity": "ASYM",
+    "Parent_Light": "NATURAL",
+    "Anisotropy_Installed": 0.2,
+    "Anisotropy_Candidate_Stored": [0.50, 0.65],
+    "Character_Lock": false,
+    "Heart_Rewrite": false
+  },
+  "Hard_Gates": [
+    "SKN-ID-001",
+    "SKN-SSS-001",
+    "SKN-ADD-001",
+    "SKN-OIL-001",
+    "SKN-POR-001",
+    "SKN-LIT-001"
+  ]
+}
