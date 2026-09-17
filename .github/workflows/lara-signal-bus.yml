@@ -1,0 +1,58 @@
+name: FGE Lara Signal Bus
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "journalist/dispatches/dispatch_register.jsonl"
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fge-lara-signal-bus
+  cancel-in-progress: false
+
+jobs:
+  signal-bus:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run acceptance tests
+        run: |
+          python -m pip install --disable-pip-version-check pytest
+          pytest -q journalist/signal_bus/test_bus.py
+
+      - name: Process dispatch register
+        run: python journalist/signal_bus/bus.py run
+
+      - name: Validate signal ledger
+        run: python journalist/signal_bus/bus.py validate
+
+      - name: Persist bus deltas
+        run: |
+          if git diff --quiet -- journalist/signal_bus journalist/dispatches/feedback_register.jsonl; then
+            echo "No bus delta to commit."
+            exit 0
+          fi
+          git config user.name "FGE Lara Signal Bus"
+          git config user.email "lara-signal-bus@users.noreply.github.com"
+          git add journalist/signal_bus/signals.jsonl \
+                  journalist/signal_bus/acks.jsonl \
+                  journalist/signal_bus/receipts.jsonl \
+                  journalist/signal_bus/state.json \
+                  journalist/dispatches/feedback_register.jsonl
+          git commit -m "Lara bus: route dispatch deltas and persist receipts"
+          git push
