@@ -11,6 +11,13 @@
     "aab964712c1551a313b608c1026df42c924f1ccbd1cf84fea5991075950c127b",
     "ca069a58dc3c8bb8de49222289d901df5b77464bbdc1818d43967fee92f35196"
   ],
-  "status": "INSTALLED_UNVERIFIED",
+  "status": "VERIFIED_ACTIVE",
+  "verification": {
+    "workflow_run": 35270788556,
+    "job": 105369275986,
+    "ack": "FGE-ACK-LARA-BUS-ACCEPT-001",
+    "delta_receipt": "FGE-DELTA-LARA-BUS-ACCEPT-001",
+    "feedback_dispatch": "FGE-FEEDBACK-LARA-BUS-ACCEPT-001"
+  },
   "version": "1.0.0"
 }
