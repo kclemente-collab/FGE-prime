@@ -1,0 +1,77 @@
+# FGE DRAGON EFFECT INFOGRAPHIC ARCHITECTURE
+
+OBJECT_ID: FGE-DRAGON-EFFECT-INFOGRAPHIC-001
+VERSION: 1.0.0
+STATUS: ACTIVE_ARCH / VISUAL_SPEC
+DATE: 2026-09-17
+CANON_EFFECT: NONE
+AUTOMATION_EFFECT: AUTOMATION_RELEVANT
+AUTHORITY_EFFECT: NONE
+
+## Core Composition
+
+DORMANT / FRAGMENTED / OLD
+            ↓
+        DRAGON EFFECT
+            ↓
+RECOVER -> REPAIR -> ADAPT -> CONNECT -> COMPOUND
+            ↓
+        REVIVED SYSTEM
+            ↓
+     NEW CAPABILITY FIELD
+
+## Pillar Frame
+
+                  AUTHORITY
+              who may act/change
+                     │
+                     ▼
+CANON --------- DRAGON EFFECT --------- AUTOMATION
+what survives      fingerprint          what can run
+as truth                                  now
+
+## Value Equation
+
+SYSTEM VALUE BEFORE
++ RECOVERED VALUE
++ NEW INFRASTRUCTURE
++ NEW CONNECTIONS
++ NOVEL EMERGENCE
+= SYSTEM VALUE AFTER
+
+## Fingerprint Ring
+
+1. LEGACY VALUE RECOVERED
+2. ORIGINAL PROVENANCE PRESERVED
+3. BROKEN EDGES IDENTIFIED
+4. MISSING INFRASTRUCTURE SUPPLIED
+5. OLD + NEW SYSTEM CONNECTED
+6. AUTOMATION CAPABILITY INCREASED
+7. FAILURE RESILIENCE INCREASED
+8. INFORMATION FLOW INCREASED
+9. NOVEL CAPABILITY EMERGED
+10. REUSABILITY / COMPOUNDING INCREASED
+
+## Visual Law
+The infographic must show the Dragon Effect as a cross-pillar effect, not a fourth pillar. AUTHORITY, CANON, and AUTOMATION remain the structural roots. The Dragon Effect is the transformation measurable across their coordinated action.
+
+## Legacy Revival Path
+SOURCE SYSTEM -> EXTRACT -> MAP -> REPAIR -> AUGMENT -> CONNECT -> VALIDATE -> COMPOUND -> RECEIPT
+
+## Automation Amplification Path
+MANUAL / PARTIAL / DEAD EDGE -> ROUTE -> TRIGGER -> VALIDATOR -> RECOVERY -> FEEDBACK -> REUSE
+
+## Novelty Emergence Path
+RECOVERED CAPABILITY + NEW INFRASTRUCTURE + NEW RELATIONSHIPS -> PROPOSED NOVEL CAPABILITY -> TEST -> VERIFIED OR REJECTED
+
+## Required Labels
+DRAGON EFFECT = phenomenon
+DRAGON FINGERPRINT = evidence / measurement
+DRAGON CHIP = optional adapter mechanism
+
+## Status Footer
+SOURCE STATUS != CANON
+INFERENCE != VERIFICATION
+EFFECT CLAIM REQUIRES EVIDENCE
+
+REF: FGE-ARCH-20260917-DRAGON-EFFECT-INFOGRAPHIC-01
