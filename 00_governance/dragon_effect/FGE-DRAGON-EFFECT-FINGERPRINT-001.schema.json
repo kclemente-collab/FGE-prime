@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "FGE-DRAGON-EFFECT-FINGERPRINT-001",
+  "title": "FGE Dragon Effect Fingerprint",
+  "type": "object",
+  "required": [
+    "DRAGON_EFFECT_ID",
+    "SOURCE_SYSTEM",
+    "TARGET_SYSTEM",
+    "AUTHORITY_ROUTE",
+    "CANON_ROUTE",
+    "AUTOMATION_ROUTE",
+    "DRAGON_EFFECT_STATUS"
+  ],
+  "properties": {
+    "DRAGON_EFFECT_ID": {"type": "string"},
+    "SOURCE_SYSTEM": {"type": "string"},
+    "TARGET_SYSTEM": {"type": "string"},
+    "RECOVERED_CAPABILITY": {"type": ["array", "string"]},
+    "REPAIRED_CAPABILITY": {"type": ["array", "string"]},
+    "NEW_CONNECTIONS": {"type": ["array", "string"]},
+    "NEW_INFRASTRUCTURE": {"type": ["array", "string"]},
+    "NEW_AUTOMATION": {"type": ["array", "string"]},
+    "NEW_FAILURE_HANDLING": {"type": ["array", "string"]},
+    "NEW_INFORMATION_FLOW": {"type": ["array", "string"]},
+    "NEW_NOVELTY": {"type": ["array", "string"]},
+    "VALUE_BEFORE": {"type": ["number", "object", "string", "null"]},
+    "VALUE_AFTER": {"type": ["number", "object", "string", "null"]},
+    "VALUE_DELTA": {"type": ["number", "object", "string", "null"]},
+    "AUTHORITY_ROUTE": {"type": ["array", "string"]},
+    "CANON_ROUTE": {"type": ["array", "string"]},
+    "AUTOMATION_ROUTE": {"type": ["array", "string"]},
+    "PROVENANCE_PRESERVED": {"type": "boolean"},
+    "LEGACY_HISTORY_PRESERVED": {"type": "boolean"},
+    "INFERRED_COMPONENTS": {"type": ["array", "string"]},
+    "PROPOSED_COMPONENTS": {"type": ["array", "string"]},
+    "TEST_EVIDENCE": {"type": ["array", "string"]},
+    "RECEIPTS": {"type": ["array", "string"]},
+    "CANON_EFFECT": {"type": "string"},
+    "AUTOMATION_EFFECT": {"type": "string"},
+    "AUTHORITY_EFFECT": {"type": "string"},
+    "DRAGON_EFFECT_STATUS": {
+      "type": "string",
+      "enum": [
+        "NO_EFFECT",
+        "PARTIAL_EFFECT",
+        "DRAGON_EFFECT_DETECTED",
+        "DRAGON_EFFECT_VERIFIED",
+        "DRAGON_EFFECT_COMPOUNDING"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
