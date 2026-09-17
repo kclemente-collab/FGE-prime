@@ -1,7 +1,7 @@
 {
-  "last_run_at": "2026-09-17T20:26:24.178159+00:00",
+  "last_run_at": "2026-09-17T23:33:21.840973+00:00",
   "last_run_blocked": 0,
-  "last_run_emitted": 2,
+  "last_run_emitted": 0,
   "object_id": "FGE-LARA-SIGNAL-BUS-IMPLEMENTATION-001",
   "processed_dispatch_ids": [
     "FGE-DISPATCH-20260917-LARA-BUS-ACCEPTANCE-001",
@@ -13,11 +13,11 @@
   ],
   "status": "VERIFIED_ACTIVE",
   "verification": {
-    "workflow_run": 35270788556,
-    "job": 105369275986,
     "ack": "FGE-ACK-LARA-BUS-ACCEPT-001",
     "delta_receipt": "FGE-DELTA-LARA-BUS-ACCEPT-001",
-    "feedback_dispatch": "FGE-FEEDBACK-LARA-BUS-ACCEPT-001"
+    "feedback_dispatch": "FGE-FEEDBACK-LARA-BUS-ACCEPT-001",
+    "job": 105369275986,
+    "workflow_run": 35270788556
   },
   "version": "1.0.0"
 }
