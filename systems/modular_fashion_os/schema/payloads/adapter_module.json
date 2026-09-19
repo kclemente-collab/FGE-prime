@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/schema/payloads/adapter_module.json",
+  "title": "FGE Executable Fashion Adapter Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payload_type", "status", "target_runtime", "adapter_id", "rig_binding", "physics_solver", "clipping_occlusion_engine", "rights_receipt"],
+  "properties": {
+    "payload_type": {"const": "FGE_FASHION_EXECUTABLE_ADAPTER_PAYLOAD"},
+    "status": {"enum": ["EXECUTION_PLAN_CANDIDATE", "BLOCKED"]},
+    "target_runtime": {"type": "string", "minLength": 1},
+    "adapter_id": {"type": ["string", "null"]},
+    "rig_binding": {"type": "object", "additionalProperties": true},
+    "physics_solver": {"type": "object", "additionalProperties": true},
+    "clipping_occlusion_engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layer_stacking_priority", "alpha_mask_registry", "runtime_vertex_push_matrix"],
+      "properties": {
+        "layer_stacking_priority": {"type": "integer", "minimum": 0, "maximum": 100},
+        "alpha_mask_registry": {"type": "object", "additionalProperties": true},
+        "runtime_vertex_push_matrix": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "rights_receipt": {"type": "object", "required": ["gate", "platform_authorized"], "additionalProperties": true}
+  }
+}

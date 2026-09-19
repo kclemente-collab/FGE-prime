@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/schema/payloads/display_module.json",
+  "title": "FGE Fashion Display Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fabric_id", "status", "ui", "viewport", "runtime_customization"],
+  "properties": {
+    "fabric_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["COMPILED", "UNKNOWN_FABRIC", "BLOCKED"]},
+    "ui": {"type": "object", "additionalProperties": true},
+    "viewport": {"type": "object", "additionalProperties": true},
+    "runtime_customization": {"type": "object", "additionalProperties": true}
+  }
+}
