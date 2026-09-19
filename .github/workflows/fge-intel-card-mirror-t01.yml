@@ -1,0 +1,36 @@
+name: FGE Intel Card Mirror T01
+
+on:
+  pull_request:
+    paths:
+      - "runtime/intel_card_mirror/**"
+      - "cards/FGE-CARD-RAVEN-001_v0.1.1.json"
+      - "book_raven.py"
+      - "registry.py"
+      - ".github/workflows/fge-intel-card-mirror-t01.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  t01-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Execute T01_BASELINE
+        run: |
+          python runtime/intel_card_mirror/t01_baseline.py \
+            --repo-root . \
+            --card cards/FGE-CARD-RAVEN-001_v0.1.1.json \
+            --evidence-dir .fge_evidence/T01_BASELINE
+
+      - name: Publish T01 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-intel-card-raven-t01-${{ github.run_id }}
+          path: .fge_evidence/T01_BASELINE
+          if-no-files-found: error
