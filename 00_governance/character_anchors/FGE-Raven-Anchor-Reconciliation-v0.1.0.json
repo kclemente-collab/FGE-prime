@@ -1,0 +1,66 @@
+{
+  "object_id": "FGE-RAVEN-ANCHOR-RECONCILIATION-001",
+  "version": "0.1.0",
+  "status": "SOURCE_BOUND_RECONCILIATION / VISUAL_HOLD",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "director_instruction": "Registry is source of truth. Correct derived visuals immediately without promoting canon; user alone determines canon.",
+  "identity": {
+    "name": "Raven Voss",
+    "operational_source_id": "SB_330",
+    "canon_seed_page_id": "FGE-CHAR-002",
+    "relationship": "SAME_NAMED_SUBJECT_IN_BOOK_RAVEN_AND_T01_RUNTIME",
+    "do_not_use_as_new_alias": "FGE-CHAR-0003",
+    "collision": "FGE-CHAR-0003 is the workbook Raven row; do not silently rewrite that workbook or create a second Raven.",
+    "height_cm": null,
+    "height_disposition": "157 in workbook and candidate combine, versus 168 in a later generated prompt. Current governing visual anchor not located; height cannot be auto-resolved."
+  },
+  "source_order": [
+    {
+      "ref": "book_raven.py",
+      "location": "https://github.com/kclemente-collab/FGE-prime/blob/main/book_raven.py",
+      "git_blob_sha": "9396a1a56052192b6153be5b86b50ea702aa2930",
+      "role": "CANON_SEED_IDENTITY_AND_HISTORY",
+      "observed_ids": ["SB_330", "FGE-CHAR-002"],
+      "limit": "Does not contain full current face and body anchor."
+    },
+    {
+      "ref": "FGE-CHAR-ANCHOR-REGISTRY-001@0.1.0",
+      "library_file_id": "libfile_6d3f37b8d9e081918c4b75ef8e1aaa9c",
+      "role": "COMPILED_VIEW_OF_INCOMPLETE_CANDIDATE",
+      "limit": "Non-canon; older amber-to-grey-green wording and incomplete visual fields."
+    },
+    {
+      "ref": "FGE-PROOF-INTEL-CARD-RAVEN-MIRROR-001@0.1.0",
+      "library_file_id": "libfile_91148ee624f48191b198902f4a67cc7c",
+      "role": "TEST_EVIDENCE",
+      "result": "PASS_RUNTIME_BOUNDARY__VISUAL_BLOCKED",
+      "blocker": "RAVEN-ID-SEPTUM-001",
+      "limit": "A runtime proof and refusal, not a visual canon pass or a mapping of card labels A1-A5."
+    }
+  ],
+  "immutable_visual_gate": {
+    "face_reference_pair": "REQUIRED / NOT_RESOLVED",
+    "temporal_rung": "REQUIRED_FOR_SEPTUM_CHRONOLOGY / UNKNOWN",
+    "septum_observation": "T01 baseline observed a nostril-style piercing rather than its expected double-gold septum; visual result blocked.",
+    "eye_wording": "Older canon seed amber-to-grey-green; T01 receipt grey-blue-green; newer drift observation records hazel-grey user wording. Resolve against current registered master prompt before an edit.",
+    "unmuting_policy": "For a muted immutable, perform in-place image remediation against the governing registered feature and correct temporal state; preserve subject geometry; validate against the registered references; retain the original and receipt.",
+    "current_render_authorization": "HOLD_IDENTITY_EDIT_UNTIL_PROMOTED_PAIR_AND_TEMPORAL_RUNG_RESOLVE"
+  },
+  "presentation_correction": {
+    "input_asset": "IMG_0700(1).jpeg",
+    "input_library_file_id": "libfile_a302b3d3d984819189b1a1d141f7c858",
+    "error": "A1-A5 all PASS and EXECUTION_EVIDENCE CLOSED_ONCE conflict with T01 VISUAL BLOCKED.",
+    "replacement_state": "T01 BASELINE / VISUAL BLOCKED; A1-A5 NOT SCORED (mapping unavailable); FACE LOCK UNVERIFIED.",
+    "original_asset_retained": true,
+    "corrected_presentation_canon_effect": "NONE"
+  },
+  "missing": [
+    "FGE_L1_MasterAnchor_Prompts_v1.0_Raven_Calista_Isolde_Marcus actual source contents and authority",
+    "promoted Raven front and right-three-quarter identity references",
+    "septum temporal rung and current imagery constraint record"
+  ],
+  "runtime_rule": "SELECT SB_330 FOR RAVEN IDENTITY REFERENCE; LOAD book_raven.py AND THE CURRENT REGISTERED VISUAL ANCHOR BEFORE IMAGE BUILD; IF VISUAL ANCHOR UNRESOLVED, HOLD IMAGE BUILD; DESCRIBE ARTIFACT SEPARATELY.",
+  "linked_laws": ["CANON / USER_STAMP_ONLY", "AUTOMATION / CORRECT_DERIVED_PRESENTATION_WITH_RECEIPT", "AUTHORITY / REGISTRY_FIRST_AND_NO_SILENT_SOURCE_MUTATION"],
+  "ref": "FGE-RAVEN-20260920-ANCHOR-RECONCILE01"
+}
