@@ -1,4 +1,4 @@
-name: FGE Intel Card Mirror PR4 Close Proof
+name: FGE Intel Card Mirror PR4 Proof
 
 on:
   pull_request:
@@ -33,4 +33,103 @@ jobs:
         with:
           name: fge-intel-card-raven-pr4-close-${{ github.run_id }}
           path: .fge_evidence/PR4_CLOSE
+          if-no-files-found: error
+
+  t05-robustness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Execute T05 robustness refusal slice
+        run: |
+          python runtime/intel_card_mirror/t05_robustness.py \
+            --repo-root . \
+            --card cards/FGE-CARD-RAVEN-001_v0.1.1.json \
+            --evidence-dir .fge_evidence/T05_ROBUSTNESS
+
+      - name: Publish T05 robustness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-intel-card-raven-t05-robustness-${{ github.run_id }}
+          path: .fge_evidence/T05_ROBUSTNESS
+          if-no-files-found: error
+
+  t05-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        python:
+          - "3.10"
+          - "3.12"
+          - "3.13"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Execute matrix probe
+        run: >-
+          python runtime/intel_card_mirror/matrix_probe.py
+          --repo-root .
+          --card cards/FGE-CARD-RAVEN-001_v0.1.1.json
+          --environment-id "${{ matrix.os }}-py${{ matrix.python }}"
+          --evidence-dir ".fge_evidence/T05_MATRIX/${{ matrix.os }}-py${{ matrix.python }}"
+
+      - name: Publish matrix evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-intel-card-raven-t05-matrix-${{ matrix.os }}-py${{ matrix.python }}-${{ github.run_id }}
+          path: .fge_evidence/T05_MATRIX/${{ matrix.os }}-py${{ matrix.python }}
+          if-no-files-found: warn
+
+  t05-aggregate:
+    if: always()
+    needs:
+      - t05-robustness
+      - t05-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download robustness evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: fge-intel-card-raven-t05-robustness-${{ github.run_id }}
+          path: .fge_evidence/downloaded/robustness
+
+      - name: Download matrix evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: fge-intel-card-raven-t05-matrix-*-${{ github.run_id }}
+          path: .fge_evidence/downloaded/matrix
+          merge-multiple: false
+
+      - name: Compare environment invariants and emit T05 receipt
+        run: |
+          python runtime/intel_card_mirror/matrix_compare.py \
+            --download-root .fge_evidence/downloaded \
+            --evidence-dir .fge_evidence/T05_AGGREGATE \
+            --expected-count 9
+
+      - name: Publish T05 aggregate receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-intel-card-raven-t05-aggregate-${{ github.run_id }}
+          path: .fge_evidence/T05_AGGREGATE
           if-no-files-found: error
