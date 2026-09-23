@@ -1,4 +1,4 @@
-name: FGE Intel Card Mirror T01
+name: FGE Intel Card Mirror PR4 Close Proof
 
 on:
   pull_request:
@@ -14,23 +14,23 @@ permissions:
   contents: read
 
 jobs:
-  t01-baseline:
+  close-proof:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Execute T01_BASELINE
+      - name: Execute PR4 close proof
         run: |
-          python runtime/intel_card_mirror/t01_baseline.py \
+          python runtime/intel_card_mirror/proof_close.py \
             --repo-root . \
             --card cards/FGE-CARD-RAVEN-001_v0.1.1.json \
-            --evidence-dir .fge_evidence/T01_BASELINE
+            --evidence-dir .fge_evidence/PR4_CLOSE
 
-      - name: Publish T01 evidence
+      - name: Publish close-proof evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fge-intel-card-raven-t01-${{ github.run_id }}
-          path: .fge_evidence/T01_BASELINE
+          name: fge-intel-card-raven-pr4-close-${{ github.run_id }}
+          path: .fge_evidence/PR4_CLOSE
           if-no-files-found: error
