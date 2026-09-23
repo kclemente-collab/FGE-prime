@@ -1,0 +1,102 @@
+{
+  "objectId": "FGE-REGRESSION-VERIFICATION-PROCESS-001",
+  "version": "0.1.0",
+  "class": "PROOF_PROCESS_REGRESSION_GATE",
+  "status": "INSTALLED_ACTIVE_PROCESS",
+  "canonEffect": "NONE",
+  "authorityEffect": "NONE",
+  "scope": "PROJECT_PROBE_SECTION_J_ONLY",
+  "productionValidation": "OUT_OF_SCOPE",
+  "installedBinding": {
+    "target": {
+      "objectId": "FGE-RECOMBINATION-ENGINE-001",
+      "version": "0.1.0",
+      "sourcePath": "runtime/recombination_engine/fge_recombination_engine.py",
+      "sourceSha256": "269232700cb8ba1de66c3033e4b25a897c9d0ebadcc0d9fcf8ce58960bac590d"
+    },
+    "suite": {
+      "objectId": "FGE-RECOMBINATION-REGRESSION-001",
+      "version": "0.1.0",
+      "path": "runtime/recombination_engine/FGE-RECOMBINATION-REGRESSION-001.py",
+      "suiteSha256": "e8990f2c63eafec8b8ea3e97f26c9356ede0f5b34a6c6cc69f7385635a6fd490",
+      "designation": "EXPLICIT_DIRECTOR_AUTHORIZATION"
+    },
+    "expectedOutputSha256": "c39a990a0e1af57a1e0614e0bbc345fee925e913cb5e417c15afe66c101e6203",
+    "proofReceipt": {
+      "objectId": "FGE-PROBE-RECOMB-20260922-GAP001-REGRESSION-VERIFIED-001",
+      "sha256": "940454e9d19c4772311544dd7e677561ed88128679a6a31520a96be935e2916e"
+    }
+  },
+  "addresses": {
+    "ID1": "TARGET_OBJECT_IDENTITY_AND_VERSION",
+    "MAT1": "FROZEN_SOURCE_PLUS_AUTHORITATIVE_SUITE",
+    "FUNC1": "UNCHANGED_REGRESSION_EXECUTION",
+    "REL1": "SUITE_TO_NEGATIVE_CONTROL_TO_REPEAT_TO_REPLAY",
+    "VAL1": "G0_THROUGH_G8_PROOF_GATES",
+    "OUT1": "PROJECT_PROBE_SECTION_J_REGRESSION_VERIFIED",
+    "PROV1": "VERIFICATION_RECEIPT_AND_HASH_CHAIN"
+  },
+  "nodes": [
+    {"id": "P01", "name": "DESIGNATE", "type": "CONTROL", "requires": ["target_object", "authoritative_suite"]},
+    {"id": "P02", "name": "FREEZE", "type": "CONTROL", "requires": ["source_sha256", "suite_sha256", "expected_output_sha256"]},
+    {"id": "P03", "name": "VERIFY_INPUT", "type": "VALIDATOR", "requires": ["source_hash_match", "suite_hash_match"]},
+    {"id": "P04", "name": "RUN_SUITE_UNCHANGED", "type": "EXECUTION"},
+    {"id": "P05", "name": "REQUIRE_100_PERCENT_PASS", "type": "VALIDATOR"},
+    {"id": "P06", "name": "NEGATIVE_CONTROL", "type": "EXECUTION"},
+    {"id": "P07", "name": "REPEAT_NEGATIVE_CONTROL", "type": "EXECUTION"},
+    {"id": "P08", "name": "REPLAY", "type": "EXECUTION"},
+    {"id": "P09", "name": "COMPARE_OUTPUT_HASH", "type": "VALIDATOR"},
+    {"id": "P10", "name": "AUTHORITY_CANON_FIREBREAK", "type": "VALIDATOR"},
+    {"id": "P11", "name": "EMIT_RECEIPT", "type": "PROVENANCE"},
+    {"id": "P12", "name": "PROJECT_PROBE_SECTION_J", "type": "STATE_PROJECTION"},
+    {"id": "P13", "name": "STOP", "type": "TERMINAL"}
+  ],
+  "edges": [
+    {"from": "P01", "to": "P02", "relation": "DESIGNATES"},
+    {"from": "P02", "to": "P03", "relation": "FREEZES"},
+    {"from": "P03", "to": "P04", "relation": "ADMITS_IF_HASHES_MATCH"},
+    {"from": "P04", "to": "P05", "relation": "PRODUCES_REGRESSION_RESULT"},
+    {"from": "P05", "to": "P06", "relation": "ADMITS_IF_ALL_PASS"},
+    {"from": "P06", "to": "P07", "relation": "ESTABLISHES_FAILURE_SEMANTICS"},
+    {"from": "P07", "to": "P08", "relation": "ADMITS_IF_FAILURE_SEMANTICS_REPEAT"},
+    {"from": "P08", "to": "P09", "relation": "PRODUCES_REPLAY_OUTPUT"},
+    {"from": "P09", "to": "P10", "relation": "ADMITS_IF_OUTPUT_HASH_IDENTICAL"},
+    {"from": "P10", "to": "P11", "relation": "ADMITS_IF_FIREBREAK_INTACT"},
+    {"from": "P11", "to": "P12", "relation": "SUPPORTS_STATE_PROJECTION"},
+    {"from": "P12", "to": "P13", "relation": "TERMINATES_AT_REGRESSION_VERIFIED"}
+  ],
+  "gates": {
+    "G0": {"name": "SOURCE_FREEZE", "pass": "source_sha_matches_before_and_after", "fail": "SOURCE_DRIFT"},
+    "G1": {"name": "SUITE_FREEZE", "pass": "suite_sha_matches_before_and_after", "fail": "SUITE_DRIFT"},
+    "G2": {"name": "FULL_REGRESSION", "pass": "pass_rate_equals_1_0", "fail": "REGRESSION_FAILED"},
+    "G3": {"name": "NEGATIVE_CONTROL", "pass": "fault_rejected_and_projection_blocked", "fail": "FAIL_OPEN"},
+    "G4": {"name": "NEGATIVE_REPEAT", "pass": "refusal_semantics_identical", "fail": "FAILURE_NONDETERMINISTIC"},
+    "G5": {"name": "REPLAY", "pass": "output_sha_matches_expected", "fail": "REPLAY_DRIFT"},
+    "G6": {"name": "CANON_FIREBREAK", "pass": "canon_effect_none", "fail": "CANON_EFFECT_BREACH"},
+    "G7": {"name": "AUTHORITY_FIREBREAK", "pass": "authority_effect_none", "fail": "AUTHORITY_EFFECT_BREACH"},
+    "G8": {"name": "RECEIPT", "pass": "all_gate_evidence_preserved", "fail": "PROOF_INCOMPLETE"}
+  },
+  "stateMachine": {
+    "entry": "DETERMINISTIC",
+    "running": "REGRESSION_RUNNING",
+    "blocked": "BLOCKED_REGRESSION_INPUT",
+    "failed": "REGRESSION_UNVERIFIED",
+    "success": "REGRESSION_VERIFIED",
+    "terminal": "STOP"
+  },
+  "allowedTransition": {
+    "from": "DETERMINISTIC",
+    "to": "REGRESSION_VERIFIED",
+    "onlyIf": "G0_G1_G2_G3_G4_G5_G6_G7_G8_ALL_PASS"
+  },
+  "forbiddenClaims": [
+    "PRODUCTION_VALIDATED",
+    "AUTOMATION_READY",
+    "DEPLOYMENT_READY",
+    "CANON_PROMOTED",
+    "AUTHORITY_PROMOTED"
+  ],
+  "currentInstanceState": "REGRESSION_VERIFIED",
+  "stopLaw": "REGRESSION_VERIFIED_THEN_STOP",
+  "ref": "FGE-PROBE-20260922-RECOMB-REGVERIFY01"
+}
