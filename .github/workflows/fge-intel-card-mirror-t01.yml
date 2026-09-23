@@ -70,8 +70,15 @@ jobs:
           - "3.13"
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
+      - name: Checkout T05 execution boundary
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            runtime/intel_card_mirror
+            cards/FGE-CARD-RAVEN-001_v0.1.1.json
+            book_raven.py
+            registry.py
+          sparse-checkout-cone-mode: false
 
       - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v5
