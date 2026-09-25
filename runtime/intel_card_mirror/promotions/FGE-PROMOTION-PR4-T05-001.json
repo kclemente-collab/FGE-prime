@@ -1,0 +1,55 @@
+{
+  "objectId": "FGE-PROMOTION-PR4-T05-001",
+  "class": "RUNTIME_PROOF_STATE_PROMOTION",
+  "version": "0.1.0",
+  "status": "AUTHORIZED_INSTALLED",
+  "promotionDecision": "EXPLICIT",
+  "authorization": {
+    "type": "DIRECTOR_EXPLICIT_INSTALL_COMMAND",
+    "scope": "BOUNDED_MIRROR_RUNTIME_PROOF_STATE_ONLY"
+  },
+  "sourceProof": {
+    "objectId": "FGE-RECEIPT-PR4-T05-PROOF-001",
+    "sourceProofState": "REPEATED_CLOSURE",
+    "workflowRunId": 35804214706,
+    "workflowConclusion": "success",
+    "headSha": "2977c489395be3007abcdf3a8f4570098250a95d",
+    "aggregateArtifactId": 10727475243,
+    "aggregateArtifactSha256": "27e3be94df71c9167d58e30508202be684316dc66d910b22c5d690a4f00c3dce",
+    "eligibility": {
+      "REPRODUCIBLE_CIRCUIT": "PASS",
+      "ROBUST_CIRCUIT": "PASS"
+    }
+  },
+  "transition": {
+    "from": "REPEATED_CLOSURE",
+    "to": [
+      "REPRODUCIBLE_CIRCUIT",
+      "ROBUST_CIRCUIT"
+    ]
+  },
+  "installedState": {
+    "REPRODUCIBLE_CIRCUIT": "ACTIVE",
+    "ROBUST_CIRCUIT": "ACTIVE"
+  },
+  "validationScope": "RUNTIME_ONLY",
+  "visualIdentityState": "NOT_EVALUATED",
+  "promotionEffect": "RUNTIME_PROOF_STATE_ONLY",
+  "canonEffect": "NONE",
+  "authorityEffect": "NONE",
+  "explicitNonClaims": [
+    "AUTOMATION_CANDIDATE",
+    "VISUAL_IDENTITY_VALIDATED",
+    "CANON_PROMOTION",
+    "AUTHORITY_PROMOTION",
+    "EXHAUSTIVE_SYSTEM_ROBUSTNESS",
+    "REPOSITORY_WIDE_CI_HEALTH",
+    "REPOSITORY_WINDOWS_PATH_PORTABILITY"
+  ],
+  "separateWork": {
+    "repositoryWindowsPathPortability": "OPEN_UNCHANGED",
+    "repositoryWidePythonCI": "OPEN_UNCHANGED",
+    "automationCandidacy": "OPEN_UNCHANGED",
+    "visualIdentityValidation": "OPEN_UNCHANGED"
+  }
+}
