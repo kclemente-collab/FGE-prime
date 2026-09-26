@@ -1,0 +1,47 @@
+{
+  "object_id": "FGE-SYS-MODULAR-FASHION-OS-001",
+  "version": "0.2.0",
+  "status": "IMPLEMENTED_BRANCH_NOT_CANON_PROMOTED",
+  "canon_effect": "NONE",
+  "authority": {
+    "storage": "GITHUB_PERSISTENCE",
+    "display": "LLM_EPHEMERAL_RUNTIME",
+    "character_binding": "CHARACTER_OS"
+  },
+  "modules": [
+    {
+      "object_id": "FGE-FASHION-STORAGE-GITHUB-001",
+      "role": "VERSIONED_PERSISTENCE_AND_PROVENANCE",
+      "status": "IMPLEMENTED_SCHEMA_VALIDATED_RECOVERABLE"
+    },
+    {
+      "object_id": "FGE-FASHION-LLM-DISPLAY-001",
+      "role": "LLM_RUNTIME_PRESENTATION_AND_DELTA_PROPOSAL",
+      "status": "IMPLEMENTED_WITH_STATIC_FDE_COMPILER"
+    },
+    {
+      "object_id": "FGE-FASHION-CHARACTER-OS-ADAPTER-001",
+      "role": "CHARACTER_SAFE_WARDROBE_BINDING",
+      "status": "IMPLEMENTED_EXACT_PROJECTION_AND_EXECUTION_PLAN"
+    },
+    {
+      "object_id": "FGE-BENCH-UE5-OCCLUSION-001",
+      "role": "EXTERNAL_UE5_PERFORMANCE_EVIDENCE_GATE",
+      "status": "SUPPRESSED_PENDING_MEASUREMENT"
+    }
+  ],
+  "laws": [
+    "UNKNOWN_OVER_INVENTED",
+    "GENERATED_OUTPUT_NOT_CANON",
+    "STORAGE_DISPLAY_ADAPTER_AUTHORITY_SEPARATION",
+    "GARMENT_REFERENCE_OVER_CHARACTER_DATA_DUPLICATION",
+    "ENGINE_SPECIFIC_PARAMETERS_DOWNSTREAM_OF_GARMENT_INTENT",
+    "CONFLICTS_PRESERVED_UNTIL_RESOLVED"
+  ],
+  "storage_layout": "storage/assets/<percent-encoded-asset-id>/<version>.json",
+  "registry": "storage/index.json",
+  "primary_contract": "contracts/fashion_asset_envelope.schema.json",
+  "character_projection_contract": "contracts/character_chip_fashion_projection.schema.json",
+  "payload_contracts": "schema/payloads/*.json",
+  "external_ci_work_order": "work_orders/FGE-WO-REPO-CI-REPAIR-001.md"
+}
