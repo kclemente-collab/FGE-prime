@@ -1,0 +1,58 @@
+{
+  "object_id": "FGE-PAYLOAD-INDEX-001",
+  "version": "0.1.0",
+  "status": "ACTIVE_CANDIDATE / HYDRATED",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "payloads": [
+    {
+      "payload_id": "FGE-PAYLOAD-000001",
+      "payload_type": "CHARACTER_COMPILER_PACKET",
+      "producer_refs": ["FGE-INFO-000001"],
+      "destinations": ["FACTORY", "IOS", "GROK", "NOTION"],
+      "constraints": {"cannot_self_promote": true, "cannot_fill_unknown": true, "pointer_is_not_character_id": true}
+    },
+    {
+      "payload_id": "FGE-PAYLOAD-000002",
+      "payload_type": "SIGNAL_PACKET",
+      "producer_refs": ["FGE-INFO-000003", "FGE-INFO-000007", "FGE-INFO-000008"],
+      "destinations": ["CHARACTER_PROFILE_MEMBRANE", "PROMPT_COMPILER", "SCENE_RUNTIME", "VALIDATION_ENGINE"],
+      "constraints": {"observation_ne_inference": true, "signal_ne_canon": true, "reproduce_signal_not_surface": true}
+    },
+    {
+      "payload_id": "FGE-PAYLOAD-000003",
+      "payload_type": "MASTERY_PRIMITIVE_CANDIDATE",
+      "producer_refs": ["FGE-INFO-000002", "FGE-INFO-000004", "FGE-INFO-000006"],
+      "destinations": ["PRIMITIVE_LIBRARY", "100X_MASTERY_LOOP"],
+      "constraints": {"pattern_requires_validation": true, "candidate_ne_verified_primitive": true}
+    },
+    {
+      "payload_id": "FGE-PAYLOAD-000004",
+      "payload_type": "SCENE_GOVERNANCE_PACKET",
+      "producer_refs": ["FGE-INFO-000007"],
+      "destinations": ["SCENE_RUNTIME", "FACTORY", "PROOF_ENGINE"],
+      "constraints": {"locked_module_mutation_requires_authority": true, "audit_receipt_required": true}
+    },
+    {
+      "payload_id": "FGE-PAYLOAD-000005",
+      "payload_type": "PRESENTATION_PACKET",
+      "producer_refs": ["FGE-INFO-000004", "FGE-INFO-000005", "FGE-INFO-000006"],
+      "destinations": ["PRESENTATION_COMPILER", "FACTORY", "OUTPUT_PROJECTION"],
+      "constraints": {"presentation_does_not_decide_truth": true, "source_refs_required": true}
+    },
+    {
+      "payload_id": "FGE-PAYLOAD-000006",
+      "payload_type": "STORAGE_PROMOTION_EVENT",
+      "producer_refs": ["FGE-STORAGE-PROMOTION-BUS-001"],
+      "destinations": ["SEARCH_COMPILER", "CHARACTER_CHIP", "FACTORY", "INFOGRAPHIC_ROUTER"],
+      "constraints": {"storage_promotion_ne_canon_promotion": true, "receipt_required": true}
+    }
+  ],
+  "cross_app_contract": {
+    "primary_character_id_ne_enterprise_asset_pointer": true,
+    "token_included_in_payload_default": false,
+    "payload_cannot_self_promote": true,
+    "same_pointer_ne_same_character": true
+  },
+  "ref": "FGE-PAYLOAD-20260928-HYDRATION-001"
+}
