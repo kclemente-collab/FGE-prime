@@ -1,0 +1,14 @@
+{
+  "object_id": "FGE-STORAGE-PROMOTION-MANIFEST-001",
+  "version": "0.1.0",
+  "status": "ACTIVE_CANDIDATE",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "promotion_law": "STORAGE_PROMOTION_NE_CANON_PROMOTION",
+  "states": ["RAW", "DISCOVERED", "HASHED", "CLASSIFIED", "NORMALIZED", "INDEXED", "CONNECTED", "VALIDATED", "PROMOTABLE", "ACTIVE_RESOURCE"],
+  "announcement_targets": ["SEARCH_COMPILER", "CHARACTER_CHIP", "FACTORY", "INFOGRAPHIC_ROUTER"],
+  "required_receipt_fields": ["object_ref", "from_state", "to_state", "gate_results", "source_refs", "timestamp", "authority_effect", "canon_effect"],
+  "automatic_canon_write": false,
+  "automatic_identity_merge": false,
+  "ref": "FGE-STORAGE-20260928-PROMOTION-MANIFEST"
+}
