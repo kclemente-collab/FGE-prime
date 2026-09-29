@@ -1,0 +1,8 @@
+{"object_ref":"FGE-INFO-000001","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_SOURCE_POINTERS_AND_PAYLOAD_LINKS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000002","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_MASTERY_LOOP_SOURCE_AND_PRIMITIVE_LINKS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000003","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VALIDATE_SIGNAL_CLASSIFICATION_SCHEMA","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000004","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_RECOMBINATOR_SOURCE_AND_RUNTIME_LINKS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000005","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_PRESENTATION_COMPILER_SOURCE_AND_OUTPUT_CONTRACTS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000006","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_RECOMBINATOR_ENGINE_SOURCE_AND_IDENTITY_CONSTRAINTS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000007","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_SCENE_GOVERNANCE_RUNTIME_BINDINGS","authority_effect":"NONE"}
+{"object_ref":"FGE-INFO-000008","current_state":"INDEXED","target_state":"ACTIVE_RESOURCE","gate":"VERIFY_ADULT_RESOURCE_MATRIX_SENSITIVITY_AND_AUTHORITY_BOUNDARIES","authority_effect":"NONE"}
