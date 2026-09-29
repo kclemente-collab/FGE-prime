@@ -1,0 +1,69 @@
+{
+  "object_id": "FGE-STORAGE-MAKEOVER-001",
+  "version": "0.1.0",
+  "status": "ACTIVE_CANDIDATE",
+  "class": "ADDRESSABLE_STORAGE_ROUTER / INDEXED_MIGRATION_PLANE",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "parent_objects": [
+    "FGE-INFOGRAPHIC-PAYLOAD-HUB-001",
+    "FGE-UNIFIED-OBJECT-INDEX-001",
+    "FGE-ATTENTION-QUEUE-001",
+    "FGE-STORAGE-PROMOTION-BUS-001"
+  ],
+  "object_classes": [
+    "INFOGRAPHIC_SYSTEM",
+    "PAYLOAD",
+    "ARTIFACT_RENDER",
+    "CHARACTER",
+    "SYSTEM",
+    "SCENE",
+    "MATERIAL",
+    "SPEC",
+    "CODE",
+    "RECEIPT"
+  ],
+  "address_prefixes": {
+    "infographic": "FGE-INFO-",
+    "payload": "FGE-PAYLOAD-",
+    "attention": "FGE-ATTN-",
+    "receipt": "FGE-RCPT-"
+  },
+  "lifecycle": [
+    "RAW",
+    "DISCOVERED",
+    "HASHED",
+    "CLASSIFIED",
+    "NORMALIZED",
+    "INDEXED",
+    "CONNECTED",
+    "VALIDATED",
+    "PROMOTABLE",
+    "ACTIVE_RESOURCE"
+  ],
+  "source_native_routing": {
+    "CODE": "GITHUB",
+    "JSON": "GITHUB",
+    "SCHEMA": "GITHUB",
+    "MARKDOWN_SPEC": "GITHUB",
+    "IMAGE": "GOOGLE_DRIVE_OR_DECLARED_BINARY_VAULT",
+    "VIDEO": "GOOGLE_DRIVE_OR_DECLARED_BINARY_VAULT",
+    "PDF": "GOOGLE_DRIVE",
+    "DOC": "GOOGLE_DRIVE",
+    "SHEET": "GOOGLE_DRIVE",
+    "HOT_LEDGER": "NOTION",
+    "TASK_STATE": "NOTION"
+  },
+  "governance": {
+    "index_is_not_authority": true,
+    "mirror_is_not_original": true,
+    "pointer_does_not_promote": true,
+    "storage_promotion_is_not_canon_promotion": true,
+    "unknown_over_invented": true,
+    "no_silent_mutation": true,
+    "no_silent_promotion": true
+  },
+  "grok_entrypoint": "storage_makeover/GROK_ENTRYPOINT.md",
+  "hydration_state": "SEE_INDEXES_AND_QUEUES",
+  "ref": "FGE-STORAGE-20260928-MAKEOVER-MANIFEST"
+}
