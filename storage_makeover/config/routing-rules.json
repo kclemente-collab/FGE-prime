@@ -1,6 +1,6 @@
 {
   "object_id": "FGE-GITHUB-INTAKE-ROUTING-RULES-001",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "ACTIVE_CANDIDATE",
   "canon_effect": "NONE",
   "authority_effect": "NONE",
@@ -27,6 +27,7 @@
     "SPEC": "storage_makeover/routed/specs",
     "STRUCTURED_DATA": "storage_makeover/routed/structured",
     "DOCUMENT": "storage_makeover/routed/documents",
+    "ARCHIVE": "storage_makeover/routed/archives",
     "PAYLOAD": "storage_makeover/routed/payloads",
     "RECEIPT": "storage_makeover/routed/receipts",
     "INFOGRAPHIC_MANIFEST": "storage_makeover/routed/infographics",
