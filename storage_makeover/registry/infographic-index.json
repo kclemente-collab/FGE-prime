@@ -1,0 +1,128 @@
+{
+  "object_id": "FGE-INFOGRAPHIC-INDEX-001",
+  "version": "0.1.0",
+  "status": "ACTIVE_CANDIDATE / HYDRATED",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "source_scope": "current chat-supplied visual set, 2026-09-28",
+  "infographics": [
+    {
+      "infographic_id": "FGE-INFO-000001",
+      "title": "FGE Nx Character Compiler",
+      "source_filename": "IMG_1345(2).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["CHARACTER", "COMPILER", "IDENTITY", "CHIP_SYSTEM", "GOVERNANCE"],
+      "signal_compatibility": "CLASS_A_DIRECT",
+      "max_depth": {"identity": "n+10", "signal": "n+10", "context": "n+8"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000002",
+      "title": "FGE 100X Mastery Loop Engine",
+      "source_filename": "IMG_1348(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["MASTERY", "RECOMBINATION", "VALIDATION", "PRIMITIVES", "MIRROR"],
+      "signal_compatibility": "CLASS_B_ADAPTER",
+      "max_depth": {"pattern": "n+10", "signal": "n+8"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000003",
+      "title": "SIREN Classification Logic",
+      "source_filename": "IMG_1349(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["SIREN", "BEHAVIOR", "EMOTIONAL_SIGNAL", "NARRATIVE_PERMISSION", "COLLECTOR_VALUE"],
+      "signal_compatibility": "CLASS_A_DIRECT",
+      "max_depth": {"signal": "n+10", "relationship": "n+9", "context": "n+8"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000004",
+      "title": "FGE Master Plate v2.0 · SVG Integrated Recombinator",
+      "source_filename": "IMG_1347(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["RECOMBINATOR", "FACTORY", "CLOSED_LOOP", "GENOME_FEEDBACK"],
+      "signal_compatibility": "CLASS_B_ADAPTER",
+      "max_depth": {"signal": "n+7", "recombination": "n+10"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000005",
+      "title": "FGE Unified Presentation Compiler v1.0",
+      "source_filename": "IMG_1350(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["PRESENTATION", "MIRROR", "DEVELOP", "BUILD", "FACTORY"],
+      "signal_compatibility": "CLASS_B_ADAPTER",
+      "max_depth": {"signal": "n+6", "presentation": "n+10"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000006",
+      "title": "FGE Recombinator Engine v1.0",
+      "source_filename": "IMG_1351(6).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["MIRROR", "DEVELOP", "BUILD", "IDENTITY_FIDELITY", "COHERENCE"],
+      "signal_compatibility": "CLASS_B_ADAPTER",
+      "max_depth": {"signal": "n+6", "recombination": "n+10"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000007",
+      "title": "Interactive Scene Governance · Design Specification",
+      "source_filename": "IMG_1352(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["SCENE", "GOVERNANCE", "PARAMETER_CONTROL", "AUDIT", "DIRECTOR_INTERFACE"],
+      "signal_compatibility": "CLASS_A_DIRECT",
+      "max_depth": {"signal": "n+8", "scene": "n+10", "context": "n+10"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    },
+    {
+      "infographic_id": "FGE-INFO-000008",
+      "title": "FGE ARMkit · Adult Resource Matrix",
+      "source_filename": "IMG_1838(3).jpeg",
+      "object_class": "INFOGRAPHIC_SYSTEM",
+      "domains": ["VISUAL_GENOME", "CHARACTER_GENOME", "MATERIAL_GENOME", "NARRATIVE_GENOME", "WORKFLOW_GENOME", "ONTOLOGY_GENOME"],
+      "signal_compatibility": "CLASS_A_DIRECT",
+      "max_depth": {"signal": "n+9", "material": "n+8", "narrative": "n+8"},
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO",
+      "promotion_state": "CANDIDATE"
+    }
+  ],
+  "related_visual_assets": [
+    {
+      "asset_ref": "FGE-VISUAL-000001",
+      "title": "Heart Pendant Render",
+      "source_filename": "IMG_1344(3).jpeg",
+      "object_class": "ARTIFACT_RENDER",
+      "signal_compatibility": "CLASS_C_PRESERVE",
+      "permitted_lenses": ["FORM", "MATERIAL", "CONSTRUCTION", "BRAND_SIGNAL"],
+      "blocked_default_lenses": ["CHARACTER_EMOTION", "RELATIONSHIP_STATE"],
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO"
+    },
+    {
+      "asset_ref": "FGE-VISUAL-000002",
+      "title": "Siren Seal Artifact Render",
+      "source_filename": "IMG_1267(1).jpeg",
+      "object_class": "ARTIFACT_RENDER",
+      "signal_compatibility": "CLASS_C_PRESERVE",
+      "permitted_lenses": ["FORM", "MATERIAL", "CONSTRUCTION", "BRAND_SIGNAL", "SYMBOLISM_CANDIDATE"],
+      "blocked_default_lenses": ["CHARACTER_EMOTION", "RELATIONSHIP_STATE"],
+      "attention_state": "INDEXED / SOURCE_BINARY_EXTERNAL_TO_REPO"
+    }
+  ],
+  "laws": [
+    "SPECIALIZATION_IS_PRESERVED",
+    "DEPTH_IS_OPTIONAL",
+    "DERIVATION_IS_LENS_BOUND",
+    "CONNECTION_DOES_NOT_ERASE_NICHE",
+    "DERIVATION_DOES_NOT_PROMOTE_CANON"
+  ],
+  "ref": "FGE-INFOGRAPHIC-20260928-HYDRATION-001"
+}
