@@ -1,0 +1,33 @@
+{
+  "receipt_id": "FGE-RCPT-STORAGE-MIRROR-20260928-001",
+  "object_id": "FGE-STORAGE-MAKEOVER-001",
+  "status": "PARTIAL_MIRROR_COMPLETE",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "character_merges": false,
+  "canon_mutations": false,
+  "collab": {
+    "repository": "kclemente-collab/FGE-prime",
+    "branch": "main",
+    "state": "MIRRORED_AND_HYDRATED",
+    "grok_entrypoint": "storage_makeover/GROK_ENTRYPOINT.md",
+    "code_search_indexed_repository": true
+  },
+  "anime08": {
+    "connection_name": "Kclemente06-anime08",
+    "state": "BLOCKED_NO_EXPOSED_INSTALLATION_OR_REPOSITORY",
+    "repositories_visible_to_connector": 0,
+    "installations_visible_to_connector": 0,
+    "write_attempted": false,
+    "required_next_condition": "EXPOSE_OR_CONNECT_A_WRITABLE_GITHUB_REPOSITORY_TO_THE_ANIME08_CONNECTION"
+  },
+  "hydrated_counts": {
+    "infographics": 8,
+    "related_visual_assets": 2,
+    "payload_classes": 6,
+    "attention_events": 6,
+    "promotion_queue_rows": 8
+  },
+  "source_binary_state": "EXTERNAL_TO_GITHUB_MIRROR",
+  "ref": "FGE-STORAGE-20260928-DUAL-MIRROR-ATTEMPT"
+}
