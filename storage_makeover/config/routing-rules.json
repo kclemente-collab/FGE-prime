@@ -1,6 +1,6 @@
 {
   "object_id": "FGE-GITHUB-INTAKE-ROUTING-RULES-001",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "status": "ACTIVE_CANDIDATE",
   "canon_effect": "NONE",
   "authority_effect": "NONE",
@@ -34,8 +34,9 @@
   },
   "public_repo_guard": {
     "enabled": true,
-    "media_requires_sidecar": true,
-    "media_requires_public_ok": true,
+    "binary_classes": ["DOCUMENT", "IMAGE", "VIDEO", "ARCHIVE"],
+    "binary_requires_sidecar": true,
+    "binary_requires_public_ok": true,
     "media_requires_sensitivity": "STANDARD",
     "media_requires_origin_class": true,
     "blocked_sensitivity_values": [
@@ -47,14 +48,14 @@
       "PRIVATE",
       "RESTRICTED"
     ],
-    "note": "FGE-prime is public. Sensitive/private binaries must never be uploaded here. The router can hold a file after upload but cannot erase exposure from Git history."
+    "note": "FGE-prime is public. Sensitive/private binaries must never be uploaded here. A router can hold a file after upload, but it cannot erase prior exposure from Git history. Put private/restricted media in a private vault/repository instead."
   },
   "hard_holds": [
     "ENTITY_AMBIGUOUS",
     "COLLISION_HOLD",
     "UNKNOWN_ROUTE",
     "SENSITIVE_OR_PRIVATE_MEDIA",
-    "MEDIA_PUBLICATION_UNVERIFIED",
+    "BINARY_PUBLICATION_UNVERIFIED",
     "AGE_OR_CONSENT_UNCERTAIN",
     "POINTER_IDENTITY_SUBSTITUTION",
     "CORRUPT_OR_UNREADABLE"
