@@ -1,0 +1,74 @@
+{
+  "object_id": "FGE-GITHUB-INTAKE-ROUTING-RULES-001",
+  "version": "0.1.2",
+  "status": "ACTIVE_CANDIDATE",
+  "canon_effect": "NONE",
+  "authority_effect": "NONE",
+  "inbox": "intake/inbox",
+  "index": "storage_makeover/registry/drop-index.jsonl",
+  "attention_queue": "storage_makeover/queues/attention-queue.jsonl",
+  "route_receipts": "storage_makeover/receipts/routes",
+  "candidate_root": "storage_makeover/routed",
+  "thresholds": {
+    "auto_route": 0.90,
+    "route_and_review": 0.70
+  },
+  "extensions": {
+    "CODE": [".py", ".js", ".ts", ".tsx", ".jsx", ".sh", ".swift", ".sql", ".css", ".html"],
+    "SPEC": [".md", ".txt", ".rst"],
+    "STRUCTURED_DATA": [".json", ".jsonl", ".yaml", ".yml", ".toml"],
+    "DOCUMENT": [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pages", ".numbers", ".key"],
+    "IMAGE": [".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic", ".tif", ".tiff"],
+    "VIDEO": [".mp4", ".mov", ".m4v", ".webm"],
+    "ARCHIVE": [".zip", ".tar", ".gz", ".7z", ".rar"]
+  },
+  "destinations": {
+    "CODE": "storage_makeover/routed/code",
+    "SPEC": "storage_makeover/routed/specs",
+    "STRUCTURED_DATA": "storage_makeover/routed/structured",
+    "DOCUMENT": "storage_makeover/routed/documents",
+    "ARCHIVE": "storage_makeover/routed/archives",
+    "PAYLOAD": "storage_makeover/routed/payloads",
+    "RECEIPT": "storage_makeover/routed/receipts",
+    "INFOGRAPHIC_MANIFEST": "storage_makeover/routed/infographics",
+    "PUBLIC_MEDIA": "storage_makeover/routed/media"
+  },
+  "public_repo_guard": {
+    "enabled": true,
+    "binary_classes": ["DOCUMENT", "IMAGE", "VIDEO", "ARCHIVE"],
+    "binary_requires_sidecar": true,
+    "binary_requires_public_ok": true,
+    "media_requires_sensitivity": "STANDARD",
+    "media_requires_origin_class": true,
+    "blocked_sensitivity_values": [
+      "NUDITY_NONSEXUAL",
+      "NUDITY_SEXUALIZED",
+      "EXPLICIT_SEXUAL",
+      "INTIMATE_PRIVATE",
+      "AGE_UNCERTAIN",
+      "PRIVATE",
+      "RESTRICTED"
+    ],
+    "note": "FGE-prime is public. Sensitive/private binaries must never be uploaded here. A router can hold a file after upload, but it cannot erase prior exposure from Git history. Put private/restricted media in a private vault/repository instead."
+  },
+  "hard_holds": [
+    "ENTITY_AMBIGUOUS",
+    "COLLISION_HOLD",
+    "UNKNOWN_ROUTE",
+    "SENSITIVE_OR_PRIVATE_MEDIA",
+    "BINARY_PUBLICATION_UNVERIFIED",
+    "AGE_OR_CONSENT_UNCERTAIN",
+    "POINTER_IDENTITY_SUBSTITUTION",
+    "CORRUPT_OR_UNREADABLE"
+  ],
+  "laws": {
+    "unknown_over_invented": true,
+    "conflict_over_silent_reconciliation": true,
+    "pointer_does_not_become_character_id": true,
+    "generated_output_does_not_become_source": true,
+    "route_does_not_promote": true,
+    "no_overwrite": true,
+    "no_delete_on_ambiguity": true,
+    "sidecar_is_routing_declaration_not_authority": true
+  }
+}
