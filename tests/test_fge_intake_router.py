@@ -1,14 +1,10 @@
-import importlib.util
 import json
 from pathlib import Path
 
+from runtime.intake import fge_intake_router as router
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = REPO_ROOT / "runtime" / "intake" / "fge_intake_router.py"
-SPEC = importlib.util.spec_from_file_location("fge_intake_router", MODULE_PATH)
-router = importlib.util.module_from_spec(SPEC)
-assert SPEC and SPEC.loader
-SPEC.loader.exec_module(router)
 
 
 def make_root(tmp_path):
@@ -20,7 +16,7 @@ def make_root(tmp_path):
     return tmp_path, config_path, config
 
 
-def test_code_routes_with_review_or_better(tmp_path):
+def test_code_routes_with_high_confidence(tmp_path):
     root, _, config = make_root(tmp_path)
     source = root / "intake" / "inbox" / "tool.py"
     source.write_text("print('ok')\n", encoding="utf-8")
@@ -44,12 +40,28 @@ def test_media_without_sidecar_holds_in_public_repo(tmp_path):
     source = root / "intake" / "inbox" / "image.png"
     source.write_bytes(b"not-a-real-png-but-hashable")
     decision = router.plan_decision(source, root, config)
-    assert decision.object_class == "IMAGE"
+    assert decision.physical_class == "IMAGE"
     assert decision.route_state == "HOLD"
-    assert decision.hold_reason == "MEDIA_PUBLICATION_UNVERIFIED"
+    assert decision.hold_reason == "BINARY_PUBLICATION_UNVERIFIED"
 
 
-def test_standard_public_media_with_origin_can_route(tmp_path):
+def test_infographic_image_still_obeys_public_binary_guard(tmp_path):
+    root, _, config = make_root(tmp_path)
+    source = root / "intake" / "inbox" / "private-plate.png"
+    source.write_bytes(b"image-placeholder")
+    sidecar = source.with_name(source.name + ".fge.json")
+    sidecar.write_text(
+        json.dumps({"object_class": "INFOGRAPHIC", "domain": "signals"}),
+        encoding="utf-8",
+    )
+    decision = router.plan_decision(source, root, config)
+    assert decision.object_class == "INFOGRAPHIC_MANIFEST"
+    assert decision.physical_class == "IMAGE"
+    assert decision.route_state == "HOLD"
+    assert decision.hold_reason == "BINARY_PUBLICATION_UNVERIFIED"
+
+
+def test_standard_public_infographic_media_can_route(tmp_path):
     root, _, config = make_root(tmp_path)
     source = root / "intake" / "inbox" / "plate.png"
     source.write_bytes(b"image-placeholder")
@@ -68,8 +80,41 @@ def test_standard_public_media_with_origin_can_route(tmp_path):
     )
     decision = router.plan_decision(source, root, config)
     assert decision.object_class == "INFOGRAPHIC_MANIFEST"
+    assert decision.physical_class == "IMAGE"
     assert decision.route_state == "ROUTE"
     assert "infographics" in decision.destination
+
+
+def test_restricted_media_holds_even_when_public_ok_true(tmp_path):
+    root, _, config = make_root(tmp_path)
+    source = root / "intake" / "inbox" / "restricted.png"
+    source.write_bytes(b"image-placeholder")
+    sidecar = source.with_name(source.name + ".fge.json")
+    sidecar.write_text(
+        json.dumps(
+            {
+                "object_class": "IMAGE",
+                "sensitivity": "INTIMATE_PRIVATE",
+                "age_state": "VERIFIED_ADULT",
+                "public_ok": True,
+                "origin_class": "RAW_SOURCE",
+            }
+        ),
+        encoding="utf-8",
+    )
+    decision = router.plan_decision(source, root, config)
+    assert decision.route_state == "HOLD"
+    assert decision.hold_reason == "SENSITIVE_OR_PRIVATE_MEDIA"
+
+
+def test_binary_document_requires_explicit_public_ok(tmp_path):
+    root, _, config = make_root(tmp_path)
+    source = root / "intake" / "inbox" / "spec.pdf"
+    source.write_bytes(b"pdf-placeholder")
+    decision = router.plan_decision(source, root, config)
+    assert decision.physical_class == "DOCUMENT"
+    assert decision.route_state == "HOLD"
+    assert decision.hold_reason == "BINARY_PUBLICATION_UNVERIFIED"
 
 
 def test_pointer_cannot_substitute_for_character_id(tmp_path):
@@ -104,3 +149,17 @@ def test_apply_moves_source_and_writes_receipt_and_index(tmp_path):
     assert (root / config["index"]).exists()
     receipts = list((root / config["route_receipts"]).glob("*.json"))
     assert len(receipts) == 1
+
+
+def test_existing_destination_is_never_overwritten(tmp_path):
+    root, config_path, config = make_root(tmp_path)
+    source = root / "intake" / "inbox" / "adapter.py"
+    source.write_text("VALUE = 2\n", encoding="utf-8")
+    expected = root / "storage_makeover" / "routed" / "code" / "unclassified" / "adapter.py"
+    expected.parent.mkdir(parents=True)
+    expected.write_text("ORIGINAL\n", encoding="utf-8")
+    events = router.run(root, config_path, apply=True)
+    assert expected.read_text(encoding="utf-8") == "ORIGINAL\n"
+    routed = root / events[0]["final_destination"]
+    assert routed != expected
+    assert routed.read_text(encoding="utf-8") == "VALUE = 2\n"
