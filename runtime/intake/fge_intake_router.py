@@ -2,10 +2,10 @@
 """FGE GitHub Intake Router.
 
 Fail-closed candidate router for files committed under intake/inbox/.
-It preserves source identity, never overwrites a destination, emits receipts,
-and does not promote canon or authority.
+Preserves source identity, never overwrites destinations, emits receipts,
+and never promotes canon or authority.
 
-Default mode is dry-run. Use --apply to move eligible files and append indexes.
+Default mode is DRY_RUN. Use --apply to move eligible files and append indexes.
 """
 from __future__ import annotations
 
@@ -15,13 +15,13 @@ import json
 import mimetypes
 import re
 import shutil
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 ROUTER_OBJECT_ID = "FGE-GITHUB-INTAKE-ROUTER-001"
-ROUTER_VERSION = "0.1.0"
+ROUTER_VERSION = "0.1.1"
 MEDIA_CLASSES = {"IMAGE", "VIDEO"}
 MEDIA_ORIGINS = {"RAW_SOURCE", "EDITED_DERIVATIVE", "GENERATED_OUTPUT", "COMPOSITE"}
 
@@ -32,6 +32,7 @@ class Decision:
     source_path: str
     sha256: str
     mime_type: str
+    physical_class: str
     object_class: str
     confidence: float
     route_state: str
@@ -63,9 +64,9 @@ def load_json(path: Path) -> Dict[str, Any]:
 
 
 def parse_simple_yaml(path: Path) -> Dict[str, Any]:
-    """Parse simple top-level YAML key/value sidecars without external deps.
+    """Parse simple top-level YAML sidecars without external dependencies.
 
-    Complex YAML is intentionally rejected. JSON sidecars are canonical.
+    Complex YAML is deliberately rejected. .fge.json is canonical.
     """
     out: Dict[str, Any] = {}
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -73,7 +74,7 @@ def parse_simple_yaml(path: Path) -> Dict[str, Any]:
         if not line or line.startswith("#"):
             continue
         if line.startswith(("-", "{", "[")) or ": " not in line:
-            raise ValueError("Only simple top-level 'key: value' YAML is supported; use .fge.json for complex metadata")
+            raise ValueError("Complex YAML unsupported; use .fge.json")
         key, value = line.split(":", 1)
         key = key.strip()
         value = value.strip().strip('"').strip("'")
@@ -98,7 +99,7 @@ def find_sidecar(path: Path) -> Tuple[Optional[Path], Dict[str, Any]]:
     ]
     for candidate in candidates:
         if candidate.exists():
-            if candidate.suffix == ".json":
+            if candidate.name.lower().endswith(".fge.json"):
                 return candidate, load_json(candidate)
             return candidate, parse_simple_yaml(candidate)
     return None, {}
@@ -111,8 +112,7 @@ def is_sidecar(path: Path) -> bool:
 
 def read_text_prefix(path: Path, limit: int = 65536) -> str:
     try:
-        data = path.read_bytes()[:limit]
-        return data.decode("utf-8")
+        return path.read_bytes()[:limit].decode("utf-8")
     except (UnicodeDecodeError, OSError):
         return ""
 
@@ -186,43 +186,48 @@ def classify(path: Path, config: Dict[str, Any], sidecar: Dict[str, Any]) -> Tup
     if declared:
         return declared, 1.0, ["SIDECAR_DECLARATION"]
 
-    text = read_text_prefix(path)
-    embedded = embedded_fge_class(text)
+    embedded = embedded_fge_class(read_text_prefix(path))
     if embedded:
         return embedded, 0.98, ["EMBEDDED_FGE_HEADER"]
 
     schema = schema_class(path)
     if schema:
-        return schema, 0.96 if schema in {"PAYLOAD", "RECEIPT", "INFOGRAPHIC_MANIFEST"} else 0.90, ["SCHEMA_MATCH"]
+        score = 0.96 if schema in {"PAYLOAD", "RECEIPT", "INFOGRAPHIC_MANIFEST"} else 0.90
+        return schema, score, ["SCHEMA_MATCH"]
 
     ext_class = extension_class(path, config)
     if ext_class:
-        confidence = 0.95 if ext_class == "CODE" else 0.85
-        return ext_class, confidence, ["MIME_EXTENSION"]
+        score = 0.95 if ext_class == "CODE" else 0.85
+        return ext_class, score, ["MIME_EXTENSION"]
 
     return "UNKNOWN", 0.0, ["NO_SUPPORTED_CLASSIFICATION"]
 
 
-def media_guard(object_class: str, sidecar: Dict[str, Any], config: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
-    if object_class not in MEDIA_CLASSES:
-        return True, None
+def public_repo_guard(physical_class: str, sidecar: Dict[str, Any], config: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     guard = config.get("public_repo_guard", {})
     if not guard.get("enabled", True):
         return True, None
-    if guard.get("media_requires_sidecar", True) and not sidecar:
-        return False, "MEDIA_PUBLICATION_UNVERIFIED"
-    sensitivity = str(sidecar.get("sensitivity", "UNKNOWN")).upper()
-    blocked = {str(x).upper() for x in guard.get("blocked_sensitivity_values", [])}
-    if sensitivity in blocked:
-        return False, "SENSITIVE_OR_PRIVATE_MEDIA"
-    required_sensitivity = str(guard.get("media_requires_sensitivity", "STANDARD")).upper()
-    if sensitivity != required_sensitivity:
-        return False, "MEDIA_PUBLICATION_UNVERIFIED"
-    if guard.get("media_requires_public_ok", True) and sidecar.get("public_ok") is not True:
-        return False, "MEDIA_PUBLICATION_UNVERIFIED"
-    origin = str(sidecar.get("origin_class", "")).upper()
-    if guard.get("media_requires_origin_class", True) and origin not in MEDIA_ORIGINS:
-        return False, "MEDIA_PUBLICATION_UNVERIFIED"
+
+    binary_classes = {str(x).upper() for x in guard.get("binary_classes", [])}
+    if physical_class not in binary_classes:
+        return True, None
+
+    if guard.get("binary_requires_sidecar", True) and not sidecar:
+        return False, "BINARY_PUBLICATION_UNVERIFIED"
+    if guard.get("binary_requires_public_ok", True) and sidecar.get("public_ok") is not True:
+        return False, "BINARY_PUBLICATION_UNVERIFIED"
+
+    if physical_class in MEDIA_CLASSES:
+        sensitivity = str(sidecar.get("sensitivity", "UNKNOWN")).upper()
+        blocked = {str(x).upper() for x in guard.get("blocked_sensitivity_values", [])}
+        if sensitivity in blocked:
+            return False, "SENSITIVE_OR_PRIVATE_MEDIA"
+        required_sensitivity = str(guard.get("media_requires_sensitivity", "STANDARD")).upper()
+        if sensitivity != required_sensitivity:
+            return False, "BINARY_PUBLICATION_UNVERIFIED"
+        origin = str(sidecar.get("origin_class", "")).upper()
+        if guard.get("media_requires_origin_class", True) and origin not in MEDIA_ORIGINS:
+            return False, "BINARY_PUBLICATION_UNVERIFIED"
     return True, None
 
 
@@ -230,10 +235,12 @@ def governance_guard(sidecar: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     entity_state = str(sidecar.get("entity_state", "")).upper()
     if sidecar.get("collision_hold") is True or entity_state in {"AMBIGUOUS", "COLLISION_HOLD"}:
         return False, "COLLISION_HOLD" if sidecar.get("collision_hold") else "ENTITY_AMBIGUOUS"
-    age_state = str(sidecar.get("age_state", "")).upper()
+
     sensitivity = str(sidecar.get("sensitivity", "")).upper()
+    age_state = str(sidecar.get("age_state", "")).upper()
     if sensitivity in {"NUDITY_NONSEXUAL", "NUDITY_SEXUALIZED", "EXPLICIT_SEXUAL", "INTIMATE_PRIVATE"} and age_state not in {"VERIFIED_ADULT", "NOT_APPLICABLE"}:
         return False, "AGE_OR_CONSENT_UNCERTAIN"
+
     primary = sidecar.get("primary_character_id")
     pointer = sidecar.get("enterprise_asset_pointer")
     if primary and pointer and str(primary) == str(pointer):
@@ -264,11 +271,8 @@ def decision_fingerprint(file_sha: str, sidecar: Dict[str, Any]) -> str:
 
 
 def choose_destination(path: Path, object_class: str, config: Dict[str, Any], sidecar: Dict[str, Any]) -> Optional[str]:
-    destinations = config.get("destinations", {})
-    route_class = object_class
-    if object_class in MEDIA_CLASSES:
-        route_class = "PUBLIC_MEDIA"
-    base = destinations.get(route_class)
+    route_class = "PUBLIC_MEDIA" if object_class in MEDIA_CLASSES else object_class
+    base = config.get("destinations", {}).get(route_class)
     if not base:
         return None
     domain = str(sidecar.get("domain", "unclassified")).strip().lower().replace(" ", "_") or "unclassified"
@@ -280,20 +284,22 @@ def plan_decision(path: Path, root: Path, config: Dict[str, Any]) -> Decision:
     file_sha = sha256_file(path)
     mime_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
     sidecar_path, sidecar = find_sidecar(path)
+    physical_class = extension_class(path, config) or "UNKNOWN"
     object_class, confidence, basis = classify(path, config, sidecar)
+    basis = list(basis) + [f"PHYSICAL_CLASS:{physical_class}"]
     fp = decision_fingerprint(file_sha, sidecar)
     drop_id = f"FGE-DROP-{file_sha[:16].upper()}"
 
     ok, reason = governance_guard(sidecar)
     if ok:
-        ok, reason = media_guard(object_class, sidecar, config)
+        ok, reason = public_repo_guard(physical_class, sidecar, config)
 
     thresholds = config.get("thresholds", {})
     auto_route = float(thresholds.get("auto_route", 0.90))
     review_route = float(thresholds.get("route_and_review", 0.70))
-
     destination: Optional[str] = None
     attention = False
+
     if not ok:
         state = "HOLD"
         attention = True
@@ -318,6 +324,7 @@ def plan_decision(path: Path, root: Path, config: Dict[str, Any]) -> Decision:
         source_path=str(path.relative_to(root)),
         sha256=file_sha,
         mime_type=mime_type,
+        physical_class=physical_class,
         object_class=object_class,
         confidence=round(confidence, 3),
         route_state=state,
@@ -334,7 +341,12 @@ def unique_destination(root: Path, rel: str, file_sha: str) -> Path:
     target = root / rel
     if not target.exists():
         return target
-    return target.with_name(f"{target.stem}__{file_sha[:8]}{target.suffix}")
+    stem, suffix = target.stem, target.suffix
+    for n in range(1, 10000):
+        candidate = target.with_name(f"{stem}__{file_sha[:8]}_{n}{suffix}")
+        if not candidate.exists():
+            return candidate
+    raise RuntimeError("Unable to allocate non-overwriting destination")
 
 
 def append_jsonl(path: Path, row: Dict[str, Any]) -> None:
@@ -343,10 +355,29 @@ def append_jsonl(path: Path, row: Dict[str, Any]) -> None:
         fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
 
 
+def sidecar_target_name(target: Path, sidecar_path: Path) -> Path:
+    lower = sidecar_path.name.lower()
+    if lower.endswith(".fge.json"):
+        ext = ".fge.json"
+    elif lower.endswith(".fge.yaml"):
+        ext = ".fge.yaml"
+    else:
+        ext = ".fge.yml"
+    candidate = target.with_name(target.name + ext)
+    if not candidate.exists():
+        return candidate
+    for n in range(1, 10000):
+        alt = target.with_name(f"{target.name}__sidecar_{n}{ext}")
+        if not alt.exists():
+            return alt
+    raise RuntimeError("Unable to allocate sidecar destination")
+
+
 def write_receipt(root: Path, config: Dict[str, Any], decision: Decision, final_destination: Optional[str]) -> Path:
     receipt_dir = root / config["route_receipts"]
     receipt_dir.mkdir(parents=True, exist_ok=True)
-    receipt_id = f"FGE-RCPT-ROUTE-{decision.drop_id.removeprefix('FGE-DROP-')}"
+    short = decision.drop_id.removeprefix("FGE-DROP-")
+    receipt_id = f"FGE-RCPT-ROUTE-{short}-{decision.decision_fingerprint[:8].upper()}"
     receipt = {
         "receipt_id": receipt_id,
         "router_object_id": ROUTER_OBJECT_ID,
@@ -360,6 +391,8 @@ def write_receipt(root: Path, config: Dict[str, Any], decision: Decision, final_
         "storage_promotion": False,
     }
     out = receipt_dir / f"{receipt_id}.json"
+    if out.exists():
+        raise RuntimeError(f"Receipt already exists: {out}")
     out.write_text(json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return out
 
@@ -374,10 +407,7 @@ def route_file(path: Path, root: Path, config: Dict[str, Any], decision: Decisio
             sidecar_path, _ = find_sidecar(path)
             shutil.move(str(path), str(target))
             if sidecar_path and sidecar_path.exists():
-                sidecar_target = target.with_name(target.name + sidecar_path.name[len(path.name):]) if sidecar_path.name.startswith(path.name) else target.with_name(target.stem + sidecar_path.name[len(path.stem):])
-                if sidecar_target.exists():
-                    sidecar_target = sidecar_target.with_name(sidecar_target.stem + f"__{decision.sha256[:8]}" + sidecar_target.suffix)
-                shutil.move(str(sidecar_path), str(sidecar_target))
+                shutil.move(str(sidecar_path), str(sidecar_target_name(target, sidecar_path)))
 
     event = {
         "timestamp": utc_now(),
@@ -385,14 +415,14 @@ def route_file(path: Path, root: Path, config: Dict[str, Any], decision: Decisio
         **asdict(decision),
         "final_destination": final_destination,
     }
-
     if apply:
         append_jsonl(root / config["index"], event)
         if decision.attention_required:
+            short = decision.drop_id.removeprefix("FGE-DROP-")
             append_jsonl(
                 root / config["attention_queue"],
                 {
-                    "event_id": f"FGE-ATTN-{decision.drop_id.removeprefix('FGE-DROP-')}",
+                    "event_id": f"FGE-ATTN-{short}-{decision.decision_fingerprint[:8].upper()}",
                     "object_ref": decision.drop_id,
                     "object_type": decision.object_class,
                     "reason": [decision.hold_reason or "ROUTE_REVIEW_REQUIRED"],
@@ -414,9 +444,28 @@ def iter_inbox_files(inbox: Path) -> Iterable[Path]:
     return (
         p
         for p in sorted(inbox.rglob("*"))
-        if p.is_file()
-        and p.name not in {"README.md", ".gitkeep"}
-        and not is_sidecar(p)
+        if p.is_file() and p.name not in {"README.md", ".gitkeep"} and not is_sidecar(p)
+    )
+
+
+def error_decision(path: Path, root: Path, exc: Exception) -> Decision:
+    file_sha = sha256_file(path) if path.exists() else "UNKNOWN"
+    fp = hashlib.sha256(f"{file_sha}|ERROR|{type(exc).__name__}".encode()).hexdigest()
+    return Decision(
+        drop_id=f"FGE-DROP-{file_sha[:16].upper()}",
+        source_path=str(path.relative_to(root)),
+        sha256=file_sha,
+        mime_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
+        physical_class="UNKNOWN",
+        object_class="UNKNOWN",
+        confidence=0.0,
+        route_state="HOLD",
+        destination=None,
+        hold_reason="CORRUPT_OR_UNREADABLE",
+        decision_basis=[f"ERROR:{type(exc).__name__}"],
+        sidecar_path=None,
+        decision_fingerprint=fp,
+        attention_required=True,
     )
 
 
@@ -428,24 +477,8 @@ def run(root: Path, config_path: Path, apply: bool) -> list[Dict[str, Any]]:
     for path in iter_inbox_files(inbox):
         try:
             decision = plan_decision(path, root, config)
-        except Exception as exc:  # Fail closed and keep source untouched.
-            file_sha = sha256_file(path) if path.exists() else "UNKNOWN"
-            fp = hashlib.sha256(f"{file_sha}|ERROR|{type(exc).__name__}".encode()).hexdigest()
-            decision = Decision(
-                drop_id=f"FGE-DROP-{file_sha[:16].upper()}",
-                source_path=str(path.relative_to(root)),
-                sha256=file_sha,
-                mime_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
-                object_class="UNKNOWN",
-                confidence=0.0,
-                route_state="HOLD",
-                destination=None,
-                hold_reason="CORRUPT_OR_UNREADABLE",
-                decision_basis=[f"ERROR:{type(exc).__name__}"],
-                sidecar_path=None,
-                decision_fingerprint=fp,
-                attention_required=True,
-            )
+        except Exception as exc:  # Fail closed and keep the source untouched.
+            decision = error_decision(path, root, exc)
         if decision.decision_fingerprint in seen:
             continue
         events.append(route_file(path, root, config, decision, apply=apply))
@@ -463,8 +496,7 @@ def main() -> int:
     args = parser.parse_args()
 
     root = Path(args.repo_root).resolve()
-    config_path = (root / args.config).resolve()
-    events = run(root, config_path, apply=args.apply)
+    events = run(root, (root / args.config).resolve(), apply=args.apply)
     summary = {
         "router_object_id": ROUTER_OBJECT_ID,
         "version": ROUTER_VERSION,
@@ -478,7 +510,10 @@ def main() -> int:
     if args.json:
         print(json.dumps(summary, indent=2, ensure_ascii=False))
     else:
-        print(f"FGE intake router {summary['mode']}: processed={summary['processed']} routed={summary['routed']} review={summary['routed_with_review']} held={summary['held']}")
+        print(
+            f"FGE intake router {summary['mode']}: processed={summary['processed']} "
+            f"routed={summary['routed']} review={summary['routed_with_review']} held={summary['held']}"
+        )
         for event in events:
             print(f"- {event['source_path']} -> {event['route_state']} {event.get('final_destination') or event.get('hold_reason')}")
     return 0
