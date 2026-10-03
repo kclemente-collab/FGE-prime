@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/schema/payloads/runtime_customization_parameters.json",
+  "title": "FGE Runtime Customization Parameters",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rgba_control_texture_uri", "max_pattern_tiling_scale", "color_tints", "pattern_overlays"],
+  "properties": {
+    "rgba_control_texture_uri": {"type": ["string", "null"]},
+    "max_pattern_tiling_scale": {"type": "number", "exclusiveMinimum": 0},
+    "color_tints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["channel", "semantic", "default_hex", "runtime_override_allowed"],
+        "properties": {
+          "channel": {"enum": ["R", "G", "B", "A"]},
+          "semantic": {"enum": ["PRIMARY_TEXTILE", "SECONDARY_ACCENT", "RIGID_HARDWARE", "ROUGHNESS_WEAR"]},
+          "default_hex": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+          "runtime_override_allowed": {"type": "boolean"},
+          "vector3": {
+            "type": "array",
+            "prefixItems": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "number", "minimum": 0, "maximum": 1}, {"type": "number", "minimum": 0, "maximum": 1}],
+            "items": false
+          }
+        }
+      }
+    },
+    "pattern_overlays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pattern_id", "tiling_frequency", "uv_channel_index", "offset_speed", "blend_mode"],
+        "properties": {
+          "pattern_id": {"type": "string", "minLength": 1},
+          "tiling_frequency": {"type": "array", "prefixItems": [{"type": "number", "exclusiveMinimum": 0}, {"type": "number", "exclusiveMinimum": 0}], "items": false},
+          "uv_channel_index": {"type": "integer", "minimum": 0, "maximum": 7},
+          "offset_speed": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "items": false},
+          "blend_mode": {"enum": ["LERP_BASE_COLOR", "LERP_SUBSTRATE_SLAB_ROUGHNESS", "MULTIPLY", "OVERLAY"]}
+        }
+      }
+    }
+  }
+}

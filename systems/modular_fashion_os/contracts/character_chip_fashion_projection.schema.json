@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/contracts/character_chip_fashion_projection.schema.json",
+  "title": "FGE Character Chip Fashion Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["object_id", "schema_version", "character_ref", "embodiment", "wardrobe_authority", "active_wardrobe"],
+  "properties": {
+    "object_id": {"const": "FGE-CHARACTER-CHIP-FASHION-PROJECTION-001"},
+    "schema_version": {"const": "1.0.0"},
+    "character_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "version", "authority"],
+      "properties": {
+        "object_id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "authority": {"type": "string", "minLength": 1}
+      }
+    },
+    "embodiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rig_profile_id", "body_profile_id"],
+      "properties": {
+        "rig_profile_id": {"type": "string", "minLength": 1},
+        "body_profile_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "wardrobe_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "allowed_asset_classes", "forbidden_asset_ids", "max_layer_priority"],
+      "properties": {
+        "status": {"enum": ["AUTHORIZED", "LOCKED", "SUSPENDED", "UNKNOWN"]},
+        "allowed_asset_classes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["GARMENT", "ACCESSORY", "FOOTWEAR", "JEWELRY", "ARMOR", "OTHER"]}
+        },
+        "forbidden_asset_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "max_layer_priority": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "active_wardrobe": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_ref", "layer_class", "layer_priority", "coverage"],
+        "properties": {
+          "asset_ref": {"type": "string", "minLength": 1},
+          "layer_class": {"type": "string", "minLength": 1},
+          "layer_priority": {"type": "integer", "minimum": 0, "maximum": 100},
+          "coverage": {
+            "type": "object",
+            "additionalProperties": {"enum": ["COVER", "PARTIAL", "OPEN", "UNKNOWN"]}
+          }
+        }
+      }
+    }
+  }
+}

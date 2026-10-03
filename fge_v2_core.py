@@ -4,9 +4,6 @@ from typing import List, Dict, Optional
 from pydantic import BaseModel, Field, field_validator
 from fastapi import FastAPI, HTTPException
 
-# ==========================================
-# 1. STANDARDIZED DATA MODELS (SCHEMA)
-# ==========================================
 class MaterialMatrix(BaseModel):
     primary: str
     secondary: Optional[str] = None
@@ -27,7 +24,6 @@ class PaletteEngine(BaseModel):
         return v
 
 class SubSurfaceCyberware(BaseModel):
-    """The brand new Layer Type: Internal Technical Embellishments"""
     node_id: str = Field(..., description="Unique anatomical sub-surface node ID")
     luminescence: bool = Field(False, description="Sub-dermal glowing state")
     circuit_material: str = Field(..., description="e.g., Liquid Gold, Graphene Threads")
