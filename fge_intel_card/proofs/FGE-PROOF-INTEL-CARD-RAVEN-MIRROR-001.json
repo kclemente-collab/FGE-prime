@@ -1,0 +1,52 @@
+{
+  "proof_id": "FGE-PROOF-INTEL-CARD-RAVEN-MIRROR-001",
+  "test_id": "T01_BASELINE",
+  "status": "PASS",
+  "target_card": "FGE-CARD-RAVEN-001@0.1.1",
+  "operation": "CARD.MIRROR",
+  "source_binding": {
+    "anchor_id": "SB_330",
+    "character_id": "FGE-CHAR-002",
+    "repository": "kclemente-collab/FGE-prime",
+    "path": "book_raven.py",
+    "source_commit": "f594da7db811d4b66c1aad119a37877bc3a2c1df",
+    "source_fetch_evidence": "turn4file0"
+  },
+  "executor": {
+    "boundary": "MIRROR_EXECUTOR",
+    "input_authority": "source_binding_only",
+    "output_kind": "CHARACTER_MIRROR_EVIDENCE",
+    "mutates_source": false,
+    "canon_effect": "NONE",
+    "authority_effect": "NONE"
+  },
+  "validation": {
+    "boundary": "MIRROR_VALIDATOR",
+    "checks": {
+      "card_id_exact": true,
+      "route_exact": true,
+      "source_anchor_exact": true,
+      "source_character_id_exact": true,
+      "source_provenance_mentions_anchor": true,
+      "source_subject_raven": true,
+      "no_source_mutation": true,
+      "canon_effect_none": true,
+      "authority_effect_none": true
+    },
+    "verdict": "PASS"
+  },
+  "receipt_gate": {
+    "requires_executor_evidence": true,
+    "requires_validator_pass": true,
+    "synthetic_receipt_forbidden": true,
+    "gate": "OPEN"
+  },
+  "mirror_output": {
+    "subject": "RAVEN VOSS",
+    "anchor": "SB_330",
+    "character_id": "FGE-CHAR-002",
+    "authority_projection": "BOUND_REFERENCE_ONLY"
+  },
+  "timestamp_utc": "2026-09-18T12:33:32.178857+00:00",
+  "promotion": false
+}
