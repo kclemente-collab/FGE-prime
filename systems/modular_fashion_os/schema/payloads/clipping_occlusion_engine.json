@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fge.local/schema/payloads/clipping_occlusion_engine.json",
+  "title": "FGE Clipping and Occlusion Execution Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["layer_stacking_priority", "alpha_mask_registry", "runtime_vertex_push_matrix"],
+  "properties": {
+    "layer_stacking_priority": {"type": "integer", "minimum": 0, "maximum": 100},
+    "alpha_mask_registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skin_zones_to_hide", "lower_assets_to_mask"],
+      "properties": {
+        "skin_zones_to_hide": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "lower_assets_to_mask": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "runtime_vertex_push_matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "collision_channel", "push_out_distance_mm", "normal_offset_falloff_power"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "collision_channel": {"type": "string", "minLength": 1},
+        "push_out_distance_mm": {"type": "number", "minimum": 0, "maximum": 25},
+        "normal_offset_falloff_power": {"type": "number", "exclusiveMinimum": 0}
+      }
+    }
+  }
+}
