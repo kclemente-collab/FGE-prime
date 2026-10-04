@@ -1,0 +1,13 @@
+{
+  "objectId": "FGE-CARD-RAVEN-001",
+  "version": "0.1.1",
+  "class": "INTELLIGENCE_CARD_RUNTIME_PROJECTION",
+  "status": "PROPOSED / FIRST_REAL_PROOF",
+  "sourceObjectId": "SB_330",
+  "eventRoutes": {
+    "CARD.MIRROR": "MIRROR_EXECUTOR"
+  },
+  "automationEnabled": false,
+  "canonEffect": "NONE",
+  "authorityEffect": "NONE"
+}
