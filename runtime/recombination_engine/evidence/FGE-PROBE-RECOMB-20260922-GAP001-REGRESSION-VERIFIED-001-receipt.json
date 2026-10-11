@@ -1,0 +1,56 @@
+{
+  "authoritative_regression_suite": {
+    "designation": "EXPLICIT_DIRECTOR_AUTHORIZATION_THIS_CYCLE",
+    "object_id": "FGE-RECOMBINATION-REGRESSION-001@0.1.0",
+    "pass_rate": 1.0,
+    "sha256": "e8990f2c63eafec8b8ea3e97f26c9356ede0f5b34a6c6cc69f7385635a6fd490",
+    "tests_failed": 0,
+    "tests_passed": 11,
+    "tests_total": 11,
+    "unchanged_during_execution": true
+  },
+  "class": "PROJECT_PROBE_SECTION_J_REGRESSION_RECEIPT",
+  "firebreak": {
+    "authority_effect": "NONE",
+    "canon_effect": "NONE",
+    "source_unchanged": true
+  },
+  "gap_001": "CLOSED",
+  "negative_control_repeat": {
+    "run_1": {
+      "details": {
+        "canon_effect": "NONE",
+        "projection_blocked": true,
+        "validation_status": "FAILED"
+      },
+      "name": "negative_control",
+      "status": "PASS"
+    },
+    "run_2": {
+      "details": {
+        "canon_effect": "NONE",
+        "projection_blocked": true,
+        "validation_status": "FAILED"
+      },
+      "name": "negative_control",
+      "status": "PASS"
+    },
+    "semantics_identical": true
+  },
+  "object_id": "FGE-PROBE-RECOMB-20260922-GAP001-REGRESSION-VERIFIED-001",
+  "project_probe_section_j": {
+    "after": "REGRESSION_VERIFIED",
+    "before": "DETERMINISTIC",
+    "production_validated": false,
+    "reason": "Authoritatively designated regression suite executed unchanged at 100% pass; negative control repeated; replay output hash identical; canon and authority effects NONE.",
+    "regression_verified": true
+  },
+  "replay": {
+    "baseline_output_sha256": "c39a990a0e1af57a1e0614e0bbc345fee925e913cb5e417c15afe66c101e6203",
+    "identical_output_hash": true,
+    "replay_output_sha256": "c39a990a0e1af57a1e0614e0bbc345fee925e913cb5e417c15afe66c101e6203"
+  },
+  "status": "PASS",
+  "target_object": "FGE-RECOMBINATION-ENGINE-001@0.1.0",
+  "target_sha256": "269232700cb8ba1de66c3033e4b25a897c9d0ebadcc0d9fcf8ce58960bac590d"
+}

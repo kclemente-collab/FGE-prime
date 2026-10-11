@@ -1,0 +1,143 @@
+name: FGE Recombination Regression Verification
+
+on:
+  pull_request:
+    paths:
+      - "runtime/recombination_engine/**"
+      - ".github/workflows/fge-recombination-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression-verified:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify frozen source and suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime/recombination_engine
+          SOURCE_EXPECTED="269232700cb8ba1de66c3033e4b25a897c9d0ebadcc0d9fcf8ce58960bac590d"
+          SUITE_EXPECTED="e8990f2c63eafec8b8ea3e97f26c9356ede0f5b34a6c6cc69f7385635a6fd490"
+          SOURCE_ACTUAL="$(sha256sum fge_recombination_engine.py | awk '{print $1}')"
+          SUITE_ACTUAL="$(sha256sum FGE-RECOMBINATION-REGRESSION-001.py | awk '{print $1}')"
+          test "$SOURCE_ACTUAL" = "$SOURCE_EXPECTED"
+          test "$SUITE_ACTUAL" = "$SUITE_EXPECTED"
+
+      - name: Run authoritative suite unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .fge_evidence/recombination_regression
+          cd runtime/recombination_engine
+          python FGE-RECOMBINATION-REGRESSION-001.py \
+            --case all \
+            --json-out ../../.fge_evidence/recombination_regression/full.json
+
+      - name: Repeat negative control
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime/recombination_engine
+          python FGE-RECOMBINATION-REGRESSION-001.py \
+            --case negative_control \
+            --json-out ../../.fge_evidence/recombination_regression/negative-1.json
+          python FGE-RECOMBINATION-REGRESSION-001.py \
+            --case negative_control \
+            --json-out ../../.fge_evidence/recombination_regression/negative-2.json
+
+      - name: Replay authoritative suite unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runtime/recombination_engine
+          python FGE-RECOMBINATION-REGRESSION-001.py \
+            --case all \
+            --json-out ../../.fge_evidence/recombination_regression/replay.json
+
+      - name: Verify proof boundary and emit receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          runtime = root / 'runtime' / 'recombination_engine'
+          evidence = root / '.fge_evidence' / 'recombination_regression'
+
+          SOURCE_EXPECTED = '269232700cb8ba1de66c3033e4b25a897c9d0ebadcc0d9fcf8ce58960bac590d'
+          SUITE_EXPECTED = 'e8990f2c63eafec8b8ea3e97f26c9356ede0f5b34a6c6cc69f7385635a6fd490'
+          OUTPUT_EXPECTED = 'c39a990a0e1af57a1e0614e0bbc345fee925e913cb5e417c15afe66c101e6203'
+
+          def sha(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def load(name):
+              return json.loads((evidence / name).read_text(encoding='utf-8'))
+
+          full = load('full.json')
+          neg1 = load('negative-1.json')
+          neg2 = load('negative-2.json')
+          replay = load('replay.json')
+
+          assert sha(runtime / 'fge_recombination_engine.py') == SOURCE_EXPECTED
+          assert sha(runtime / 'FGE-RECOMBINATION-REGRESSION-001.py') == SUITE_EXPECTED
+          assert full['pass_rate'] == 1.0 and full['failed'] == 0
+          assert replay['pass_rate'] == 1.0 and replay['failed'] == 0
+          assert full['canon_effect'] == 'NONE'
+          assert replay['canon_effect'] == 'NONE'
+          assert full['authority_effect'] == 'NONE'
+          assert replay['authority_effect'] == 'NONE'
+
+          def case(summary, name):
+              return next(item for item in summary['results'] if item['name'] == name)
+
+          n1 = case(neg1, 'negative_control')
+          n2 = case(neg2, 'negative_control')
+          assert n1['status'] == 'PASS' and n2['status'] == 'PASS'
+          assert n1['details'] == n2['details']
+          assert n1['details']['validation_status'] == 'FAILED'
+          assert n1['details']['projection_blocked'] is True
+
+          full_out = case(full, 'differential_projection')['details']['output_sha256']
+          replay_out = case(replay, 'differential_projection')['details']['output_sha256']
+          assert full_out == replay_out == OUTPUT_EXPECTED
+
+          receipt = {
+              'object_id': 'FGE-REGRESSION-VERIFICATION-RUNTIME-RECEIPT-001',
+              'process': 'FGE-REGRESSION-VERIFICATION-PROCESS-001@0.1.0',
+              'target': 'FGE-RECOMBINATION-ENGINE-001@0.1.0',
+              'status': 'PASS',
+              'project_probe_section_j': 'REGRESSION_VERIFIED',
+              'production_validated': False,
+              'source_sha256': SOURCE_EXPECTED,
+              'suite_sha256': SUITE_EXPECTED,
+              'output_sha256': OUTPUT_EXPECTED,
+              'suite_pass_rate': 1.0,
+              'negative_control_repeat_identical': True,
+              'replay_hash_identical': True,
+              'canon_effect': 'NONE',
+              'authority_effect': 'NONE',
+              'terminal': 'STOP',
+          }
+          (evidence / 'runtime-receipt.json').write_text(
+              json.dumps(receipt, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
+      - name: Publish regression verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-recombination-regression-${{ github.run_id }}
+          path: .fge_evidence/recombination_regression
+          if-no-files-found: error
