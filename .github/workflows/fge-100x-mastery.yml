@@ -1,0 +1,33 @@
+name: FGE 100X Mastery | Governed Mock Validation
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'automation/fge-100x/**'
+      - '.github/workflows/fge-100x-mastery.yml'
+  schedule:
+    - cron: '0 12 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: fge-100x-mastery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate governed mock scenarios
+        run: python automation/fge-100x/run.py
+      - name: Upload immutable run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fge-100x-receipt-${{ github.run_id }}
+          path: automation/fge-100x/results/
+          if-no-files-found: warn
+          retention-days: 90
