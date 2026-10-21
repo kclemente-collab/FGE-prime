@@ -147,6 +147,13 @@ def plate(p, pageno):
 
 def centerfold():
     c = D.CENTERFOLD
+    centerfold_cards = "".join(
+        f"<div style='border-left:2px solid {GOLD};padding-left:16px;'>"
+        f"<div class='disp' style='font-size:24px;color:{GOLD_HI};'>{t}</div>"
+        f"<div style='font-size:14px;color:#dcd6c8;opacity:.85;max-width:180px;'>{d}</div>"
+        "</div>"
+        for t, d in [c["left"], c["mid"], c["right"]]
+    )
     return f"""
 <div class="spread">
   <img src="{b64(c['image'])}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">
@@ -164,7 +171,7 @@ def centerfold():
     <p class="disp" style="font-size:23px;font-style:italic;line-height:1.5;color:#efe9da;">{c['fragment']}</p>
   </div>
   <div style="position:absolute;bottom:120px;left:90px;right:90px;z-index:6;display:flex;gap:60px;justify-content:flex-start;">
-    {''.join(f"<div style='border-left:2px solid {GOLD};padding-left:16px;'><div class=\"disp\" style=\"font-size:24px;color:{GOLD_HI};\">{t}</div><div style=\"font-size:14px;color:#dcd6c8;opacity:.85;max-width:180px;\">{d}</div></div>" for t,d in [c['left'],c['mid'],c['right']])}
+    {centerfold_cards}
   </div>
   <div class="wm" style="font-size:420px;left:50%;">FGE</div>
 </div>"""
