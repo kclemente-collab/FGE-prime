@@ -1,0 +1,30 @@
+---
+---
+@import "{{ site.theme }}";
+:root{color-scheme:dark}
+body{background:#08090b;color:#d9d5cc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#header{background:#0c0c0d;border-bottom:1px solid #43371d}
+.wrapper{max-width:1100px}
+section{max-width:1100px}
+h1,h2,h3{color:#f3e5c3;text-shadow:none}
+a{color:#d8b978}
+a:hover{color:#ffe4a6}
+.fge-kicker,.fge-label{color:#c9a55e;letter-spacing:.18em;font-size:.7rem;font-weight:750}
+.fge-kicker{margin:2rem 0 1rem}
+.fge-hero-title{font-size:clamp(2rem,6vw,3.8rem);line-height:1.07;letter-spacing:-.035em;margin:.6rem 0 1.2rem;color:#f7f4ed}
+.fge-hero-title span{color:#c9a55e}
+.fge-lead{max-width:770px;color:#b5b5b5;font-size:1.08rem;line-height:1.7}
+.fge-status{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;border:1px solid #68522b;background:#17140e;padding:1rem 1.2rem;border-radius:10px;color:#e7c785;font-size:.78rem;font-weight:700;letter-spacing:.08em;margin:2rem 0}
+.fge-pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:#d1a24e;box-shadow:0 0 0 4px #d1a24e25}
+.fge-sep{color:#766449}
+.fge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.5rem 0}
+.fge-panel,.fge-spine,.fge-footer-panel{background:linear-gradient(145deg,#18191b,#0d0e10);border:1px solid #34312b;border-radius:14px;padding:1.5rem;box-shadow:0 8px 30px #0005}
+.fge-panel h2{font-size:1.4rem;margin:.65rem 0 1rem;color:#f5eee0}
+.fge-panel p,.fge-spine p,.fge-footer-panel p{color:#aaa9a7;line-height:1.7}
+.fge-panel strong{color:#d8b978}
+.fge-chip{display:inline-block;color:#d7b877;border:1px solid #56472d;border-radius:30px;padding:.3rem .65rem;font-size:.7rem;margin-top:.8rem}
+.fge-spine,.fge-footer-panel{margin:1rem 0}
+.fge-stages{display:flex;gap:.45rem;flex-wrap:wrap;margin:1.3rem 0}
+.fge-stages span{flex:1 1 100px;text-align:center;background:#22201b;border:1px solid #53472f;border-radius:8px;padding:.7rem .4rem;font-size:.7rem;color:#ead6a9;font-weight:700;letter-spacing:.04em}
+.fge-footer-panel code{overflow-wrap:anywhere;color:#cdb37c;background:#141414;padding:.2rem .3rem}
+@media(max-width:650px){.fge-grid{grid-template-columns:1fr}.fge-panel,.fge-spine,.fge-footer-panel{padding:1.15rem}.fge-status{font-size:.68rem}}
