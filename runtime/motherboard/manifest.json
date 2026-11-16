@@ -1,0 +1,61 @@
+{
+  "object_id": "FGE-GITHUB-MOTHERBOARD-RUNTIME-001",
+  "version": "0.1.0",
+  "state": "CANDIDATE",
+  "authority": "PROPOSE_ONLY",
+  "director_veto": true,
+  "canon_effect": "NONE",
+  "provenance": {
+    "source": "FGE_Local_Motherboard_Install_v0.1.0.zip",
+    "source_bytes_published": false,
+    "source_hash": "NOT_PUBLISHED",
+    "source_verification": "LOCAL_ONLY_NOT_REMOTE_ATTESTED"
+  },
+  "architecture": {
+    "compiler": "FGE-ADAPT-UNIFIED-LAYER-BINDING-001@0.2.0",
+    "network": "FGE-THREAD-NETWORK-ADAPTER-001@0.1.0",
+    "stages": [
+      "INGEST",
+      "RESOLVE",
+      "GENOME",
+      "SEED",
+      "RENDER",
+      "SHIP"
+    ],
+    "ports": [
+      "L01_SOURCE_IDENTITY",
+      "L02_HEART_BRAIN",
+      "L03_SCHEMA_AUTOFACTORY",
+      "L04_LINKBASE_HARNESS",
+      "L05_ATLAS_BRAINDOC",
+      "L06_PRODUCTION_MIRROR",
+      "L07_DELIVERY_RECEIPT"
+    ],
+    "declared_character_references": 4,
+    "candidate_connections": 8
+  },
+  "gates": {
+    "identity": "HOLD",
+    "schema": "HOLD",
+    "authority": "HOLD",
+    "compatibility": "HOLD",
+    "output_proof": "HOLD"
+  },
+  "missing": [
+    "AUTHORITATIVE_CHARACTER_ID",
+    "HB_MASTER",
+    "EXACT_PROVIDER_CONSUMER_INTERFACES",
+    "IMAGE_BYTES",
+    "EXTERNAL_REGISTRY_COMMIT",
+    "INDEPENDENT_RUNTIME_ATTESTATION"
+  ],
+  "activation": {
+    "live_dispatch": false,
+    "canon_write": false,
+    "external_registry_write": false,
+    "leases_activated": 0
+  },
+  "release_gate": "HOLD",
+  "execution_state": "NOT_EXECUTED",
+  "source_disclosure": "PUBLIC_METADATA_ONLY"
+}
