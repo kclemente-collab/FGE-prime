@@ -1,0 +1,8 @@
+title: FGE Motherboard
+subtitle: CharacterOS Readiness Console
+description: Public, read-only candidate status dashboard. Not a live character registry.
+theme: jekyll-theme-midnight
+show_downloads: false
+exclude:
+  - tests
+  - runtime/motherboard/preflight.py

@@ -1,0 +1,36 @@
+name: FGE Motherboard Read-only Preflight
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'runtime/motherboard/**'
+      - 'tests/test_fge_runtime.py'
+      - '.github/workflows/fge-motherboard-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public candidate contracts
+        shell: bash
+        run: |
+          python3 -m unittest discover -s tests -p 'test_fge_runtime.py' -v
+          python3 runtime/motherboard/preflight.py > preflight_receipt.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads(Path('preflight_receipt.json').read_text())
+          assert r['structural_result']=='PASS', r
+          assert r['release_gate']=='HOLD', r
+          assert r['runtime_attestation']=='NOT_PROVEN', r
+          assert r['canon_write'] is False and r['external_dispatches']==0, r
+          summary=(f"## FGE Motherboard Public Preflight\\n"
+                   f"Checks: {r['passed']}/{r['total']}\\n\\n"
+                   f"Release: **{r['release_gate']}**\\n\\n"
+                   "Sanitized metadata only; source bytes and live execution not attested.\\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write(summary)
+          print(summary)
+          PY
