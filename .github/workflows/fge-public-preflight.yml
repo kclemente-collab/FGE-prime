@@ -1,0 +1,17 @@
+name: FGE Public Synthetic Preflight
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'runtime/public/**'
+      - '.github/workflows/fge-public-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fail-closed synthetic contract checks
+        run: python3 runtime/public/validate.py
