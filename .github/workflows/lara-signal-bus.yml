@@ -35,6 +35,9 @@ jobs:
           python -m pip install --disable-pip-version-check pytest
           pytest -q journalist/signal_bus/test_bus.py
 
+      - name: Test source emitter adapters
+        run: python -m unittest discover -s journalist/signal_bus -p test_emitters.py -v
+
       - name: Process dispatch register
         run: python journalist/signal_bus/bus.py run
 
